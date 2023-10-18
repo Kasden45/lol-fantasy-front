@@ -1,7 +1,7 @@
 <template>
-    <div id="panel">
+    <div id="panel" class="justify-content-center">
 
-        <div class="row w-80 mb-1">
+        <div class="row w-80 mb-1 ">
             <label class="form-label text-start text-white fw-bolder" for="login-mail">Adres e-mail:</label>
             <input
                 id="login-mail"
@@ -206,10 +206,7 @@ export default {
             }
             const url = `${this.apiURL}User/login`
             this.axios.post(url, data).then((response) => {
-                this.$store.commit('setToken', response.data['jwt']);
                 this.$store.commit('setProfileId', response.data);
-                localStorage.setItem('token', response.data.jwt)
-                this.$store.commit('setEmail', this.email);
                 this.getUserInfo()
                 this.$router.push({name: 'LeaguesView'})
                 this.clearInputs()

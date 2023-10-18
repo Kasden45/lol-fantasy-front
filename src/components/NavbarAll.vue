@@ -1,7 +1,7 @@
 <template>
     <nav class="navbar navbar-expand-md navbar-light bg-white sticky-top">
       <div class="container">
-        <a class="navbar-brand" href="#">Worlds 2023 Fantasy2KPI</a>
+        <a class="navbar-brand">Worlds 2023 Fantasy2KPI</a>
         <button
           class="navbar-toggler"
           type="button"
@@ -26,12 +26,20 @@
             <li class="nav-item pe-3">
               <router-link
                 class="nav-link"
+                :class="{ active: this.$route.name === 'Home' }"
+                :to="{ name: 'Home' }"
+                >Home</router-link
+              >
+            </li>
+            <li class="nav-item pe-3" v-if="(this.$store.getters.getProfileId != null && this.$store.getters.getProfileId != '')">
+              <router-link
+                class="nav-link"
                 :class="{ active: this.$route.name === 'TeamSelection' }"
                 :to="{ name: 'TeamSelection' }"
                 >Team Selection</router-link
               >
             </li>
-            <li class="nav-item pe-3">
+            <li class="nav-item pe-3" v-if="(this.$store.getters.getProfileId != null && this.$store.getters.getProfileId != '')">
               <router-link
                 class="nav-link"
                 :class="{ active: this.$route.name === 'CurrentPointsView' }"
@@ -42,20 +50,12 @@
             <li class="nav-item pe-3">
               <router-link
                 class="nav-link"
-                :class="{ active: this.$route.name === 'Home' }"
-                :to="{ name: 'Home' }"
-                >Home</router-link
-              >
-            </li>
-            <li class="nav-item pe-3">
-              <router-link
-                class="nav-link"
                 :class="{ active: this.$route.name === 'PlayersView' }"
                 :to="{ name: 'PlayersView' }"
                 >Players</router-link
               >
             </li>
-            <li class="nav-item pe-3">
+            <li class="nav-item pe-3" v-if="(this.$store.getters.getProfileId != null && this.$store.getters.getProfileId != '')">
               <router-link
                 class="nav-link"
                 :class="{ active: this.$route.name === 'LeaguesView' }"
@@ -66,9 +66,9 @@
             <li class="nav-item pe-3">
               <router-link
                 class="nav-link"
-                :class="{ active: this.$route.name === 'PlayersView' }"
-                :to="{ name: 'PlayersView' }"
-                >Results</router-link
+                :class="{ active: this.$route.name === 'MatchesView' }"
+                :to="{ name: 'MatchesView' }"
+                >Matches</router-link
               >
             </li>
             <li class="nav-item pe-3">
@@ -148,4 +148,39 @@
   .cart-money {
     font-size: smaller;
   }
+
+  .first-letter {
+  border: 2px solid var(--PRIMARY);
+  border-radius: 50%;
+  /*color: var(--PRIMARY);*/
+}
+
+.first-letter:hover,
+.first-letter:focus {
+  box-shadow: none;
+  color: white;
+  background-color: var(--PRIMARY);
+}
+
+.dropdown-menu {
+  padding: 0;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  border: none;
+  overflow: hidden;
+}
+
+.dropdown-item {
+  padding: 0.75rem 1rem;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus,
+.dropdown-item.active,
+.dropdown-item:active {
+  background-color: var(--GREY-LIGHT);
+}
+
+.btn-no-style:focus {
+  box-shadow: none;
+}
   </style>

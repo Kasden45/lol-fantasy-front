@@ -6,6 +6,7 @@ import LeaguesView from "./views/LeaguesView.vue"; // Import your component
 import GamePointsView from "./views/GamePointsView.vue"; // Import your component
 import CurrentPointsView from "./views/CurrentPointsView.vue"; // Import your component
 import SingleLeagueView from "./views/SingleLeagueView.vue"; // Import your component
+import MatchesView from "./views/MatchesView.vue"; // Import your component
 
 
 const routes = [
@@ -13,6 +14,7 @@ const routes = [
   { name: "TeamSelection", path: "/team-selection", component: TeamSelection },
   { name: "PlayersView", path: "/players", component: PlayersView },
   { name: "LeaguesView", path: "/leagues", component: LeaguesView },
+  { name: "MatchesView", path: "/matches", component: MatchesView },
   { name: "SingleLeagueView", path: "/leagues/:leagueCode", component: SingleLeagueView },
   { name: "CurrentPointsView", path: "/current-points/:userId", component: CurrentPointsView },
   { name: "GamePointsView", path: "/points/team/:teamSlug/game/:gameId", component: GamePointsView },

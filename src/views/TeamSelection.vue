@@ -2,7 +2,7 @@
 <template>
     <div class="container">
       <h1>Team Selection</h1>
-      <h3 :class="{'error-text' : this.teamValue > 75}">Price total {{ this.teamValue }}/75$</h3>
+      <h3 :class="{'error-text' : this.teamValue > 78}">Price total {{ this.teamValue }}/78$</h3>
       <h3>Transfers made: {{ this.transfersMade }}</h3>
       <h3 :class="{'error-text' : this.selectedUserTeam.transfersAvailable - this.selectedUserTeam.transfersMade < 0}">Transfers available: {{ this.selectedUserTeam.transfersAvailable > 10 ? '∞' : this.selectedUserTeam.transfersAvailable - this.transfersMade }}/2</h3>
       <div class="row w-100 justify-content-md-center m-auto">
