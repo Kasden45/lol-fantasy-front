@@ -15,7 +15,7 @@
     </td>
     <td v-if="participantData != null">{{ participantData.userTeam ? participantData.userTeam.totalPoints : (participantData.points != null ? participantData.points : 0) }} pts</td>
     <!-- <td>{{ participant.joinedAt }}</td> -->
-    <td v-if="participantData != null">
+    <td v-if="participantData != null && participantData.userTeam != null">
         <button @click="toggleDetailsVisibility" data-toggle="modal" data-target="#sda">
             {{ showDetails ? 'Hide team' : 'Show team' }}
         </button>
