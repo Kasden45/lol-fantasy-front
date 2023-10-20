@@ -8,8 +8,21 @@
       <div class="row w-100 justify-content-md-center m-auto">
         <div class="col-md-7">
           <PlayerTeam :currently-picked="this.roleToAddPlayer" @playerRemove="playerRemoved" @rolePick="(r) => roleToAddPlayer = r" :userTeam="selectedUserTeam"/>
+            <div class="row justify-content-md-center m-auto py-2">
+              <label class="w-auto" for="captain">Captain: </label>
+            <select class="w-auto" id="captain" v-model="selectedUserTeam.captain">
+              <option value=1>Top</option>
+              <option value=2>Jungle</option>
+              <option value=3>Mid</option>
+              <option value=4>Bottom</option>
+              <option value=5>Support</option>
+            </select>  
+            </div>
             
       <button :class="{ disabled : this.teamValue > 75 || this.selectedUserTeam.transfersAvailable < this.selectedUserTeam.transfersMade}" @click="submitTeam">Submit Team</button>
+      <div v-if="this.submittingTeam">
+        Saving your team . . .
+      </div>
       <div v-if="this.successSubmittingTeam">
         Team saved!
       </div>
@@ -56,6 +69,7 @@
     data() {
       return {
         errorSubmittingTeam:false,
+        submittingTeam:false,
         successSubmittingTeam: false,
         allPlayers: [],
         allTeams: [],
@@ -237,15 +251,16 @@
             this.axios.post(url, data).then((response) => {
                 console.log(response.data)
                 this.successSubmittingTeam = true
+            this.submittingTeam = false
                 // this.clearInputs()
             }).catch(() => {
               this.errorSubmittingTeam = true
+            this.submittingTeam = false
 
                 // if (error.response.status === 409) {
                 // }
             });
 
-            this.submittingTeam = false
         console.log('Selected Players:', this.selectedPlayers);
         // You can send the selected team to your backend here
       },
@@ -271,16 +286,18 @@
             this.axios.put(url, data).then((response) => {
                 console.log(response.data)
                 this.successSubmittingTeam = true
+            this.submittingTeam = false
                 
                 // this.clearInputs()
             }).catch(() => {
               this.errorSubmittingTeam = true
+            this.submittingTeam = false
 
                 // if (error.response.status === 409) {
                 // }
             });
 
-            this.submittingTeam = false
+            // this.submittingTeam = false
         console.log('Selected Players:', this.selectedPlayers);
         // You can send the selected team to your backend here
       },

@@ -2,37 +2,37 @@
     <div class="container">
       <div class="row gy-3">
         <div class="col-12 col-sm-6 col-md-3 text-sm-start">
-          <h5 class="mb-2 mb-sm-4 fw-bolder">Firma</h5>
+          <h5 class="mb-2 mb-sm-4 fw-bolder">Our company</h5>
           <ul>
-            <li><a href="javascript:">O nas</a></li>
-            <li><a href="javascript:">Praca</a></li>
-            <li><a href="javascript:">Reklama</a></li>
-            <li><a href="javascript:">Współpraca</a></li>
+            <li><a href="javascript:">About us</a></li>
+            <li><a href="javascript:">Jobs</a></li>
+            <li><a href="javascript:">Press</a></li>
+            <li><a href="javascript:">Collaboration</a></li>
           </ul>
         </div>
         <div class="col-12 col-sm-6 col-md-3 text-sm-start">
-          <h5 class="mb-2 mb-sm-4 fw-bolder">Informacje</h5>
+          <h5 class="mb-2 mb-sm-4 fw-bolder">Info</h5>
           <ul>
-            <li><a href="javascript:">Aktualności</a></li>
-            <li><a href="javascript:">Strefa klienta</a></li>
-            <li><a href="javascript:">Zasady dostawy</a></li>
-            <li><a href="javascript:">Dla firm</a></li>
+            <li><a href="javascript:">News</a></li>
+            <li><a href="javascript:">Security</a></li>
+            <li><a href="javascript:">Legal</a></li>
           </ul>
         </div>
         <div class="col-12 col-sm-6 col-md-3 text-sm-start">
-          <h5 class="mb-2 mb-sm-4 fw-bolder">Pomoc</h5>
+          <h5 class="mb-2 mb-sm-4 fw-bolder">Support</h5>
           <ul>
-            <li><a href="javascript:">Obsługa Klienta</a></li>
-            <li><a href="javascript:">Reklamacje</a></li>
-            <li><a href="javascript:">Regulamin</a></li>
+            <li><a href="javascript:">JD</a></li>
+            <li><a href="javascript:">FAQ</a></li>
+            <li><a href="javascript:">Terms and conditions</a></li>
           </ul>
         </div>
         <div class="col-12 col-sm-6 col-md-3 text-sm-start">
-          <h5 class="mb-2 mb-sm-4 fw-bolder">Kontakt</h5>
+          <h5 class="mb-2 mb-sm-4 fw-bolder">Contact</h5>
           <ul>
-            <li><span>ul. Kościerzyńska 9, Wrocław</span></li>
-            <li><span>kontakt@rent4events.com</span></li>
-            <li><span>+48 234 567 88</span></li>
+            <li><span>12333 West Olympic Blvd.
+Los Angeles, CA 90064
+United States</span></li>
+            <li><span>kontakt@2kpi.2kpi</span></li>
           </ul>
         </div>
       </div>

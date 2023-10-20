@@ -7,7 +7,7 @@
             <p>{{ playerDetails.summonerName }}</p>
             <p class="role">{{ playerDetails.role }}</p>
             <p>{{ playerDetails.team.name }}</p>
-            <p class="points" v-if="totalPoints != null">{{ totalPoints }} pts</p>
+            <p class="points" v-if="totalPoints != null">{{ totalPoints.toFixed(2) }} pts</p>
           </div>
         </div>
         <div class="col-md-9">

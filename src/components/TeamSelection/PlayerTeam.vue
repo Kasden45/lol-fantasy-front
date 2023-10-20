@@ -7,7 +7,7 @@
     <PlayerTeamTile :currently-picked="this.currentlyPicked" @playerRemove="playerRemoved" @rolePick="rolePicked" v-if="userTeam != null" :role="'bottom'" :teamPlayer="userTeam.botPlayer.player" :img_url="bot_img"/>
     <PlayerTeamTile :currently-picked="this.currentlyPicked" @playerRemove="playerRemoved" @rolePick="rolePicked" v-if="userTeam != null" :role="'support'" :teamPlayer="userTeam.supportPlayer.player" :img_url="supp_img"/>
     <PlayerTeamTile :currently-picked="this.currentlyPicked" @playerRemove="playerRemoved" @rolePick="rolePicked" v-if="userTeam != null" :role="'sub'" :teamPlayer="userTeam.subPlayer.player" :img_url="sub_img"/>
-    <TeamTeamTile :currently-picked="this.currentlyPicked" @playerRemove="playerRemoved" @rolePick="rolePicked" v-if="userTeam != null" :role="'team'" :teamTeam="userTeam.team.team" :img_url="sub_img"/>
+    <TeamTeamTile :currently-picked="this.currentlyPicked" @playerRemove="playerRemoved" @rolePick="rolePicked" v-if="userTeam != null" :role="'team'" :teamTeam="userTeam.team.team" :img_url="team_img"/>
     
   </template>
   
@@ -32,6 +32,7 @@
         bot_img: "https://cdn3.emoji.gg/emojis/9366-lol-role-bot.png",
         supp_img: "https://cdn3.emoji.gg/emojis/7990-lol-role-support.png",
         sub_img: "https://cdn3.emoji.gg/emojis/2724-lol-role-fill.png",
+        team_img: "https://i.imgur.com/bLArMp2.png",
         team: {
           topPlayer: {},
           junglePlayer: {},
