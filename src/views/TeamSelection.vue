@@ -2,6 +2,7 @@
 <template>
     <div class="container">
       <h1>Team Selection</h1>
+      <h4 v-if="this.nextFixture != null">Next deadline: {{ this.formatDate(this.nextFixture.fixture.deadlineDate) }}</h4>
       <h3 :class="{'error-text' : this.teamValue > 78}">Price total {{ this.teamValue }}/78$</h3>
       <h3>Transfers made: {{ this.transfersMade }}</h3>
       <h3 :class="{'error-text' : this.selectedUserTeam.transfersAvailable - this.selectedUserTeam.transfersMade < 0}">Transfers available: {{ this.selectedUserTeam.transfersAvailable > 10 ? '∞' : this.selectedUserTeam.transfersAvailable - this.transfersMade }}/2</h3>
@@ -110,13 +111,16 @@
           transfersAvailable: 100
         },
         selectedPlayers: [],
-        loadedPlayers: []
+        loadedPlayers: [],
+        matchesByFixture: [],
+        nextFixture: null
       };
     },
     mounted(){
       this.fetchPlayers();
       this.fetchTeams();
-      
+      this.getCurrentFixture();
+      // this.getFixtures();
     },
     computed: {
       teamValue() {
@@ -145,6 +149,7 @@
 
         return totalValue;
       },
+      
       transfersMade() {
           // this.loadedPlayers
           var currentLineup = [];
@@ -162,9 +167,55 @@
           console.log('current',currentLineup)
           console.log('loaded',this.loadedPlayers)
           return this.loadedPlayers.filter(n => !currentLineup.includes(n)).length
-      }
+      },
     },
     methods: {
+      formatDate(inputDate) {
+    // Create a Date object from the input string
+        const date = new Date(inputDate);
+        
+        // Get the individual date and time components
+        const day = date.getUTCDate();
+        const month = date.getUTCMonth() + 1; // Months are zero-based
+        const year = date.getUTCFullYear() % 100; // Get the last two digits of the year
+        const hours = date.getUTCHours() + 2;
+        const minutes = date.getUTCMinutes();
+
+        // Ensure single digits have leading zeros
+        const formattedDay = day < 10 ? `0${day}` : day;
+        const formattedMonth = month < 10 ? `0${month}` : month;
+        const formattedYear = year < 10 ? `0${year}` : year;
+        const formattedHours = hours < 10 ? `0${hours}` : hours;
+        const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+
+        // Construct the formatted date and time string
+        const formattedDate = `${formattedDay}.${formattedMonth}.${formattedYear} ${formattedHours}:${formattedMinutes}`;
+
+        return formattedDate;
+    },
+      async getCurrentFixture() {
+            const url = `${this.apiURL}Matches/fixture`
+
+            this.axios.get(url).then((response) => {
+                this.$store.commit('setFixtureId', response.data);
+                console.log("Current fixture: ", this.$store.getters.getFixtureId)
+                this.getFixtures();
+                // this.$router.push({name: 'LeaguesView'})
+            }).catch(error => {
+                console.log(error.response);
+            });
+        },
+        async getFixtures() {
+            const url = `${this.apiURL}Matches/fixtures`
+
+            this.axios.get(url).then((response) => {
+                this.matchesByFixture = response.data.fixturesWithMatches;
+                this.nextFixture = this.matchesByFixture.find((fix => fix.fixture.fixtureId == this.$store.getters.getFixtureId+1))
+                // this.$router.push({name: 'LeaguesView'})
+            }).catch(error => {
+                console.log(error.response);
+            });
+        },
       async fetchUserTeam() {
         try {
             const response = await this.axios.get(`${this.apiURL}FantasyPoints/user_team/${this.$store.getters.getProfileId}`);

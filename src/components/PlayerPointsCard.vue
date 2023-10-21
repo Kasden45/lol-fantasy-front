@@ -1,5 +1,5 @@
 <template>
-    <div class="player-card" v-if="playerDetails != null">
+    <div class="player-card" :class="{'captain' : this.isCaptain, 'sub' : this.isSub} " v-if="playerDetails != null">
       <div class="player-details row">
         <div class="left-section col-md-3">
           <div class="player-info">
@@ -43,7 +43,9 @@
     name: "PlayerPointsCard",
     props:{
         playerDetails: Object,
-        totalPoints: Number
+        totalPoints: Number,
+        isCaptain: Boolean,
+        isSub: Boolean
     },
     
     data() {
@@ -168,5 +170,12 @@
     border-radius: 3px;
     background-color: rgb(150, 79, 150);
     --webkit-box-shadow: inset 0 0 6px rgba(90, 90, 90, 0.7);
+}
+
+.captain {
+  background-color: rgba(224, 191, 3, 0.747);
+}
+.sub {
+  background-color: rgba(114, 106, 106, 0.432);
 }
 </style>

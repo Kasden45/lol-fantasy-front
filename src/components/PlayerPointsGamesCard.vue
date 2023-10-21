@@ -7,7 +7,7 @@
     <div class="game-points" v-if="selectedGame != null">
       <div class="game-tabs ms-2">
       <div
-        v-for="(game, index) in gamesPointsDetails"
+        v-for="(game, index) in gamesPointsDetails.sort((a,b) => a.gameId > b.gameId ? 1 : -1)"
         :key="index"
         @click="selectGame(index)"
         :class="{ active: selectedGameIndex === index }"
@@ -15,7 +15,7 @@
         Game {{ index + 1 }}
       </div>
     </div>
-      <PlayerPointsCard :playerDetails="selectedGame" :totalPoints="totalPointsA" v-if="selectedGame" />
+      <PlayerPointsCard :isSub="isSub" :playerDetails="selectedGame" :isCaptain="isCaptain" :totalPoints="totalPointsA" v-if="selectedGame" />
     </div>
   </div>
 </template>
@@ -26,7 +26,9 @@
     name: "PlayerPointsGamesCard",
     props:{
       gamesPointsDetails: Array,
-      totalPointsA: Number
+      totalPointsA: Number,
+      isCaptain: Boolean,
+      isSub: Boolean
     },
     components: {
       PlayerPointsCard
