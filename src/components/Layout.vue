@@ -4,6 +4,7 @@
       <slot />
       <button class="scroll-top" id="scroll-btn" @click="scrollTop">
         <font-awesome-icon :icon="['fa', 'arrow-up']" />
+        ^
       </button>
       <div id="footer">
         <site-footer class="py-5" />
@@ -58,7 +59,7 @@
     position: fixed;
     bottom: 25px;
     right: 25px;
-  
+    font-weight: 700;
     z-index: 100;
     opacity: 0;
     transform: translateY(100px);

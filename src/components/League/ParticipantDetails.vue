@@ -13,10 +13,10 @@
                 </div>
 
     </td>
-    <td v-if="participantData != null">{{ participantData.userTeam ? participantData.userTeam.totalPoints : (participantData.points != null ? participantData.points : 0) }} pts</td>
+    <td :class="{'showing-details' : showDetails}" v-if="participantData != null">{{ participantData.userTeam ? participantData.userTeam.totalPoints : (participantData.points != null ? participantData.points : 0) }} pts</td>
     <!-- <td>{{ participant.joinedAt }}</td> -->
-    <td v-if="participantData != null && participantData.userTeam != null">
-        <button @click="toggleDetailsVisibility" data-toggle="modal" data-target="#sda">
+    <td :class="{'showing-details' : showDetails}" v-if="participantData != null && participantData.userTeam != null" >
+        <button @click="toggleDetailsVisibility" data-toggle="modal" data-target="#sda" >
             {{ showDetails ? 'Hide team' : 'Show team' }}
         </button>
     </td>
@@ -175,5 +175,7 @@ p.has-error {
     border: none;
     width: 100%;
 }
-
+.showing-details {
+    vertical-align: top; 
+}
 </style>

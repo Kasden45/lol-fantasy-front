@@ -83,7 +83,7 @@
   margin: 10px;
   padding: 10px;
   /* max-width: 400px; */
-  max-height: 250px;
+  /* max-height: 250px; */
 }
 
 .player-details {
@@ -95,13 +95,13 @@
 .left-section {
   padding: 10px;
   text-align: center;
-  height: 200px;
+  /* height: 800px; */
 }
 
 .right-section {
   flex: 2;
   overflow-y: scroll;
-  height: 200px;
+  /* height: 800px; */
 }
 
 .player-info img {
@@ -131,7 +131,7 @@
 
 .player-points-scrollable {
   flex: 1; /* Make this part expand to fill available space */
-  overflow-y: scroll;
+  overflow-y: visible;
   /* Adjust the height and other styles as needed */
 }
 
