@@ -41,6 +41,31 @@
       </div>
       
       <div class="col-md-3">
+        <div class="text-danger">
+          <h3 v-if="new Date() < new Date('2023-11-02')"> NEW LIMITS FOR UPCOMING FIXTURES </h3>
+        </div>
+        <div class="game-tabs ms-2 justify-content-md-center">
+          <div
+            v-for="(fixture, index) in tabs"
+            :key="index"
+            @click="selectTab(index, fixture)"
+            :class="{ active: selectedTabIndex === index }"
+          >
+            {{ fixture != 0 ? fixture : 'General' }}
+          </div>
+        </div>
+        <!--  -->
+        <div class="info-section" v-if="this.currentFixture.fixture.id != null">
+          <h2 class=" pb-4">Fixture {{ this.currentFixture.fixture.id }}</h2>
+          <h4 class=" pb-2">{{this.currentFixture.fixture.name}}</h4>
+          <h4 :class="{
+            'text-danger' : ((new Date(this.currentFixture.fixture.deadlineDateTime) - new Date())/ 36e5) < 48, 
+            'text-warning': ((new Date(this.currentFixture.fixture.deadlineDateTime) - new Date())/ 36e5) > 48}">
+            Deadline: {{ this.$func_global.formatDate(this.currentFixture.fixture.deadlineDateTime) }}
+          </h4>
+        {{  }}
+        </div>
+        
         <div class="info-section">
           <h2 class=" pb-4">Rules</h2>
           <table >
@@ -112,9 +137,18 @@ export default {
   },  
   data() {
     return {
+      currentFixture: {
+        rules: [],
+        fixture: {}
+      },
+        tabs: [],
       rulesData: [
         // Your rules data here
       ],
+      newRulesData: [
+        // Your rules data here
+      ],
+        selectedTabIndex: 0,
     };
   },
   mounted() {
@@ -125,10 +159,20 @@ export default {
     console.log(this.profile)
   },
   methods: {
+      selectTab(index, f){
+        var fixture = f != 0 ? f : null;
+        this.selectedTabIndex = index;
+        console.log(this.selectedTabIndex);
+        this.currentFixture = this.newRulesData.find((element) => element.fixture.id == fixture);
+      },
     async fetchRulesData() {
       try {
         const response = await this.axios.get(`${this.apiURL}FantasyPoints/rules`);
-        this.rulesData = response.data;
+        this.newRulesData = response.data;
+        this.tabs = response.data.map(function(fix) {
+              return fix.fixture != null ? fix.fixture.id : 0;
+            }).sort();
+        this.selectTab(this.$store.getters.getFixtureId-1,this.$store.getters.getFixtureId);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -155,13 +199,13 @@ export default {
   },
   computed: {
     playerPointsRules() {
-      return this.rulesData.filter((rule) => rule.type === 'PlayerPoints');
+      return this.currentFixture.rules.filter((rule) => rule.type === 'PlayerPoints');
     },
     teamPointsRules() {
-      return this.rulesData.filter((rule) => rule.type === 'TeamPoints');
+      return this.currentFixture.rules.filter((rule) => rule.type === 'TeamPoints');
     },
     rules() {
-      return this.rulesData.filter((rule) => rule.type === 'Rule');
+      return this.currentFixture.rules.filter((rule) => rule.type === 'Rule');
     },
     profile() {
     return this.$store.getters.getProfileId;
@@ -241,5 +285,23 @@ h2 {
     text-align: left;
     font-style: italic;
     z-index: 2;
+}
+
+.game-tabs {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.game-tabs div {
+  cursor: pointer;
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  margin-right: 7px;
+}
+
+.game-tabs .active {
+  background-color: #007BFF;
+  color: #fff;
 }
 </style>

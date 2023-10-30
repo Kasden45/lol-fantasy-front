@@ -4,6 +4,29 @@ const apiURL = 'https://worlds-fantasy-5b89dfe65b80.herokuapp.com/'
 
 export const func_global = {
 
+    formatDate(inputDate) {
+        // Create a Date object from the input string
+            const date = new Date(inputDate);
+            
+            // Get the individual date and time components
+            const day = date.getUTCDate();
+            const month = date.getUTCMonth() + 1; // Months are zero-based
+            const year = date.getUTCFullYear() % 100; // Get the last two digits of the year
+            const hours = date.getUTCHours() + 2;
+            const minutes = date.getUTCMinutes();
+    
+            // Ensure single digits have leading zeros
+            const formattedDay = day < 10 ? `0${day}` : day;
+            const formattedMonth = month < 10 ? `0${month}` : month;
+            const formattedYear = year < 10 ? `0${year}` : year;
+            const formattedHours = hours < 10 ? `0${hours}` : hours;
+            const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+    
+            // Construct the formatted date and time string
+            const formattedDate = `${formattedDay}.${formattedMonth}.${formattedYear} ${formattedHours}:${formattedMinutes}`;
+    
+            return formattedDate;
+        },
     async importData(myfile, token, type, id) {
         // let myfile = this.$refs.myfile;
         let files = myfile.files;

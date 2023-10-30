@@ -3,9 +3,9 @@
     <div class="container">
       <h1>Team Selection</h1>
       <h4 v-if="this.nextFixture != null">Next deadline: {{ this.formatDate(this.nextFixture.fixture.deadlineDate) }}</h4>
-      <h3 :class="{'error-text' : this.teamValue > 78}">Price total {{ this.teamValue }}/78$</h3>
-      <h3>Transfers made: {{ this.transfersMade }}</h3>
-      <h3 :class="{'error-text' : this.selectedUserTeam.transfersAvailable - this.selectedUserTeam.transfersMade < 0}">Transfers available: {{ this.selectedUserTeam.transfersAvailable > 10 ? '∞' : this.selectedUserTeam.transfersAvailable - this.transfersMade }}/2</h3>
+      <h3 v-if="this.nextFixture != null" :class="{'error-text' : this.teamValue > this.nextFixture.fixture.teamValueLimit}">Price total {{ this.teamValue }}/{{ this.nextFixture.fixture.teamValueLimit }}$</h3>
+      <h3 >Transfers made: {{ this.transfersMade }}</h3>
+      <h3 v-if="this.nextFixture != null" :class="{'error-text' : this.selectedUserTeam.transfersAvailable - this.selectedUserTeam.transfersMade < 0}">Transfers available: {{ this.selectedUserTeam.transfersAvailable > 10 ? '∞' : this.selectedUserTeam.transfersAvailable - this.transfersMade }}/{{ this.nextFixture.fixture.transfersLimit }}</h3>
       <div class="row w-100 justify-content-md-center m-auto">
         <div class="col-md-7">
           <PlayerTeam :currently-picked="this.roleToAddPlayer" @playerRemove="playerRemoved" @rolePick="(r) => roleToAddPlayer = r" :userTeam="selectedUserTeam"/>
@@ -20,7 +20,7 @@
             </select>  
             </div>
             
-      <button :class="{ disabled : this.teamValue > 75 || this.selectedUserTeam.transfersAvailable < this.selectedUserTeam.transfersMade}" @click="submitTeam">Submit Team</button>
+      <button v-if="this.nextFixture != null" :class="{ disabled : this.teamValue > this.nextFixture.fixture.teamValueLimit || this.selectedUserTeam.transfersAvailable < this.selectedUserTeam.transfersMade}" @click="submitTeam">Submit Team</button>
       <div v-if="this.submittingTeam">
         Saving your team . . .
       </div>
@@ -210,7 +210,13 @@
 
             this.axios.get(url).then((response) => {
                 this.matchesByFixture = response.data.fixturesWithMatches;
-                this.nextFixture = this.matchesByFixture.find((fix => fix.fixture.fixtureId == this.$store.getters.getFixtureId+1))
+                this.nextFixture = this.matchesByFixture
+                .filter(m => new Date(m.fixture.deadlineDate) > new Date())
+                        .sort(function(a,b){
+                        // Turn your strings into dates, and then subtract them
+                        // to get a value that is either negative, positive, or zero.
+                        return new Date(a.fixture.deadlineDate) - new Date(b.fixture.deadlineDate);
+                      })[0]
                 // this.$router.push({name: 'LeaguesView'})
             }).catch(error => {
                 console.log(error.response);
