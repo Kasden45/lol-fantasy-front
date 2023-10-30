@@ -12,7 +12,7 @@ export const func_global = {
             const day = date.getUTCDate();
             const month = date.getUTCMonth() + 1; // Months are zero-based
             const year = date.getUTCFullYear() % 100; // Get the last two digits of the year
-            const hours = date.getUTCHours() + 2;
+            const hours = date.getHours();
             const minutes = date.getUTCMinutes();
     
             // Ensure single digits have leading zeros

@@ -3,7 +3,7 @@
         
         <div class="row justify-content-md-center m-auto fixture-header">
             <h2>{{ fixture.fixture.name }}</h2>
-            <h2>Deadline: {{ this.formatDate(fixture.fixture.deadlineDate) }}</h2>
+            <h2>Deadline: {{ this.$func_global.formatDate(fixture.fixture.deadlineDate) }}</h2>
         </div>
         
         <div class="row d-flex align-items-center justify-content-md-center m-auto" v-for="match in fixture.matches" :key="match.id">
@@ -19,7 +19,7 @@
             </div>
             <div class="col-md-2">
                 Bo{{ match.maxGames }}
-                <h5>{{ this.formatDate(match.startTime) }}</h5>
+                <h5>{{ this.$func_global.formatDate(match.startTime) }}</h5>
             </div>
             <div class="col-md-1 d-flex align-items-center">
                 {{ match.team2 != null ? match.team2.wins : "0" }}
@@ -65,7 +65,7 @@ name: 'MatchesView',
         const day = date.getUTCDate();
         const month = date.getUTCMonth() + 1; // Months are zero-based
         const year = date.getUTCFullYear() % 100; // Get the last two digits of the year
-        const hours = date.getUTCHours() + 2;
+        const hours = date.getHours();
         const minutes = date.getUTCMinutes();
 
         // Ensure single digits have leading zeros

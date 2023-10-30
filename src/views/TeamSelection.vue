@@ -2,7 +2,7 @@
 <template>
     <div class="container">
       <h1>Team Selection</h1>
-      <h4 v-if="this.nextFixture != null">Next deadline: {{ this.formatDate(this.nextFixture.fixture.deadlineDate) }}</h4>
+      <h4 v-if="this.nextFixture != null">Next deadline: {{ this.$func_global.formatDate(this.nextFixture.fixture.deadlineDate) }}</h4>
       <h3 v-if="this.nextFixture != null" :class="{'error-text' : this.teamValue > this.nextFixture.fixture.teamValueLimit}">Price total {{ this.teamValue }}/{{ this.nextFixture.fixture.teamValueLimit }}$</h3>
       <h3 >Transfers made: {{ this.transfersMade }}</h3>
       <h3 v-if="this.nextFixture != null" :class="{'error-text' : this.selectedUserTeam.transfersAvailable - this.selectedUserTeam.transfersMade < 0}">Transfers available: {{ this.selectedUserTeam.transfersAvailable > 10 ? '∞' : this.selectedUserTeam.transfersAvailable - this.transfersMade }}/{{ this.nextFixture.fixture.transfersLimit }}</h3>
@@ -178,7 +178,7 @@
         const day = date.getUTCDate();
         const month = date.getUTCMonth() + 1; // Months are zero-based
         const year = date.getUTCFullYear() % 100; // Get the last two digits of the year
-        const hours = date.getUTCHours() + 2;
+        const hours = date.getUTCHours() + 1;
         const minutes = date.getUTCMinutes();
 
         // Ensure single digits have leading zeros
