@@ -125,7 +125,6 @@
     </div>
     </div>
     <!-- Rule Section -->
-    <RiftMapPlayer></RiftMapPlayer>
   </div>
 </template>
 
