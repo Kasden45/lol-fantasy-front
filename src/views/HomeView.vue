@@ -125,14 +125,16 @@
     </div>
     </div>
     <!-- Rule Section -->
-    
+    <RiftMapPlayer></RiftMapPlayer>
   </div>
 </template>
 
 <script>
-import LoginPanel from "@/views/LoginView.vue"
+import LoginPanel from "@/views/LoginView.vue";
+import RiftMapPlayer from '@/components/RiftMapPlayers.vue';
 export default {
   components: {
+    RiftMapPlayer,
     LoginPanel
   },  
   data() {
