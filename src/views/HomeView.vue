@@ -130,10 +130,8 @@
 
 <script>
 import LoginPanel from "@/views/LoginView.vue";
-import RiftMapPlayer from '@/components/RiftMapPlayers.vue';
 export default {
   components: {
-    RiftMapPlayer,
     LoginPanel
   },  
   data() {
