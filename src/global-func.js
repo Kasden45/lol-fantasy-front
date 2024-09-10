@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const apiURL = 'https://worlds-fantasy-5b89dfe65b80.herokuapp.com/'
+const apiURL = 'https://localhost:7061'
 
 export const func_global = {
 

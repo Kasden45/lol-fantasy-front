@@ -6,7 +6,9 @@ export default createStore({
         return {
             // SOCIAL
             profileId: "",
+            login: "",
             fixtureId: "",
+            currentTournamentId: '110852926142971547',
             email: "",
             token: "",
             roles: [],
@@ -19,6 +21,9 @@ export default createStore({
     mutations: {
         setProfileId(state, value) {
             state.profileId = value;
+        },
+        setLogin(state, value) {
+            state.login = value;
         },
         setFixtureId(state, value) {
             state.fixtureId = value;
@@ -37,11 +42,17 @@ export default createStore({
         },
         setSelectedRequest(state, value) {
             state.selectedRequest = value;
+        },
+        setCurrentTournamentId(state, value) {
+            state.currentTournamentId = value;
         }
     },
     getters: {
         getProfileId(state) {
             return state.profileId;
+        },
+        getLogin(state) {
+            return state.login;
         },
         getFixtureId(state) {
             return state.fixtureId;
@@ -57,6 +68,9 @@ export default createStore({
         },
         getSelectedRequest(state) {
             return state.selectedRequest;
+        },
+        getCurrentTournamentId(state) {
+            return state.currentTournamentId;
         }
     },
     plugins: [createPersistedState()],

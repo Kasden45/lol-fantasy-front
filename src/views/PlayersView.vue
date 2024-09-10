@@ -79,7 +79,7 @@
       fetchTeamPlayers() {
       // Axios GET request to populate the 'teamPlayers' data
       // Replace the URL with your actual API endpoint
-      this.axios.get(`${this.apiURL}FantasyPoints/teams_players`)
+      this.axios.get(`${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/teams_players`)
         .then((response) => {
           this.teamPlayers = response.data;
         })

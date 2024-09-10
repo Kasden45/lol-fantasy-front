@@ -9,7 +9,7 @@
             </div>
         </div>
         <div class="row justify-content-center">
-      <div class="col-md-6 ">
+      <div class="col-md-5 ">
         <h2>What is Fantasy LOL?</h2>
         <div class="row pb-4 pt-3">
           <span>Introducing the <b>"2KPI LoL Worlds 2023 Fantasy Game"</b> – where esports enthusiasts get to step into the shoes of a team manager and put their strategic prowess to the test. Just like traditional Fantasy Premier League (FPL) games in the realm of football, our Fantasy format takes the excitement of competitive gaming to a <b>whole new level</b>.
@@ -40,22 +40,23 @@
 
       </div>
       
-      <div class="col-md-3">
+      <div class="col-md-4" v-if="this.currentFixture != null">
         <div class="text-danger">
           <h3 v-if="new Date() < new Date('2023-11-02')"> NEW LIMITS FOR UPCOMING FIXTURES </h3>
         </div>
-        <div class="game-tabs ms-2 justify-content-md-center">
+        <div class="game-tabs ms-2 justify-content-md-center fs-6">
           <div
             v-for="(fixture, index) in tabs"
-            :key="index"
-            @click="selectTab(index, fixture)"
-            :class="{ active: selectedTabIndex === index }"
+            :key="fixture.order"
+            @click="selectTab(fixture.order, fixture.id)"
+            :class="{ active: selectedTabIndex === fixture.order }"
           >
-            {{ fixture != 0 ? fixture : 'General' }}
+            <!-- {{ fixture != 0 ? fixture : 'General' }}  -->
+            {{fixture.title}}
           </div>
         </div>
         <!--  -->
-        <div class="info-section" v-if="this.currentFixture.fixture.id != null">
+        <div class="info-section" v-if="this.currentFixture != null && this.currentFixture.fixture.id != null">
           <h2 class=" pb-4">Fixture {{ this.currentFixture.fixture.id }}</h2>
           <h4 class=" pb-2">{{this.currentFixture.fixture.name}}</h4>
           <h4 :class="{
@@ -66,7 +67,7 @@
         {{  }}
         </div>
         
-        <div class="info-section">
+        <div class="info-section" v-if="this.currentFixture != null">
           <h2 class=" pb-4">Rules</h2>
           <table >
             <thead>
@@ -85,7 +86,7 @@
         </div>
 
         <!-- PlayerPoints Section -->
-        <div class="info-section">
+        <div class="info-section" v-if="this.currentFixture != null">
           <h2>Player Points</h2>
           <table>
             <thead>
@@ -140,7 +141,7 @@ export default {
         rules: [],
         fixture: {}
       },
-        tabs: [],
+        tabs: [], // {id, name, order}
       rulesData: [
         // Your rules data here
       ],
@@ -150,10 +151,13 @@ export default {
         selectedTabIndex: 0,
     };
   },
-  mounted() {
+  async mounted() {
     // Fetch data when the component is mounted
-    this.fetchRulesData();
-    this.getCurrentFixture();
+    this.getCurrentFixture()
+    while ( this.currentFixture.rules.length == 0) {
+      await this.fetchRulesData();
+    }
+    // this.fetchRulesData();
     // this.profile = 
     console.log(this.profile)
   },
@@ -165,29 +169,33 @@ export default {
         this.currentFixture = this.newRulesData.find((element) => element.fixture.id == fixture);
       },
     async fetchRulesData() {
+      
       try {
-        const response = await this.axios.get(`${this.apiURL}FantasyPoints/rules`);
+        const response = await this.axios.get(`${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/rules`);
         this.newRulesData = response.data;
         this.tabs = response.data.map(function(fix) {
-              return fix.fixture != null ? fix.fixture.id : 0;
-            }).sort();
-        this.selectTab(this.$store.getters.getFixtureId-1,this.$store.getters.getFixtureId);
+          var newFix = {
+                id: fix.fixture.id,
+                title: fix.fixture.name,
+                order: fix.fixture.id,
+              } 
+              return newFix;
+              
+            }).sort((a, b) => a.order - b.order);
+            console.log('tabs', this.tabs);
+
+        this.selectTab(this.tabs.find((element) => element.id == this.$store.getters.getFixtureId).order,this.$store.getters.getFixtureId);
+
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     },
     getCurrentFixture() {
-            const url = `${this.apiURL}Matches/fixture`
+
+            const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixture`
 
             this.axios.get(url).then((response) => {
                 this.$store.commit('setFixtureId', response.data);
-                // this.$store.commit('setLastName', response.data['lastName']);
-                // this.$store.commit('setProfileId', response.data['id']);
-                // this.$store.commit('setProfileImageSrc', response.data['profileImgPath']);
-                // this.$store.commit('setDoctorProfile', response.data['doctorProfile']);
-                // this.$store.commit('setDieticianProfile', response.data['dieticianProfile']);
-                // this.$store.commit('setTrainerProfile', response.data['trainerProfile']);
-                // this.$store.commit('setSex', response.data['esex']);
                 console.log("Current fixture: ", this.$store.getters.getFixtureId)
                 
                 // this.$router.push({name: 'LeaguesView'})
