@@ -180,7 +180,7 @@
     methods: {
       async fetchGamePoints(gameId, teamSlug) {
         try {
-          const response = await this.axios.get(`${this.apiURL}FantasyPoints/points/team/${teamSlug}/game/${gameId}/details`);
+          const response = await this.axios.get(`${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/points/team/${teamSlug}/game/${gameId}/details`);
           this.teamPoints = response.data;
           this.playersWithPoints = response.data.playersWithPoints;
         } catch (error) {

@@ -51,7 +51,7 @@
     methods: {
       async createLeague() {
         try {
-          const response = await this.axios.post(`${this.apiURL}User/league/create`, {
+          const response = await this.axios.post(`${this.apiURL}User/${this.$store.getters.getCurrentTournamentId}/league/create`, {
             idOwner: this.$store.getters.getProfileId, // Set the user's ID
             name: this.newLeagueName,
           });
@@ -85,7 +85,7 @@
       },
       async fetchUserLeagues() {
       try {
-        const response = await this.axios.get(`${this.apiURL}User/leagues/${this.$store.getters.getProfileId}`); // Replace with the correct endpoint
+        const response = await this.axios.get(`${this.apiURL}User/${this.$store.getters.getCurrentTournamentId}/leagues/${this.$store.getters.getProfileId}`); // Replace with the correct endpoint
         this.userLeagues = response.data;
       } catch (error) {
         console.error("Error fetching user leagues:", error);

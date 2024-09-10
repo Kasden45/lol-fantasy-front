@@ -1,7 +1,7 @@
 <template>
     <nav class="navbar navbar-expand-md navbar-light bg-white sticky-top">
       <div class="container">
-        <a class="navbar-brand">Worlds 2023 Fantasy2KPI</a>
+        <a class="navbar-brand">{{ this.tournaments[this.$store.getters.getCurrentTournamentId] }} Fantasy2KPI</a>
         <button
           class="navbar-toggler"
           type="button"
@@ -80,13 +80,28 @@
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  <span class=""></span>
+                  <span v-if="this.$store.getters.getLogin.length > 0" class="">{{ this.$store.getters.getLogin[0] }}</span>
                 </button>
                 <ul
                   class="dropdown-menu dropdown-menu-end"
                   aria-labelledby="dropdownMenuAccount"
                 >
-                  <li><a class="dropdown-item" href="#">Ustawienia</a></li> 
+                  <li><a class="dropdown-item" href="#">Ustawienia</a></li>
+                  <li>
+                    <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.worlds_2023 }" class="dropdown-item" href="#" @click="switchTournament(this.worlds_2023)">
+                      WORLDS 2023
+                    </a>
+                  </li>
+                  <li>
+                    <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.worlds_2024 }" class="dropdown-item" href="#" @click="switchTournament(this.worlds_2024)">
+                      WORLDS 2024
+                    </a>
+                  </li>
+                  <li>
+                    <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.msi_2024 }" class="dropdown-item" href="#" @click="switchTournament(this.msi_2024)">
+                      MSI 2024
+                    </a>
+                  </li>
                   <li>
                     <a @click="logout" class="dropdown-item" href="#"
                       >Wyloguj się</a
@@ -123,6 +138,10 @@
         this.$store.commit("setProfileId", "");
             this.$router.push({ name: "Home" });
       },
+      switchTournament(tournamentId){
+        this.$store.commit("setCurrentTournamentId", tournamentId);
+        this.$router.go();
+      }
     },
   };
   </script>
@@ -182,5 +201,9 @@
 
 .btn-no-style:focus {
   box-shadow: none;
+}
+.active-tournament {
+  background-color: var(--GREY-LIGHT);
+  color: var(--PRIMARY);
 }
   </style>

@@ -11,8 +11,8 @@
                 {{ match.team1 != null ? match.team1.name : "TBD" }}
                 <!-- {{ match.team1 != null ? match.team1.code : "TBD" }} -->
             </div>
-            <div class="col-md-1" v-if="match.team2 != null">
-                <img :src="match.team1.imageUrl" class="player-photo" alt="Player Photo" /> 
+            <div class="col-md-1" >
+                <img v-if="match.team1 != null" :src="match.team1.imageUrl" class="player-photo" alt="Player Photo" /> 
             </div>
             <div class="col-md-1">
                 {{ match.team1 != null ? match.team1.wins : "0" }}
@@ -24,8 +24,8 @@
             <div class="col-md-1 d-flex align-items-center">
                 {{ match.team2 != null ? match.team2.wins : "0" }}
             </div>
-            <div class="col-md-1" v-if="match.team2 != null">
-                <img :src="match.team2.imageUrl" class="player-photo" alt="Player Photo" /> 
+            <div class="col-md-1" >
+                <img v-if="match.team2 != null" :src="match.team2.imageUrl" class="player-photo" alt="Player Photo" /> 
             </div>
             <div class="col-md-2 d-flex align-items-center">
                 <!-- {{ match.team2 != null ? match.team2.code : "TBD" }} -->
@@ -86,14 +86,14 @@ name: 'MatchesView',
     },
     async fetchRulesData() {
       try {
-        const response = await this.axios.get(`${this.apiURL}FantasyPoints/rules`);
+        const response = await this.axios.get(`${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/rules`);
         this.rulesData = response.data;
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     },
     getCurrentFixture() {
-            const url = `${this.apiURL}Matches/fixture`
+            const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixture`
 
             this.axios.get(url).then((response) => {
                 this.$store.commit('setFixtureId', response.data);
@@ -105,7 +105,7 @@ name: 'MatchesView',
             });
         },
         getFixtures() {
-            const url = `${this.apiURL}Matches/fixtures`
+            const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixtures`
 
             this.axios.get(url).then((response) => {
                 this.matchesByFixture = response.data.fixturesWithMatches;
@@ -142,6 +142,6 @@ name: 'MatchesView',
 }
 
 .matches-back {
-    background-color: rgba(232, 180, 245, 0.658);
+    background-color: var(--PRIMARY-LIGHTER);
 }
 </style>

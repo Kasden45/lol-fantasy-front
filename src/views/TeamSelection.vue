@@ -194,7 +194,7 @@
         return formattedDate;
     },
       async getCurrentFixture() {
-            const url = `${this.apiURL}Matches/fixture`
+            const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixture`
 
             this.axios.get(url).then((response) => {
                 this.$store.commit('setFixtureId', response.data);
@@ -206,7 +206,7 @@
             });
         },
         async getFixtures() {
-            const url = `${this.apiURL}Matches/fixtures`
+            const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixtures`
 
             this.axios.get(url).then((response) => {
                 this.matchesByFixture = response.data.fixturesWithMatches;
@@ -224,7 +224,7 @@
         },
       async fetchUserTeam() {
         try {
-            const response = await this.axios.get(`${this.apiURL}FantasyPoints/user_team/${this.$store.getters.getProfileId}`);
+            const response = await this.axios.get(`${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/user_team/${this.$store.getters.getProfileId}`);
             var userTeam = response.data;
             this.selectedUserTeam.topPlayer.player = this.allPlayers.find((element) => element.esportsPlayerId == userTeam.topPlayer.esportsPlayerId);
             this.selectedUserTeam.junglePlayer.player = this.allPlayers.find((element) => element.esportsPlayerId == userTeam.junglePlayer.esportsPlayerId);
@@ -256,7 +256,7 @@
       },
       async fetchPlayers() {
         try {
-            const response = await this.axios.get(`${this.apiURL}FantasyPoints/players`);
+            const response = await this.axios.get(`${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/players`);
             this.allPlayers = response.data;
             // this.sortedPlayers = this.players;
           } catch (error) {
@@ -266,7 +266,7 @@
       },
       async fetchTeams() {
         try {
-            const response = await this.axios.get(`${this.apiURL}FantasyPoints/teams`);
+            const response = await this.axios.get(`${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/teams`);
             this.allTeams = response.data;
             this.fetchUserTeam();
             // this.sortedPlayers = this.players;
@@ -304,7 +304,7 @@
               "teamSlug": this.selectedUserTeam.team.team.slug,
               "captain": this.selectedUserTeam.captain,
             }
-            const url = `${this.apiURL}FantasyPoints/user_team`
+            const url = `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/user_team`
             this.axios.post(url, data).then((response) => {
                 console.log(response.data)
                 this.successSubmittingTeam = true
@@ -339,7 +339,7 @@
               "teamSlug": this.selectedUserTeam.team.team.slug,
               "captain": this.selectedUserTeam.captain,
             }
-            const url = `${this.apiURL}FantasyPoints/user_team`
+            const url = `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/user_team`
             this.axios.put(url, data).then((response) => {
                 console.log(response.data)
                 this.successSubmittingTeam = true

@@ -1,16 +1,16 @@
 <template>
   <div>
-      <h1>Points in fixture no. {{ this.tabs[this.selectedTabIndex] }}</h1>
+      <h1 v-if="this.tabs[this.selectedTabIndex] != null">Points in fixture {{ this.tabs[this.selectedTabIndex].title }}</h1>
   </div>
   <div class="game-points col-md-12" >
     <div class="game-tabs ms-2 justify-content-md-center">
       <div
         v-for="(fixture, index) in tabs"
-        :key="index"
-        @click="selectTab(index, fixture)"
-        :class="{ active: selectedTabIndex === index }"
+        :key="fixture.order"
+        @click="selectTab(fixture.order, fixture.id)"
+        :class="{ active: selectedTabIndex === fixture.order }"
       >
-        {{ fixture }}
+        {{ fixture.title }}
       </div>
     </div>
     <!-- NEW COMPONENT TEST -->
@@ -49,7 +49,7 @@
             <TeamPointsGamesCard :key="teamPlayers" :gamesPointsDetails="teamPlayers.teamPoints.gamesPointsDetails" :totalPointsA="teamPlayers.teamPoints.totalPoints"/>
           </div>
           <div v-else>
-            Loading
+            {{ this.errorUserTeamFixture }}
           </div>
         </div>
       </div>
@@ -70,6 +70,7 @@
     },
     data() {
       return {
+        errorUserTeamFixture: 'Loading . . .',
         selectedTabIndex: 0,
         tabs: [],
         playersForSummonersRiftView: [
@@ -149,7 +150,8 @@
       fetchUserTeamFixture(fixtureId) {
       // Axios GET request to populate the 'teamPlayers' data
       // Replace the URL with your actual API endpoint
-        this.axios.get(`${this.apiURL}FantasyPoints/user_team/${this.$store.getters.getProfileId}/fixture/${fixtureId}`)
+        this.errorUserTeamFixture = 'Loading . . .'
+        this.axios.get(`${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/user_team/${this.$store.getters.getProfileId}/fixture/${fixtureId}`)
             .then((response) => {
             this.teamPlayers = response.data;
             this.correctEmptyPlayers();
@@ -157,12 +159,28 @@
             })
             .catch((error) => {
             console.error("Error fetching team players:", error);
+                this.errorUserTeamFixture = 'No team found for this fixture'
+            });
+        },
+        async getCurrentFixture() {
+
+            const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixture`
+
+            this.axios.get(url).then((response) => {
+                this.$store.commit('setFixtureId', response.data);
+                console.log("Current fixture: ", this.$store.getters.getFixtureId)
+                this.selectedTabIndex = this.$store.getters.getFixtureId;
+                // this.$router.push({name: 'LeaguesView'})
+            }).catch(error => {
+                console.log(error.response);
+                this.errorUserTeamFixture = 'No team found for this fixture'
             });
         },
         fetchUserTeam() {
       // Axios GET request to populate the 'teamPlayers' data
       // Replace the URL with your actual API endpoint
-        this.axios.get(`${this.apiURL}FantasyPoints/user_team/${this.$store.getters.getProfileId}/fixture/${this.$store.getters.getFixtureId}`)
+            this.errorUserTeamFixture = 'Loading . . .'
+        this.axios.get(`${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/user_team/${this.$store.getters.getProfileId}/fixture/${this.$store.getters.getFixtureId}`)
             .then((response) => {
             this.teamPlayers = response.data;
             this.correctEmptyPlayers();
@@ -170,6 +188,7 @@
             })
             .catch((error) => {
             console.error("Error fetching team players:", error);
+            this.errorUserTeamFixture = 'No team found for this fixture'
             });
         },
         teamPlayerToMapPlayer(teamPlayer, isCaptain) {
@@ -223,9 +242,30 @@
         }
     },
     mounted() {
-        this.fetchUserTeam()
-        this.tabs = Array.from({length: this.$store.getters.getFixtureId}, (_, i) => i + 1)
-        this.selectedTabIndex = this.$store.getters.getFixtureId-1;
+        this.getCurrentFixture()
+        
+        this.axios.get(`${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/rules`).then((response) => {
+          this.tabs = response.data.map(function(fix) {
+          var newFix = {
+                id: fix.fixture.id,
+                title: fix.fixture.name,
+                order: fix.fixture.id,
+              } 
+              return newFix;
+              
+            }).sort((a, b) => a.order - b.order);
+            this.fetchUserTeam()
+                // this.$router.push({name: 'LeaguesView'})
+            // this.getCurrentFixture().then((response) => {
+            //     this.selectedTabIndex = this.$store.getters.getFixtureId;
+            //   });
+            }).catch(error => {
+                console.log(error.response);
+            });
+        
+            
+        // this.tabs = Array.from({length: this.$store.getters.getFixtureId}, (_, i) => i + 1)
+        
     }
 }
 </script>
