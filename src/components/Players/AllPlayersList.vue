@@ -45,7 +45,7 @@
                 <td>{{ player.team.code }}</td>
                 <td>{{ player.points }}</td>
                 <td>{{ player.price }}</td>
-                <td ><button class="btn-info" @click="selectPlayer(player)" :disabled="selectedRole != player.role && selectedRole != 'sub'">+</button></td>
+                <td ><button :class="{ 'btn-secondary' : selectedRole != player.role && selectedRole != 'sub', 'btn-info' : selectedRole == player.role || selectedRole == 'sub'}" class="btn btn-secondary" @click="selectPlayer(player)" :disabled="selectedRole != player.role && selectedRole != 'sub'">+</button></td>
                 <!-- </div> -->
             </tr>
         </tbody>
@@ -116,6 +116,7 @@ export default {
     },
     fetchPlayers() {
       this.sortedPlayers = this.players;
+      this.orderPlayers("points");
       console.log("acd", this.sortedPlayers)
       console.log("dsa", this.players)
     }

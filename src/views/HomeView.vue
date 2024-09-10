@@ -9,14 +9,14 @@
             </div>
         </div>
         <div class="row justify-content-center">
-      <div class="col-md-5 ">
+      <div class="col-md-4 ">
         <h2>What is Fantasy LOL?</h2>
         <div class="row pb-4 pt-3">
-          <span>Introducing the <b>"2KPI LoL Worlds 2023 Fantasy Game"</b> – where esports enthusiasts get to step into the shoes of a team manager and put their strategic prowess to the test. Just like traditional Fantasy Premier League (FPL) games in the realm of football, our Fantasy format takes the excitement of competitive gaming to a <b>whole new level</b>.
+          <span>Introducing the <b>"2KPI LoL Fantasy Game"</b> – where esports enthusiasts get to step into the shoes of a team manager and put their strategic prowess to the test. Just like traditional Fantasy Premier League (FPL) games in the realm of football, our Fantasy format takes the excitement of competitive gaming to a <b>whole new level</b>.
           </span></div>
         <div class="row pb-4">
           <span>
-            In this virtual world, participants assemble their <b>dream teams</b> of professional League of Legends players, each with their unique skills and talents. Your mission? To draft the ultimate roster that will accumulate the most points based on <b>real-world performance during the LoL Worlds 2023 tournament</b>.
+            In this virtual world, participants assemble their <b>dream teams</b> of professional League of Legends players, each with their unique skills and talents. Your mission? To draft the ultimate roster that will accumulate the most points based on <b>real-world performance during the League of Legends tournament</b>.
           </span>
         </div>
         <div class="row pb-4">
@@ -31,7 +31,7 @@
         </div>
         <div class="row pb-4">
           <span>
-          So, whether you're a League of Legends fanatic or simply a strategic mastermind, the <b>2KPI LoL Worlds 2023 Fantasy Game</b> provides an opportunity to immerse yourself in the world of professional esports, compete against friends, and experience the thrill of managing your very own championship-winning team. It's time to unleash your inner coach and <b>claim the title of Fantasy League of Legends champion</b>!
+          So, whether you're a League of Legends fanatic or simply a strategic mastermind, the <b>2KPI LoL Fantasy Game</b> provides an opportunity to immerse yourself in the world of professional esports, compete against friends, and experience the thrill of managing your very own championship-winning team. It's time to unleash your inner coach and <b>claim the title of Fantasy League of Legends champion</b>!
         </span>
         </div>
 
@@ -40,7 +40,7 @@
 
       </div>
       
-      <div class="col-md-4" v-if="this.currentFixture != null">
+      <div class="col-md-5" v-if="this.currentFixture != null">
         <div class="text-danger">
           <h3 v-if="new Date() < new Date('2023-11-02')"> NEW LIMITS FOR UPCOMING FIXTURES </h3>
         </div>
@@ -57,17 +57,17 @@
         </div>
         <!--  -->
         <div class="info-section" v-if="this.currentFixture != null && this.currentFixture.fixture.id != null">
-          <h2 class=" pb-4">Fixture {{ this.currentFixture.fixture.id }}</h2>
-          <h4 class=" pb-2">{{this.currentFixture.fixture.name}}</h4>
+          <h2 class=" pb-4">{{ this.currentFixture.fixture.name }}</h2>
+          <!-- <h4 class=" pb-2">{{this.currentFixture.fixture.name}}</h4> -->
           <h4 :class="{
             'text-danger' : ((new Date(this.currentFixture.fixture.deadlineDateTime) - new Date())/ 36e5) < 48, 
-            'text-warning': ((new Date(this.currentFixture.fixture.deadlineDateTime) - new Date())/ 36e5) > 48}">
+            'text-warning': ((new Date(this.currentFixture.fixture.deadlineDateTime) - new Date())/ 36e5) > 48 && ((new Date(this.currentFixture.fixture.deadlineDateTime) - new Date())/ 36e5) < 96}">
             Deadline: {{ this.$func_global.formatDate(this.currentFixture.fixture.deadlineDateTime) }}
           </h4>
         {{  }}
         </div>
         
-        <div class="info-section" v-if="this.currentFixture != null">
+        <div class="info-section col-md-4 offset-md-4" v-if="this.currentFixture != null">
           <h2 class=" pb-4">Rules</h2>
           <table >
             <thead>
@@ -86,7 +86,7 @@
         </div>
 
         <!-- PlayerPoints Section -->
-        <div class="info-section" v-if="this.currentFixture != null">
+        <div class="info-section col-md-4 offset-md-4" v-if="this.currentFixture != null">
           <h2>Player Points</h2>
           <table>
             <thead>
@@ -105,7 +105,7 @@
         </div>
 
         <!-- TeamPoints Section -->
-        <div class="info-section">
+        <div class="info-section col-md-4 offset-md-4">
           <h2>Team Points</h2>
           <table>
             <thead>

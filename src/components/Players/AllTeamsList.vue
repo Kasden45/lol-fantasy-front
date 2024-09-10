@@ -38,7 +38,7 @@
                 <td>{{ team.league }}</td>
                 <td>{{ team.points }}</td>
                 <td>{{ team.price }}</td>
-                <td ><button class="btn-info" @click="selectTeam(team)" :disabled="selectedRole != 'team'">+</button></td>
+                <td ><button :class="{ 'btn-secondary' : selectedRole != 'team', 'btn-info' : selectedRole == 'team'}" class="btn" @click="selectTeam(team)" :disabled="selectedRole != 'team'">+</button></td>
                 <!-- </div> -->
             </tr>
         </tbody>
@@ -105,6 +105,7 @@ export default {
     },
     fetchTeams() {
       this.sortedTeams = this.teams;
+      this.orderTeams("points");
       console.log("acd", this.sortedTeams)
       console.log("dsa", this.teams)
     }

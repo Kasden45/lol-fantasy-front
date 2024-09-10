@@ -8,7 +8,7 @@
           <div  class="col-md-8 team-tile d-flex align-items-center ">
             <PlayerTile :player="teamPlayer" v-if="teamPlayer != null"/>
           </div>
-          <div class="col-md-4 align-items-center">
+          <div class="col-md-4 d-flex justify-content-center align-items-center">
             <button v-if="teamPlayer != null" class="btn btn-danger" @click="removePlayerFromRole(role)">-</button>
             <button class="btn btn-success" v-else @click="addPlayerToRole(role)">+</button>
           </div>
