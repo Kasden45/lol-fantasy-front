@@ -1,6 +1,7 @@
 <template>
-    <div class="filter-div">
-      <label for="filter-method">Filter by: </label>
+  <div class="row">
+    <div class="filter-div  col-5 my-1">
+      <label class="me-1" for="filter-method">Filter by: </label>
       <select id="filter-method" v-model="selectedFilter" @change="filterPlayers(selectedFilter)">
         <option value="any">All</option>
         <optgroup label="Role">
@@ -15,8 +16,8 @@
         </optgroup>
       </select>
     </div>
-    <div class="sorting-div">
-      <label for="sorting-method">Sort by: </label>
+    <div class="sorting-div col-7 my-1">
+      <label class="me-1"  for="sorting-method">Sort by: </label>
       <select id="sorting-method" v-model="selectedSorting" @change="orderPlayers(selectedSorting)">
         <option value="points">Points</option>
         <option value="priceAsc">Price ASC</option>
@@ -25,6 +26,7 @@
         <option value="team">Team</option>
       </select>
     </div>
+  </div>
     <table class="table table-striped list-scrollable">
         <thead>
             <th></th>
@@ -115,7 +117,7 @@ export default {
       this.$emit("playerSelect", player);
     },
     fetchPlayers() {
-      this.sortedPlayers = this.players;
+      this.sortedPlayers = this.players.filter((p) => p.price > 0);
       this.orderPlayers("points");
       console.log("acd", this.sortedPlayers)
       console.log("dsa", this.players)

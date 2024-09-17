@@ -28,7 +28,7 @@
           <!-- Player cards in a row -->
           <div class="row">
             <div
-              v-for="player in team.players"
+              v-for="player in team.players.filter(player => player.price > 0)"
               :key="player.esportsPlayerId"
               class="col-md-4 mb-4"
             >

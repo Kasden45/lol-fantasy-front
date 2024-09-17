@@ -37,6 +37,9 @@
 
 <script>
 export default {
+  props:{
+    oneFixtureId: Number
+  },
 name: 'MatchesView',
   components: {
     
@@ -84,14 +87,6 @@ name: 'MatchesView',
        var jsDate = new Date(datetime);
        return `${jsDate.getDay()}-${jsDate.getUTCMonth()}-${jsDate.getUTCFullYear()} ${jsDate.getUTCHours()}:${jsDate.getUTCMinutes()}`
     },
-    async fetchRulesData() {
-      try {
-        const response = await this.axios.get(`${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/rules`);
-        this.rulesData = response.data;
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    },
     getCurrentFixture() {
             const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixture`
 
@@ -108,7 +103,12 @@ name: 'MatchesView',
             const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixtures`
 
             this.axios.get(url).then((response) => {
+              if(this.oneFixtureId == null) {
                 this.matchesByFixture = response.data.fixturesWithMatches;
+              }
+              else{
+                this.matchesByFixture = response.data.fixturesWithMatches.filter((f) => f.fixture.fixtureId == this.oneFixtureId)
+              }
                 // this.$router.push({name: 'LeaguesView'})
             }).catch(error => {
                 console.log(error.response);
@@ -116,15 +116,6 @@ name: 'MatchesView',
         },
   },
   computed: {
-    playerPointsRules() {
-      return this.rulesData.filter((rule) => rule.type === 'PlayerPoints');
-    },
-    teamPointsRules() {
-      return this.rulesData.filter((rule) => rule.type === 'TeamPoints');
-    },
-    rules() {
-      return this.rulesData.filter((rule) => rule.type === 'Rule');
-    },
     profile() {
     return this.$store.getters.getProfileId;
     }
