@@ -1,11 +1,77 @@
 <!-- TeamSelection.vue -->
 <template>
     <div class="container">
+        
+
       <h1>Team Selection</h1>
-      <h4 v-if="this.nextFixture != null">Next deadline: {{ this.$func_global.formatDate(this.nextFixture.fixture.deadlineDate) }}</h4>
-      <h3 v-if="this.nextFixture != null" :class="{'error-text' : this.teamValue > this.nextFixture.fixture.teamValueLimit}">Price total {{ this.teamValue }}/{{ this.nextFixture.fixture.teamValueLimit }}$</h3>
-      <h3 >Transfers made: {{ this.transfersMade }}</h3>
-      <h3 v-if="this.nextFixture != null" :class="{'error-text' : this.selectedUserTeam.transfersAvailable - this.selectedUserTeam.transfersMade < 0}">Transfers available: {{ this.selectedUserTeam.transfersAvailable > 10 ? '∞' : this.selectedUserTeam.transfersAvailable - this.transfersMade }}/{{ this.nextFixture.fixture.transfersLimit }}</h3>
+      <div class="row">
+      <div class="progress-ring col-8" v-if="this.nextFixture != null">
+          <svg
+            class="progress-ring__svg"
+            :width="radius * 2"
+            :height="radius * 2"
+            viewBox="0 0 500 500"
+          >
+            <!-- Background Circle -->
+            <circle
+              class="progress-ring__background"
+              :r="normalizedRadius"
+              :cx="center"
+              :cy="center"
+              fill="transparent"
+              :stroke-width="strokeWidth"
+            />
+            <!-- Foreground Progress Circle -->
+            <circle
+              class="progress-ring__progress"
+              :r="normalizedRadius"
+              :cx="center"
+              :cy="center"
+              fill="transparent"
+              :stroke-width="strokeWidth"
+              :stroke-dasharray="circumference"
+              :stroke-dashoffset="strokeDashoffset"
+              stroke-linecap="round"
+            />
+            <g transform="rotate(90, 270, 270)">
+            <text
+              class="progress-ring__text"
+              :x="center"
+              :y="center"
+              fill="#000"
+              font-size="28"
+              font-weight="bold"
+              text-anchor="middle"
+              dominant-baseline="middle"
+            >
+             REMAINING BUDGET
+            </text>
+            </g>
+            <g transform="rotate(90, 165, 165)">
+            <text
+              :style="{fill: this.teamValue > this.nextFixture.fixture.teamValueLimit ? 'red' : black}"
+              :class="{'fill-primary' : this.teamValue <= this.nextFixture.fixture.teamValueLimit, 'fill-error' : this.teamValue > this.nextFixture.fixture.teamValueLimit}"
+              class="progress-ring__text"
+              :x="center"
+              :y="center"
+              font-size="34"
+              font-weight="bold"
+              text-anchor="middle"
+              dominant-baseline="middle"
+            >
+              {{ this.nextFixture.fixture.teamValueLimit - teamValue }}$ 
+            </text>
+            </g>
+          </svg>
+          <!--  -->
+        </div>
+        <div class="col-4">
+          <h4 v-if="this.nextFixture != null">Next deadline: {{ this.$func_global.formatDate(this.nextFixture.fixture.deadlineDate) }}</h4>
+          <h3 v-if="this.nextFixture != null" :class="{'error-text' : this.teamValue > this.nextFixture.fixture.teamValueLimit}">Price total {{ this.teamValue }}/{{ this.nextFixture.fixture.teamValueLimit }}$</h3>
+          <h3 >Transfers made: {{ this.transfersMade }}</h3>
+          <h3 v-if="this.nextFixture != null" :class="{'error-text' : this.selectedUserTeam.transfersAvailable - this.selectedUserTeam.transfersMade < 0}">Transfers available: {{ this.selectedUserTeam.transfersAvailable > 10 ? '∞' : this.selectedUserTeam.transfersAvailable - this.transfersMade }}/{{ this.selectedUserTeam.transfersAvailable > 10 ? '∞' : this.nextFixture.fixture.transfersLimit }}</h3>
+        </div>
+      </div>
       <div class="row w-100 justify-content-md-center m-auto">
         <div class="col-md-7">
           <PlayerTeam :currently-picked="this.roleToAddPlayer" @playerRemove="playerRemoved" @rolePick="(r) => roleToAddPlayer = r" :userTeam="selectedUserTeam"/>
@@ -20,7 +86,7 @@
             </select>  
             </div>
             
-      <button v-if="this.nextFixture != null" :class="{ disabled : this.teamValue > this.nextFixture.fixture.teamValueLimit || this.selectedUserTeam.transfersAvailable < this.selectedUserTeam.transfersMade}" @click="submitTeam">Submit Team</button>
+      <button v-if="this.nextFixture != null" class="btn" :class="{ 'btn-warning': !teamIsCorrect, 'btn-success': teamIsCorrect, disabled : !teamIsCorrect}" @click="submitTeam">Submit Team</button>
       <div v-if="this.submittingTeam">
         Saving your team . . .
       </div>
@@ -51,24 +117,31 @@
           </div>
           <!-- <PlayerPointsCard :playerDetails="selectedGame" :totalPoints="totalPointsA" v-if="selectedGame" /> -->
         </div>
-        
       </div>
-      
+
+      <button  class='btn btn-info my-2 col-6 w-100' @click="this.showMatches = !this.showMatches">{{ this.showMatches ? 'Hide matches':'Show matches' }}</button>
+      <div v-if="this.showMatches && this.nextFixture != null" class="col-6 offset-3 ">
+        <MatchesView :oneFixtureId="this.nextFixture.fixture.fixtureId"/>
+      </div>
     </div>
+    
   </template>
   
   <script>
   import PlayersList from "@/components/Players/AllPlayersList.vue" 
   import TeamsList from "@/components/Players/AllTeamsList.vue" 
   import PlayerTeam from "@/components/TeamSelection/PlayerTeam.vue" 
+  import MatchesView from "./MatchesView.vue";
   export default {
     components: {
       PlayersList,
       TeamsList,
-      PlayerTeam
+      PlayerTeam,
+      MatchesView
     },
     data() {
       return {
+        showMatches:false,
         errorSubmittingTeam:false,
         submittingTeam:false,
         successSubmittingTeam: false,
@@ -113,7 +186,11 @@
         selectedPlayers: [],
         loadedPlayers: [],
         matchesByFixture: [],
-        nextFixture: null
+        nextFixture: null,
+        value: 50, // Example value
+      maxValue: 100, // Example max value
+      radius: 150, // Radius of the ring
+      strokeWidth: 40, // Thickness of the ring
       };
     },
     mounted(){
@@ -123,6 +200,52 @@
       // this.getFixtures();
     },
     computed: {
+      center() {
+      return this.radius + this.strokeWidth / 2;
+      },
+      normalizedRadius() {
+        return this.radius - this.strokeWidth / 2;
+      },
+      circumference() {
+        return 2 * Math.PI * this.normalizedRadius;
+      },
+      strokeDashoffset() {
+        const percent = Math.min(this.teamValue / this.nextFixture.fixture.teamValueLimit, 1);
+        return this.circumference - percent * this.circumference;
+      },
+      strokeDashoffsetTransfer() {
+        const percent = (this.nextFixture.fixture.transfersAvailable - this.transfersMade) / this.nextFixture.fixture.transfersLimit;
+        return this.circumference - percent * this.circumference;
+      },
+      teamIsCorrect() {
+        return !(this.teamValue > this.nextFixture.fixture.teamValueLimit || this.selectedUserTeam.transfersAvailable < this.selectedUserTeam.transfersMade || this.pickedPlayersNumber < 7)
+      },
+      pickedPlayersNumber() {
+        
+        let pickedPlayers = 0;
+    // Iterate through the player roles and team
+        for (const role in this.selectedUserTeam) {
+          // eslint-disable-next-line
+          if (this.selectedUserTeam.hasOwnProperty(role)) {
+            const player = this.selectedUserTeam[role].player;
+// eslint-disable-next-line
+            if (player != null && player.hasOwnProperty("price")) {
+              pickedPlayers += 1;
+            }
+          }
+        }
+
+        // Add the team price
+        // eslint-disable-next-line
+        if (this.selectedUserTeam.hasOwnProperty("team") && this.selectedUserTeam.team.team != null) {
+          pickedPlayers += 1;
+        }
+
+        // You can store or display the totalValue as needed
+        console.log("Selected: " + pickedPlayers);
+
+        return pickedPlayers;
+      },
       teamValue() {
         
         let totalValue = 0;
@@ -485,4 +608,33 @@
 .error-text {
   color: red;
 }
+.progress-ring__svg {
+  transform: rotate(-90deg); /* Rotates the ring to start at the top */
+}
+
+.progress-ring__text {
+  font-family: 'Arial', sans-serif;
+}
+
+.progress-ring__background {
+  stroke: var(--GREY-DARKER); /* Background color */
+}
+
+.progress-ring__progress {
+  stroke: var(--PRIMARY); /* Progress bar color */
+  transition: stroke-dashoffset 0.35s; /* Smooth animation */
+  transform: rotate(0deg);
+  transform-origin: 50% 50%;
+}
+
+.fill-primary {
+  fill: var(--PRIMARY);
+}
+
+
+.fill-error {
+  fill: red;
+}
+
+
 </style>

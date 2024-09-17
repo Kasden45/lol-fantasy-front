@@ -1,22 +1,24 @@
 <template>
-    <div class="filter-div">
-      <label for="filter-method">Filter by: </label>
-      <select id="filter-method" v-model="selectedFilter" @change="filterTeams(selectedFilter)">
-        <option value="any">All</option>
-        <optgroup label="Region">
-            <option v-for="uniqueTeamCode in uniqueLeagues" :key="uniqueTeamCode" :value="uniqueTeamCode">{{ uniqueTeamCode }}</option>
-        </optgroup>
-      </select>
-    </div>
-    <div class="sorting-div">
-      <label for="sorting-method">Sort by: </label>
-      <select id="sorting-method" v-model="selectedSorting" @change="orderTeams(selectedSorting)">
-        <option value="points">Points</option>
-        <option value="priceAsc">Price ASC</option>
-        <option value="priceDesc">Price DESC</option>
-        <option value="name">Team name</option>
-        <option value="league">League</option>
-      </select>
+  <div class="row">
+      <div class="filter-div col-5 my-1">
+        <label class="me-1" for="filter-method">Filter by: </label>
+        <select id="filter-method" v-model="selectedFilter" @change="filterTeams(selectedFilter)">
+          <option value="any">All</option>
+          <optgroup label="Region">
+              <option v-for="uniqueTeamCode in uniqueLeagues" :key="uniqueTeamCode" :value="uniqueTeamCode">{{ uniqueTeamCode }}</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="sorting-div col-7 my-1">
+        <label class="me-1" for="sorting-method">Sort by: </label>
+        <select id="sorting-method" v-model="selectedSorting" @change="orderTeams(selectedSorting)">
+          <option value="points">Points</option>
+          <option value="priceAsc">Price ASC</option>
+          <option value="priceDesc">Price DESC</option>
+          <option value="name">Team name</option>
+          <option value="league">League</option>
+        </select>
+      </div>
     </div>
     <table class="table table-striped list-scrollable">
         <thead>
