@@ -38,7 +38,7 @@
             <th></th>
         </thead>
         <tbody>
-            <tr v-for="player in sortedPlayers" :key="player.esportsPlayerId" >
+            <tr v-for="player in sortedPlayers.filter((p) => p.price > 0)" :key="player.esportsPlayerId" >
                 <td><img :src="player.imageUrl" class="player-photo" alt="Player Photo" /></td>
                 <!-- <div class="player-info row"> -->
                     
@@ -166,12 +166,6 @@ th {
     font-weight: 300;
 }
 
-.list-scrollable {
-  height: 50px;
-    
-  flex: 1; /* Make this part expand to fill available space */
-  overflow-y: scroll;
-}
 
 .section-bg ::-webkit-scrollbar {
     background-color: gray;

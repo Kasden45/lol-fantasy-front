@@ -5,7 +5,7 @@
 
       <h1>Team Selection</h1>
       <div class="row">
-      <div class="progress-ring col-8" v-if="this.nextFixture != null">
+      <div class="progress-ring col-3 offset-1 d-flex align-content-start" v-if="this.nextFixture != null">
           <svg
             class="progress-ring__svg"
             :width="radius * 2"
@@ -39,7 +39,7 @@
               :x="center"
               :y="center"
               fill="#000"
-              font-size="28"
+              font-size="26"
               font-weight="bold"
               text-anchor="middle"
               dominant-baseline="middle"
@@ -59,34 +59,99 @@
               text-anchor="middle"
               dominant-baseline="middle"
             >
-              {{ this.nextFixture.fixture.teamValueLimit - teamValue }}$ 
+              {{ this.nextFixture.fixture.teamValueLimit - teamValue }}$ / {{this.nextFixture.fixture.teamValueLimit}}$
             </text>
             </g>
           </svg>
           <!--  -->
         </div>
-        <div class="col-4">
+        <div class="progress-ring col-4 d-flex align-content-start" v-if="this.nextFixture != null">
+          <svg
+            class="progress-ring__svg"
+            :width="radius * 2"
+            :height="radius * 2"
+            viewBox="0 0 500 500"
+          >
+            <!-- Background Circle -->
+            <circle
+              class="progress-ring__background"
+              :r="normalizedRadius"
+              :cx="center"
+              :cy="center"
+              fill="transparent"
+              :stroke-width="strokeWidth"
+            />
+            <!-- Foreground Progress Circle -->
+            <circle
+              class="progress-ring__progress"
+              :r="normalizedRadius"
+              :cx="center"
+              :cy="center"
+              fill="transparent"
+              :stroke-width="strokeWidth"
+              :stroke-dasharray="circumference"
+              :stroke-dashoffset="strokeDashoffsetTransfer"
+              stroke-linecap="round"
+            />
+            <g transform="rotate(90, 270, 270)">
+            <text
+              class="progress-ring__text"
+              :x="center"
+              :y="center"
+              fill="#000"
+              font-size="26"
+              font-weight="bold"
+              text-anchor="middle"
+              dominant-baseline="middle"
+            >
+             REMAINING TRANSFERS
+            </text>
+            </g>
+            <g transform="rotate(90, 165, 165)">
+            <text
+              :class="{'fill-primary' : this.selectedUserTeam.transfersAvailable - this.transfersMade >= 0, 'fill-error' : this.selectedUserTeam.transfersAvailable - this.transfersMade < 0}"
+              class="progress-ring__text"
+              :x="center"
+              :y="center"
+              font-size="34"
+              font-weight="bold"
+              text-anchor="middle"
+              dominant-baseline="middle"
+            >
+            {{ this.selectedUserTeam.transfersAvailable > 10 ? '∞' : this.selectedUserTeam.transfersAvailable - this.transfersMade }} / {{this.nextFixture.fixture.transfersLimit}}
+            </text>
+            </g>
+          </svg>
+          <!--  -->
+        </div>
+        <div class="col-4 d-flex align-items-end">
           <h4 v-if="this.nextFixture != null">Next deadline: {{ this.$func_global.formatDate(this.nextFixture.fixture.deadlineDate) }}</h4>
-          <h3 v-if="this.nextFixture != null" :class="{'error-text' : this.teamValue > this.nextFixture.fixture.teamValueLimit}">Price total {{ this.teamValue }}/{{ this.nextFixture.fixture.teamValueLimit }}$</h3>
+          <!-- <h3 v-if="this.nextFixture != null" :class="{'error-text' : this.teamValue > this.nextFixture.fixture.teamValueLimit}">Price total {{ this.teamValue }}/{{ this.nextFixture.fixture.teamValueLimit }}$</h3>
           <h3 >Transfers made: {{ this.transfersMade }}</h3>
-          <h3 v-if="this.nextFixture != null" :class="{'error-text' : this.selectedUserTeam.transfersAvailable - this.selectedUserTeam.transfersMade < 0}">Transfers available: {{ this.selectedUserTeam.transfersAvailable > 10 ? '∞' : this.selectedUserTeam.transfersAvailable - this.transfersMade }}/{{ this.selectedUserTeam.transfersAvailable > 10 ? '∞' : this.nextFixture.fixture.transfersLimit }}</h3>
+          <h3 v-if="this.nextFixture != null" :class="{'error-text' : this.selectedUserTeam.transfersAvailable - this.transfersMade < 0}">Transfers available: {{ this.selectedUserTeam.transfersAvailable > 10 ? '∞' : this.selectedUserTeam.transfersAvailable - this.transfersMade }}/{{ this.selectedUserTeam.transfersAvailable > 10 ? '∞' : this.nextFixture.fixture.transfersLimit }}</h3> -->
         </div>
       </div>
       <div class="row w-100 justify-content-md-center m-auto">
         <div class="col-md-7">
           <PlayerTeam :currently-picked="this.roleToAddPlayer" @playerRemove="playerRemoved" @rolePick="(r) => roleToAddPlayer = r" :userTeam="selectedUserTeam"/>
             <div class="row justify-content-md-center m-auto py-2">
-              <label class="w-auto" for="captain">Captain: </label>
-            <select class="w-auto" id="captain" v-model="selectedUserTeam.captain">
-              <option value=1>Top</option>
-              <option value=2>Jungle</option>
-              <option value=3>Mid</option>
-              <option value=4>Bottom</option>
-              <option value=5>Support</option>
-            </select>  
+              <div class="col-3 d-flex justify-content-start ps-0">
+                <label class="w-auto d-flex align-self-center me-1" for="captain">Captain: </label>
+                <select class="w-auto" id="captain" v-model="selectedUserTeam.captain">
+                  <option value=1>Top</option>
+                  <option value=2>Jungle</option>
+                  <option value=3>Mid</option>
+                  <option value=4>Bottom</option>
+                  <option value=5>Support</option>
+                </select>  
+              </div>
+              <div class="col-3 offset-6 d-flex justify-content-end px-0">
+                <button v-if="this.nextFixture != null" class="btn sticky-end" :class="{ 'btn-warning': !teamIsCorrect, 'btn-success': teamIsCorrect, disabled : !teamIsCorrect}" @click="submitTeam">Submit Team</button>
+
+              </div>
+              
             </div>
             
-      <button v-if="this.nextFixture != null" class="btn" :class="{ 'btn-warning': !teamIsCorrect, 'btn-success': teamIsCorrect, disabled : !teamIsCorrect}" @click="submitTeam">Submit Team</button>
       <div v-if="this.submittingTeam">
         Saving your team . . .
       </div>
@@ -190,7 +255,7 @@
         value: 50, // Example value
       maxValue: 100, // Example max value
       radius: 150, // Radius of the ring
-      strokeWidth: 40, // Thickness of the ring
+      strokeWidth: 30, // Thickness of the ring
       };
     },
     mounted(){
@@ -214,7 +279,7 @@
         return this.circumference - percent * this.circumference;
       },
       strokeDashoffsetTransfer() {
-        const percent = (this.nextFixture.fixture.transfersAvailable - this.transfersMade) / this.nextFixture.fixture.transfersLimit;
+        const percent = (this.selectedUserTeam.transfersAvailable - this.transfersMade) / this.nextFixture.fixture.transfersLimit;
         return this.circumference - percent * this.circumference;
       },
       teamIsCorrect() {
@@ -569,7 +634,7 @@
 .players-list-container {
   height: 40vh;
   overflow-y: scroll;
-  overflow-x: hidden;
+  overflow-x: scroll;
   padding-left: 0%;
   padding-right: 0%;
   border: 1px solid #ddd;
@@ -577,7 +642,7 @@
 
 ::-webkit-scrollbar {
     width: 5px;
-    height: 15px;
+    height: 5px;
     background-color: var(--DARK-YELLOW);
 }
 
