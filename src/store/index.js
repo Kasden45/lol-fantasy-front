@@ -8,7 +8,7 @@ export default createStore({
             profileId: "",
             login: "",
             fixtureId: "",
-            currentTournamentId: '110852926142971547',
+            currentTournamentId: '112966669920590211',
             email: "",
             token: "",
             roles: [],
