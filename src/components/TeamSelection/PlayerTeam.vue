@@ -1,11 +1,11 @@
 <template>
 
 
-    <PlayerTeamTile :currently-picked="this.currentlyPicked" @playerRemove="playerRemoved" @rolePick="rolePicked" v-if="userTeam != null" :role="'top'" :teamPlayer="userTeam.topPlayer.player" :img_url="top_img"/>
-    <PlayerTeamTile :currently-picked="this.currentlyPicked" @playerRemove="playerRemoved" @rolePick="rolePicked" v-if="userTeam != null" :role="'jungle'" :teamPlayer="userTeam.junglePlayer.player" :img_url="jng_img"/>
-    <PlayerTeamTile :currently-picked="this.currentlyPicked" @playerRemove="playerRemoved" @rolePick="rolePicked" v-if="userTeam != null" :role="'mid'" :teamPlayer="userTeam.midPlayer.player" :img_url="mid_img"/>
-    <PlayerTeamTile :currently-picked="this.currentlyPicked" @playerRemove="playerRemoved" @rolePick="rolePicked" v-if="userTeam != null" :role="'bottom'" :teamPlayer="userTeam.botPlayer.player" :img_url="bot_img"/>
-    <PlayerTeamTile :currently-picked="this.currentlyPicked" @playerRemove="playerRemoved" @rolePick="rolePicked" v-if="userTeam != null" :role="'support'" :teamPlayer="userTeam.supportPlayer.player" :img_url="supp_img"/>
+    <PlayerTeamTile :is-captain="captain==1" :currently-picked="this.currentlyPicked" @playerRemove="playerRemoved" @rolePick="rolePicked" v-if="userTeam != null" :role="'top'" :teamPlayer="userTeam.topPlayer.player" :img_url="top_img"/>
+    <PlayerTeamTile :is-captain="captain==2" :currently-picked="this.currentlyPicked" @playerRemove="playerRemoved" @rolePick="rolePicked" v-if="userTeam != null" :role="'jungle'" :teamPlayer="userTeam.junglePlayer.player" :img_url="jng_img"/>
+    <PlayerTeamTile :is-captain="captain==3" :currently-picked="this.currentlyPicked" @playerRemove="playerRemoved" @rolePick="rolePicked" v-if="userTeam != null" :role="'mid'" :teamPlayer="userTeam.midPlayer.player" :img_url="mid_img"/>
+    <PlayerTeamTile :is-captain="captain==4" :currently-picked="this.currentlyPicked" @playerRemove="playerRemoved" @rolePick="rolePicked" v-if="userTeam != null" :role="'bottom'" :teamPlayer="userTeam.botPlayer.player" :img_url="bot_img"/>
+    <PlayerTeamTile :is-captain="captain==5" :currently-picked="this.currentlyPicked" @playerRemove="playerRemoved" @rolePick="rolePicked" v-if="userTeam != null" :role="'support'" :teamPlayer="userTeam.supportPlayer.player" :img_url="supp_img"/>
     <PlayerTeamTile :currently-picked="this.currentlyPicked" @playerRemove="playerRemoved" @rolePick="rolePicked" v-if="userTeam != null" :role="'sub'" :teamPlayer="userTeam.subPlayer.player" :img_url="sub_img"/>
     <TeamTeamTile :currently-picked="this.currentlyPicked" @playerRemove="playerRemoved" @rolePick="rolePicked" v-if="userTeam != null" :role="'team'" :teamTeam="userTeam.team.team" :img_url="team_img"/>
     
@@ -22,7 +22,8 @@
     props:{
         userTeam: Object,
         readOnly: Boolean,
-        currentlyPicked: String
+        currentlyPicked: String,
+        captain: Number
     },
     data() {
       return {

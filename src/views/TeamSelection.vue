@@ -133,7 +133,7 @@
       </div>
       <div class="row w-100 justify-content-md-center m-auto">
         <div class="col-md-7">
-          <PlayerTeam :currently-picked="this.roleToAddPlayer" @playerRemove="playerRemoved" @rolePick="(r) => roleToAddPlayer = r" :userTeam="selectedUserTeam"/>
+          <PlayerTeam :captain="selectedUserTeam.captain" :currently-picked="this.roleToAddPlayer" @playerRemove="playerRemoved" @rolePick="(r) => roleToAddPlayer = r" :userTeam="selectedUserTeam"/>
             <div class="row justify-content-md-center m-auto py-2">
               <div class="col-3 d-flex justify-content-start ps-0">
                 <label class="w-auto d-flex align-self-center me-1" for="captain">Captain: </label>
