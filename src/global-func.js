@@ -3,11 +3,19 @@ import axios from "axios";
 const apiURL = 'https://localhost:7061'
 
 export const func_global = {
-
+    getDayOfWeek(inputDate) {
+        console.log(inputDate)
+        var dateFormat = inputDate.split('.')
+        const today = new Date(2000+dateFormat[2], dateFormat[1] - 1, dateFormat[0]);
+        console.log(today)
+        
+        const dayOfWeekNumber = today.getDay();
+        const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        return daysOfWeek[dayOfWeekNumber];
+      },
     formatDate(inputDate) {
         // Create a Date object from the input string
             const date = new Date(inputDate);
-            
             // Get the individual date and time components
             const day = date.getUTCDate();
             const month = date.getUTCMonth() + 1; // Months are zero-based
@@ -24,6 +32,42 @@ export const func_global = {
     
             // Construct the formatted date and time string
             const formattedDate = `${formattedDay}.${formattedMonth}.${formattedYear} ${formattedHours}:${formattedMinutes}`;
+    
+            return formattedDate;
+        },
+        formatDateOnly(inputDate) {
+            // Create a Date object from the input string
+                const date = new Date(inputDate);
+                
+                // Get the individual date and time components
+                const day = date.getUTCDate();
+                const month = date.getUTCMonth() + 1; // Months are zero-based
+                const year = date.getUTCFullYear() % 100; // Get the last two digits of the year
+        
+                // Ensure single digits have leading zeros
+                const formattedDay = day < 10 ? `0${day}` : day;
+                const formattedMonth = month < 10 ? `0${month}` : month;
+                const formattedYear = year < 10 ? `0${year}` : year;
+        
+                // Construct the formatted date and time string
+                const formattedDate = `${formattedDay}.${formattedMonth}.${formattedYear}`;
+        
+                return formattedDate;
+            },
+        formatTime(inputDate) {
+        // Create a Date object from the input string
+            const date = new Date(inputDate);
+            
+            // Get the individual date and time components
+            const hours = date.getHours();
+            const minutes = date.getUTCMinutes();
+    
+            // Ensure single digits have leading zeros
+            const formattedHours = hours < 10 ? `0${hours}` : hours;
+            const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+    
+            // Construct the formatted date and time string
+            const formattedDate = `${formattedHours}:${formattedMinutes}`;
     
             return formattedDate;
         },

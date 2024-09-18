@@ -1,9 +1,6 @@
 <!-- TeamSelection.vue -->
 <template>
     <div class="container">
-        
-
-      <h1>Team Selection</h1>
       <div class="row">
       <div class="progress-ring col-3 offset-1 d-flex align-content-start" v-if="this.nextFixture != null">
           <svg
@@ -125,7 +122,12 @@
           <!--  -->
         </div>
         <div class="col-4 d-flex align-items-end">
-          <h4 v-if="this.nextFixture != null">Next deadline: {{ this.$func_global.formatDate(this.nextFixture.fixture.deadlineDate) }}</h4>
+          <h4 
+          v-if="this.nextFixture != null"
+          :class="{
+            'text-danger' : ((new Date(this.nextFixture.fixture.deadlineDate) - new Date())/ 36e5) < 48, 
+            'text-warning': ((new Date(this.nextFixture.fixture.deadlineDate) - new Date())/ 36e5) > 48 && ((new Date(this.nextFixture.fixture.deadlineDate) - new Date())/ 36e5) < 24*7}"
+          >Next deadline: {{ this.$func_global.formatDate(this.nextFixture.fixture.deadlineDate) }}</h4>
           <!-- <h3 v-if="this.nextFixture != null" :class="{'error-text' : this.teamValue > this.nextFixture.fixture.teamValueLimit}">Price total {{ this.teamValue }}/{{ this.nextFixture.fixture.teamValueLimit }}$</h3>
           <h3 >Transfers made: {{ this.transfersMade }}</h3>
           <h3 v-if="this.nextFixture != null" :class="{'error-text' : this.selectedUserTeam.transfersAvailable - this.transfersMade < 0}">Transfers available: {{ this.selectedUserTeam.transfersAvailable > 10 ? '∞' : this.selectedUserTeam.transfersAvailable - this.transfersMade }}/{{ this.selectedUserTeam.transfersAvailable > 10 ? '∞' : this.nextFixture.fixture.transfersLimit }}</h3> -->
@@ -185,7 +187,7 @@
       </div>
 
       <button  class='btn btn-info my-2 col-6 w-100' @click="this.showMatches = !this.showMatches">{{ this.showMatches ? 'Hide matches':'Show matches' }}</button>
-      <div v-if="this.showMatches && this.nextFixture != null" class="col-6 offset-3 ">
+      <div v-if="this.showMatches && this.nextFixture != null" class="col-4 offset-4">
         <MatchesView :oneFixtureId="this.nextFixture.fixture.fixtureId"/>
       </div>
     </div>

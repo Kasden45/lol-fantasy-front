@@ -86,7 +86,6 @@
                   class="dropdown-menu dropdown-menu-end"
                   aria-labelledby="dropdownMenuAccount"
                 >
-                  <li><a class="dropdown-item" href="#">Ustawienia</a></li>
                   <li>
                     <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.worlds_2023 }" class="dropdown-item" href="#" @click="switchTournament(this.worlds_2023)">
                       WORLDS 2023
@@ -102,7 +101,7 @@
                       MSI 2024
                     </a>
                   </li>
-                  <li>
+                  <li v-if="(this.$store.getters.getProfileId != null && this.$store.getters.getProfileId != '')">
                     <a @click="logout" class="dropdown-item" href="#"
                       >Wyloguj się</a
                     >

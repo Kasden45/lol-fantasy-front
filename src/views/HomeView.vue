@@ -84,9 +84,8 @@
             </tbody>
           </table>
         </div>
-
-        <!-- PlayerPoints Section -->
-        <div class="info-section col-md-4 offset-md-4" v-if="this.currentFixture != null">
+        <div class="row">
+          <div class="info-section col-md-4 offset-md-2" v-if="this.currentFixture != null">
           <h2>Player Points</h2>
           <table>
             <thead>
@@ -105,23 +104,26 @@
         </div>
 
         <!-- TeamPoints Section -->
-        <div class="info-section col-md-4 offset-md-4">
-          <h2>Team Points</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Event</th>
-                <th>Points</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="rule in teamPointsRules" :key="rule.name">
-                <td>{{ rule.name }}</td>
-                <td>{{ rule.value }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="info-section col-md-4">
+            <h2>Team Points</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>Event</th>
+                  <th>Points</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="rule in teamPointsRules" :key="rule.name">
+                  <td>{{ rule.name }}</td>
+                  <td>{{ rule.value }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
+        <!-- PlayerPoints Section -->
+        
       </div>
     </div>
     </div>
