@@ -1,5 +1,22 @@
 <template>
-    <div v-for="fixture in this.matchesByFixture" :key="fixture.id" class="w-75 m-auto matches-back">
+  <div class="button-container m-auto row" v-if="this.oneFixtureId == null">
+    <div class="col-6 d-flex justify-self-start">
+      <button class="btn btn-info btn-purple" @click="scrollLeft">&lt;</button>
+    </div>
+    <div class="col-6 d-flex justify-content-end sticky-end">
+      <button class="btn btn-info btn-purple" @click="scrollRight">></button>
+    </div>
+    </div>
+  <div class="fixtures-container m-auto">
+  <div class="fixtures" ref="fixturesContainer">
+        <FixtureCard
+          v-for="fixture in this.matchesByFixture"
+          :key="fixture.id"
+          :fixture="fixture"
+        />
+    </div>
+  </div>
+    <div v-if="false" v-for="fixture in this.matchesByFixture" :key="fixture.id" class="w-75 m-auto matches-back">
         
         <div class="row justify-content-md-center m-auto fixture-header">
             <h2>{{ fixture.fixture.name }}</h2>
@@ -36,13 +53,14 @@
 </template>
 
 <script>
+import FixtureCard from '@/components/Matches/FixtureCard.vue';  
 export default {
   props:{
     oneFixtureId: Number
   },
 name: 'MatchesView',
   components: {
-    
+    FixtureCard
   },  
   data() {
     return {
@@ -60,6 +78,16 @@ name: 'MatchesView',
     console.log(this.profile)
   },
   methods: {
+    scrollRight() {
+      const cardWidth = this.$refs.fixturesContainer.children[0].offsetWidth; // get width of the first card
+      const scrollAmount = cardWidth; // scroll width for 4 cards
+      this.$refs.fixturesContainer.scrollLeft += scrollAmount; // scroll right
+    },
+    scrollLeft() {
+      const cardWidth = this.$refs.fixturesContainer.children[0].offsetWidth; // get width of the first card
+      const scrollAmount = cardWidth; // scroll width for 4 cards
+      this.$refs.fixturesContainer.scrollLeft -= scrollAmount; // scroll left
+    },
     formatDate(inputDate) {
     // Create a Date object from the input string
         const date = new Date(inputDate);
@@ -134,5 +162,39 @@ name: 'MatchesView',
 
 .matches-back {
     background-color: var(--PRIMARY-LIGHTER);
+}
+.fixtures-container {
+  width: 80vw;
+  padding: 20px;
+  /* display: flex; */
+}
+
+.button-container {
+  width: 80vw;
+  padding-left: 50px;
+  padding-right: 0px;
+}
+
+.fixtures {
+  display: flex;
+  justify-content: space-between;
+  width: 80vw;
+  overflow-x: auto;
+  white-space: nowrap;
+  /* background-color: rgb(252, 240, 255) */
+  /* border: 1px solid #ddd; */
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+    height: 10px;
+    background-color: var(--DARK-YELLOW);
+}
+
+.btn-purple {
+  background-color: var(--PRIMARY-LIGHTER);
+  font-weight: 800;
+  color: white;
+  border: none;
 }
 </style>

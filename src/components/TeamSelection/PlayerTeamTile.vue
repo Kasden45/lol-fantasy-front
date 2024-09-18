@@ -1,5 +1,5 @@
 <template>
-    <div  class="row m-auto  team-player" :class="{'picked-position': currentlyPicked == role}">
+    <div  class="row m-auto  team-player" :class="{'picked-position': currentlyPicked == role, 'captain-player': isCaptain}">
       <div class="col-md-2">
         <img :src="img_url" class="player-photo" alt="Player Photo" /> 
       </div>
@@ -29,7 +29,8 @@ export default {
         img_url: String,
         teamPlayer: Object,
         role: String,
-        currentlyPicked: String
+        currentlyPicked: String,
+        isCaptain: Boolean
     },
     components: {
       PlayerTile
@@ -57,6 +58,10 @@ export default {
 
 <style scoped>
 .picked-position {
-  background-color: rgb(52, 118, 194);
+  background-color: rgb(52, 118, 194) !important;
+}
+
+.captain-player {
+  background-color: rgb(250, 212, 44);
 }
 </style>
