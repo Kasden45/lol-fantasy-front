@@ -38,7 +38,7 @@
             <th></th>
         </thead>
         <tbody>
-            <tr v-for="player in sortedPlayers.filter((p) => p.price > 0)" :key="player.esportsPlayerId" >
+            <tr v-for="player in sortedPlayers.filter((p) => p.price > 0)" :key="player.esportsPlayerId" :class="{'player-inactive' :this.teamsPlayingNextFixture.length > 0 && !this.teamsPlayingNextFixture.includes(player.team.code)}">
                 <td><img :src="player.imageUrl" class="player-photo" alt="Player Photo" /></td>
                 <!-- <div class="player-info row"> -->
                     
@@ -47,7 +47,7 @@
                 <td>{{ player.team.code }}</td>
                 <td>{{ player.points }}</td>
                 <td>{{ player.price }}</td>
-                <td ><button :class="{ 'btn-secondary' : selectedRole != player.role && selectedRole != 'sub', 'btn-info' : selectedRole == player.role || selectedRole == 'sub'}" class="btn btn-secondary" @click="selectPlayer(player)" :disabled="selectedRole != player.role && selectedRole != 'sub'">+</button></td>
+                <td ><button :class="{ 'btn-secondary' : selectedRole != player.role && selectedRole != 'sub', 'btn-info' : (selectedRole == player.role || selectedRole == 'sub') && this.teamsPlayingNextFixture.includes(player.team.code)}" class="btn btn-secondary" @click="selectPlayer(player)" :disabled="(!this.teamsPlayingNextFixture.includes(player.team.code)) || (selectedRole != player.role && selectedRole != 'sub')">+</button></td>
                 <!-- </div> -->
             </tr>
         </tbody>
@@ -57,6 +57,7 @@
 <script>
 export default {
     props: {
+        teamsPlayingNextFixture: Array,
         selectedRole: String,
         players: Array
     },
@@ -191,6 +192,9 @@ th {
 .list-scrollable td, th {
     
     padding: 1px 1px 1px 1px ;
+}
+.player-inactive {
+  --bs-table-bg: #f85a6746 !important;
 }
 /* Add any other styling you need */
 </style>

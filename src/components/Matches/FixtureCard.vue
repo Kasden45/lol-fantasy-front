@@ -18,9 +18,15 @@
           >
           <div class="col-2">{{ match.team1 != null ? match.team1.code : "TBD"}}</div>
           <div class="col-2"><img v-if="match.team1 != null" :src="match.team1.imageUrl" class="team-photo" alt="Player Photo" /> </div>
-          <div class="col-2" v-if="match.team1 != null && match.team1.wins != null && match.team2 != null && match.team2.wins != null">
+          <router-link
+          :to="{ name: 'MatchDetailsView', params: {matchId: match.id} }"
+          class="col-2 router-black" v-if="(this.$store.getters.getProfileId != null && this.$store.getters.getProfileId == 5) && (match.team1 != null && match.team1.wins != null && match.team2 != null && match.team2.wins != null)">
             {{ match.team1.wins }} - {{ match.team2.wins }}
-          </div>
+          </router-link>
+          <div
+          class="col-2" v-if="(this.$store.getters.getProfileId == null || this.$store.getters.getProfileId != 5) && (match.team1 != null && match.team1.wins != null && match.team2 != null && match.team2.wins != null)">
+            {{ match.team1.wins }} - {{ match.team2.wins }}
+        </div>
           <div class="col-2" 
             v-if="!((match.team1 != null && match.team1.wins != null) && (match.team2 != null && match.team2.wins != null))"
           >
@@ -131,6 +137,11 @@
   object-fit: cover;
   border-radius: 50%;
   margin-right: 20px;
+}
+
+.router-black {
+  color: black;
+  
 }
 
 </style>

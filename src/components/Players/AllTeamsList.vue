@@ -31,7 +31,7 @@
             <th></th>
         </thead>
         <tbody>
-            <tr v-for="team in sortedTeams" :key="team.esportsTeamId" >
+            <tr v-for="team in sortedTeams" :key="team.esportsTeamId" :class="{'team-inactive' : !this.teamsPlayingNextFixture.includes(team.code)}">
                 <td><img :src="team.imageUrl" class="player-photo" alt="Player Photo" /></td>
                 <!-- <div class="player-info row"> -->
                     
@@ -40,7 +40,7 @@
                 <td>{{ team.league }}</td>
                 <td>{{ team.points }}</td>
                 <td>{{ team.price }}</td>
-                <td ><button :class="{ 'btn-secondary' : selectedRole != 'team', 'btn-info' : selectedRole == 'team'}" class="btn" @click="selectTeam(team)" :disabled="selectedRole != 'team'">+</button></td>
+                <td ><button :class="{ 'btn-secondary' : selectedRole != 'team', 'btn-info' : selectedRole == 'team' && this.teamsPlayingNextFixture.includes(team.code)}" class="btn" @click="selectTeam(team)" :disabled="!this.teamsPlayingNextFixture.includes(team.code) || selectedRole != 'team'">+</button></td>
                 <!-- </div> -->
             </tr>
         </tbody>
@@ -50,6 +50,7 @@
 <script>
 export default {
     props: {
+        teamsPlayingNextFixture: Array,
         selectedRole: String,
         teams: Array
     },
@@ -187,6 +188,10 @@ th {
 .list-scrollable td, th {
     
     padding: 1px 1px 1px 1px ;
+}
+
+.team-inactive {
+  --bs-table-bg: #f85a6746 !important;
 }
 /* Add any other styling you need */
 </style>

@@ -177,10 +177,10 @@
           </div>
         </div>
           <div class="players-list-container" v-if="selectedTabIndex == 0">
-            <PlayersList @playerSelect="playerSelected" :selectedRole="roleToAddPlayer" :players="allPlayers" v-if="allPlayers.length > 0"/>
+            <PlayersList :teamsPlayingNextFixture="teamsPlayingInNextFixture" @playerSelect="playerSelected" :selectedRole="roleToAddPlayer" :players="allPlayers" v-if="allPlayers.length > 0"/>
           </div>
           <div class="players-list-container" v-if="selectedTabIndex == 1">
-            <TeamsList @teamSelect="teamSelected" :selectedRole="roleToAddPlayer" :teams="allTeams" v-if="allTeams.length > 0"/>
+            <TeamsList :teamsPlayingNextFixture="teamsPlayingInNextFixture" @teamSelect="teamSelected" :selectedRole="roleToAddPlayer" :teams="allTeams" v-if="allTeams.length > 0"/>
           </div>
           <!-- <PlayerPointsCard :playerDetails="selectedGame" :totalPoints="totalPointsA" v-if="selectedGame" /> -->
         </div>
@@ -208,6 +208,7 @@
     },
     data() {
       return {
+        teamsPlayingInNextFixture: [],
         showMatches:false,
         errorSubmittingTeam:false,
         submittingTeam:false,
@@ -407,6 +408,10 @@
                         // to get a value that is either negative, positive, or zero.
                         return new Date(a.fixture.deadlineDate) - new Date(b.fixture.deadlineDate);
                       })[0]
+
+            this.teamsPlayingInNextFixture = this.nextFixture.matches
+              .filter(m => m.team1 != null && m.team2 != null).map(m => m.team1).concat(this.nextFixture.matches.filter(m => m.team1 != null && m.team2 != null).map(m => m.team2))
+              .map(m => m.code);
                 // this.$router.push({name: 'LeaguesView'})
             }).catch(error => {
                 console.log(error.response);

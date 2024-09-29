@@ -7,7 +7,7 @@ import GamePointsView from "./views/GamePointsView.vue"; // Import your componen
 import CurrentPointsView from "./views/CurrentPointsView.vue"; // Import your component
 import SingleLeagueView from "./views/SingleLeagueView.vue"; // Import your component
 import MatchesView from "./views/MatchesView.vue"; // Import your component
-
+import MatchDetailsView from "./views/MatchDetailsView.vue";
 
 const routes = [
   { name: "Home", path: "/", component: HomeView },
@@ -17,6 +17,7 @@ const routes = [
   { name: "MatchesView", path: "/matches", component: MatchesView },
   { name: "SingleLeagueView", path: "/leagues/:leagueCode", component: SingleLeagueView },
   { name: "CurrentPointsView", path: "/current-points/:userId", component: CurrentPointsView },
+  { name: "MatchDetailsView", path: "/match-details/:matchId", component: MatchDetailsView },
   { name: "GamePointsView", path: "/points/team/:teamSlug/game/:gameId", component: GamePointsView },
   // Define more routes as needed
 ];
