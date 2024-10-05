@@ -40,13 +40,13 @@
       <div class="row justify-content-md-center">
         <div class="col-md-auto">
           <div v-if="teamPlayers != null">
-            <PlayerPointsGamesCard :isCaptain="teamPlayers.captain == 1" :key="teamPlayers" :gamesPointsDetails="teamPlayers.topPlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.topPlayerPoints.totalPoints"/>
-            <PlayerPointsGamesCard :isCaptain="teamPlayers.captain == 2" :key="teamPlayers" :gamesPointsDetails="teamPlayers.junglePlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.junglePlayerPoints.totalPoints"/>
-            <PlayerPointsGamesCard :isCaptain="teamPlayers.captain == 3" :key="teamPlayers" :gamesPointsDetails="teamPlayers.midPlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.midPlayerPoints.totalPoints"/>
-            <PlayerPointsGamesCard :isCaptain="teamPlayers.captain == 4" :key="teamPlayers" :gamesPointsDetails="teamPlayers.bottomPlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.bottomPlayerPoints.totalPoints"/>
-            <PlayerPointsGamesCard :isCaptain="teamPlayers.captain == 5" :key="teamPlayers" :gamesPointsDetails="teamPlayers.supportPlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.supportPlayerPoints.totalPoints"/>
-            <PlayerPointsGamesCard :isSub="true" :key="teamPlayers" :gamesPointsDetails="teamPlayers.subPlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.subPlayerPoints.totalPoints"/>
-            <TeamPointsGamesCard :key="teamPlayers" :gamesPointsDetails="teamPlayers.teamPoints.gamesPointsDetails" :totalPointsA="teamPlayers.teamPoints.totalPoints"/>
+            <PlayerPointsGamesCard :gamesList="fixtureGames" :isCaptain="teamPlayers.captain == 1" :key="teamPlayers" :gamesPointsDetails="teamPlayers.topPlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.topPlayerPoints.totalPoints"/>
+            <PlayerPointsGamesCard :gamesList="fixtureGames" :isCaptain="teamPlayers.captain == 2" :key="teamPlayers" :gamesPointsDetails="teamPlayers.junglePlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.junglePlayerPoints.totalPoints"/>
+            <PlayerPointsGamesCard :gamesList="fixtureGames" :isCaptain="teamPlayers.captain == 3" :key="teamPlayers" :gamesPointsDetails="teamPlayers.midPlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.midPlayerPoints.totalPoints"/>
+            <PlayerPointsGamesCard :gamesList="fixtureGames" :isCaptain="teamPlayers.captain == 4" :key="teamPlayers" :gamesPointsDetails="teamPlayers.bottomPlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.bottomPlayerPoints.totalPoints"/>
+            <PlayerPointsGamesCard :gamesList="fixtureGames" :isCaptain="teamPlayers.captain == 5" :key="teamPlayers" :gamesPointsDetails="teamPlayers.supportPlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.supportPlayerPoints.totalPoints"/>
+            <PlayerPointsGamesCard :gamesList="fixtureGames" :isSub="true" :key="teamPlayers" :gamesPointsDetails="teamPlayers.subPlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.subPlayerPoints.totalPoints"/>
+            <TeamPointsGamesCard :gamesList="fixtureGames" :key="teamPlayers" :gamesPointsDetails="teamPlayers.teamPoints.gamesPointsDetails" :totalPointsA="teamPlayers.teamPoints.totalPoints"/>
           </div>
           <div v-else>
             {{ this.errorUserTeamFixture }}
@@ -70,6 +70,7 @@
     },
     data() {
       return {
+        fixtureGames: [],
         errorUserTeamFixture: 'Loading . . .',
         selectedTabIndex: 0,
         tabs: [],
@@ -239,7 +240,16 @@
             {
                 this.teamPlayers.teamPoints.gamesPointsDetails = [this.teamPlayers.teamPoints.team]
             }
-        }
+        },
+      FetchFixtureGames() {
+        this.axios.get(`${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/matches`)
+        .then(response => {
+            this.fixtureGames = response.data;
+        })
+        .catch(error => {
+            console.error("Error fetching fixture games:", error);
+        });
+      },
     },
     mounted() {
         this.getCurrentFixture()
@@ -263,7 +273,7 @@
                 console.log(error.response);
             });
         
-            
+        this.FetchFixtureGames();
         // this.tabs = Array.from({length: this.$store.getters.getFixtureId}, (_, i) => i + 1)
         
     }

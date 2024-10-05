@@ -12,7 +12,7 @@
         @click="selectGame(index)"
         :class="{ active: selectedGameIndex === index }"
       >
-        Game {{ index + 1 }}
+      {{this.getGameHeader(game.gameId)}}
       </div>
     </div>
       <PlayerPointsCard :isSub="isSub" :playerDetails="selectedGame" :isCaptain="isCaptain" :totalPoints="totalPointsA" v-if="selectedGame" />
@@ -25,6 +25,7 @@
   export default {
     name: "PlayerPointsGamesCard",
     props:{
+      gamesList: Array,
       gamesPointsDetails: Array,
       totalPointsA: Number,
       isCaptain: Boolean,
@@ -44,6 +45,14 @@
         }
     },
     methods: {
+      getGameHeader(gameId) {
+        console.log(gameId);
+        console.log(this.gamesList);
+        var game = this.gamesList.find(game => game.gameId === gameId);
+        if(!game) return '';
+        var teamCode = this.gamesPointsDetails[0].team.code;
+        return `Game ${game.gameNumber} vs ${game.gameTeam1 == teamCode ? game.gameTeam2 : game.gameTeam1}`;
+      },
     calculateTotalPoints(pointsDetails) {
       return Object.values(pointsDetails).reduce((total, points) => total + points.points, 0);
     },
@@ -64,12 +73,14 @@
 .game-tabs {
   display: flex;
   margin-bottom: 20px;
+  overflow-x: scroll;
 }
 
 .game-tabs div {
   cursor: pointer;
   padding: 10px 20px;
   border: 1px solid #ccc;
+  min-width: 120px;
   border-radius: 4px;
   margin-right: 10px;
 }
@@ -83,5 +94,11 @@
   border: 1px solid #ccc;
   padding: 10px;
   border-radius: 4px;
+}
+
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
 }
 </style>

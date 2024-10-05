@@ -29,7 +29,7 @@
                     </tbody>
                 </table>
                 <div class="total-points pe-2">
-                    <p>Game points: {{ playerDetails.points }}</p>
+                    <p>Game points: {{ playerDetails.points.toFixed(2) }}</p>
                 </div>
             </div>
         </div>

@@ -3,13 +3,13 @@
     <td v-if="participantData != null">{{ participantData.userLogin }}
 
         <div v-if="participantData != null && participantData.userTeam != null && showDetails" >
-                            <PlayerPointsGamesCard :isCaptain="participantData.userTeam.captain == 1" :gamesPointsDetails="participantData.userTeam.topPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.topPlayerPoints.totalPoints"/>
-                            <PlayerPointsGamesCard :isCaptain="participantData.userTeam.captain == 2" :gamesPointsDetails="participantData.userTeam.junglePlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.junglePlayerPoints.totalPoints"/>
-                            <PlayerPointsGamesCard :isCaptain="participantData.userTeam.captain == 3" :gamesPointsDetails="participantData.userTeam.midPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.midPlayerPoints.totalPoints"/>
-                            <PlayerPointsGamesCard :isCaptain="participantData.userTeam.captain == 4" :gamesPointsDetails="participantData.userTeam.bottomPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.bottomPlayerPoints.totalPoints"/>
-                            <PlayerPointsGamesCard :isCaptain="participantData.userTeam.captain == 5" :gamesPointsDetails="participantData.userTeam.supportPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.supportPlayerPoints.totalPoints"/>
-                            <PlayerPointsGamesCard :isSub="true" :gamesPointsDetails="participantData.userTeam.subPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.subPlayerPoints.totalPoints"/>
-                            <TeamPointsGamesCard :gamesPointsDetails="participantData.userTeam.teamPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.teamPoints.totalPoints"/>
+                            <PlayerPointsGamesCard :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 1" :gamesPointsDetails="participantData.userTeam.topPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.topPlayerPoints.totalPoints"/>
+                            <PlayerPointsGamesCard :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 2" :gamesPointsDetails="participantData.userTeam.junglePlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.junglePlayerPoints.totalPoints"/>
+                            <PlayerPointsGamesCard :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 3" :gamesPointsDetails="participantData.userTeam.midPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.midPlayerPoints.totalPoints"/>
+                            <PlayerPointsGamesCard :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 4" :gamesPointsDetails="participantData.userTeam.bottomPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.bottomPlayerPoints.totalPoints"/>
+                            <PlayerPointsGamesCard :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 5" :gamesPointsDetails="participantData.userTeam.supportPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.supportPlayerPoints.totalPoints"/>
+                            <PlayerPointsGamesCard :gamesList="fixtureGames" :isSub="true" :gamesPointsDetails="participantData.userTeam.subPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.subPlayerPoints.totalPoints"/>
+                            <TeamPointsGamesCard :gamesList="fixtureGames" :gamesPointsDetails="participantData.userTeam.teamPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.teamPoints.totalPoints"/>
                 </div>
 
     </td>
@@ -36,6 +36,7 @@
   },
   props: {
     participant: Object, // Pass the participant data as a prop
+    fixtureGames: Array
   },
     data() {
       return {

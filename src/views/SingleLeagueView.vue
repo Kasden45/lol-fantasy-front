@@ -8,11 +8,12 @@
           <div class="game-tabs ms-2 justify-content-md-center">
           <div
             v-for="(fixture, index) in tabs"
-            :key="index"
-            @click="selectTab(index, fixture)"
-            :class="{ active: selectedTabIndex === index }"
+            :key="fixture.order"
+            @click="selectTab(fixture.order, fixture.id)"
+            :class="{ active: selectedTabIndex === fixture.order }"
           >
-            {{ fixture != 0 ? fixture : 'General' }}
+          {{ fixture.title }}
+            <!-- {{ fixture != 0 ? fixture : 'General' }} -->
           </div>
         </div>
         <div class="container">
@@ -32,19 +33,7 @@
             <tbody>
               <tr v-for="(participant, index) in currentLeague.participants.sort(calculatePosition)" :key="participant.userId">
               <td>{{ index+1 }}.</td>  
-              <ParticipantDetails :participant="participant" />
-                  <!-- {{ participant.userId }}
-                  {{ participant.joinedAt }}
-                  {{ participant.totalPoints }}
-                  <div v-if="participant.userTeam != null && showDetails" >
-                    <PlayerPointsGamesCard :gamesPointsDetails="participant.userTeam.topPlayerPoints.gamesPointsDetails" :totalPointsA="participant.userTeam.topPlayerPoints.totalPoints"/>
-                    <PlayerPointsGamesCard :gamesPointsDetails="participant.userTeam.junglePlayerPoints.gamesPointsDetails" :totalPointsA="participant.userTeam.junglePlayerPoints.totalPoints"/>
-                    <PlayerPointsGamesCard :gamesPointsDetails="participant.userTeam.midPlayerPoints.gamesPointsDetails" :totalPointsA="participant.userTeam.midPlayerPoints.totalPoints"/>
-                    <PlayerPointsGamesCard :gamesPointsDetails="participant.userTeam.bottomPlayerPoints.gamesPointsDetails" :totalPointsA="participant.userTeam.bottomPlayerPoints.totalPoints"/>
-                    <PlayerPointsGamesCard :gamesPointsDetails="participant.userTeam.supportPlayerPoints.gamesPointsDetails" :totalPointsA="participant.userTeam.supportPlayerPoints.totalPoints"/>
-                    <PlayerPointsGamesCard :gamesPointsDetails="participant.userTeam.subPlayerPoints.gamesPointsDetails" :totalPointsA="participant.userTeam.subPlayerPoints.totalPoints"/>
-                    <TeamPointsGamesCard :gamesPointsDetails="participant.userTeam.teamPoints.gamesPointsDetails" :totalPointsA="participant.userTeam.teamPoints.totalPoints"/>
-                  </div> -->
+              <ParticipantDetails :participant="participant" :fixtureGames="this.fixtureGames"/>
                 </tr>
             </tbody>
           </table>
@@ -100,6 +89,7 @@
         invitationCode: "",
         userLeagues: [],
         currentLeague: null,
+        fixtureGames: [],
       };
     },
     methods: {
@@ -108,12 +98,19 @@
         var bPoints = b.points != null ? b.points : (b.userTeam != null ? b.userTeam.totalPoints : 0)
         return (aPoints < bPoints) ? 1 : (aPoints > bPoints) ? -1 : 0
       },
-      selectTab(index, f){
-        var fixture = f != 0 ? f : null;
+      selectTab(index, fixture){
         this.selectedTabIndex = index;
         console.log(this.selectedTabIndex);
         this.currentLeague = this.fixturesData.fixtures.find((element) => element.fixture == fixture);
+
+        // this.currentLeague = this.fixturesData.fixtures.find((element) => element.fixture == fixture);
       },
+      // selectTab(index, f){
+      //   var fixture = f != 0 ? f : null;
+      //   this.selectedTabIndex = index;
+      //   console.log(this.selectedTabIndex);
+      //   this.currentLeague = this.fixturesData.fixtures.find((element) => element.fixture == fixture);
+      // },
       async getLeagueDetails(invitationCode) {
         try {
           const response = await this.axios.get(`${this.apiURL}User/league/${invitationCode}`);
@@ -128,9 +125,10 @@
           const response = await this.axios.get(`${this.apiURL}User/league/${invitationCode}/fixtures`);
           this.currentLeague = response.data.fixtures.find((element) => element.fixture == null);
           this.fixturesData = response.data;
-          this.tabs = response.data.fixtures.map(function(fix) {
-              return fix.fixture != null ? fix.fixture : 0;
-            }).sort();
+          this.FetchRules();
+          // this.tabs = response.data.fixtures.map(function(fix) {
+          //     return fix.fixture != null ? fix.fixture : 0;
+          //   }).sort();
           console.log("get league details", this.currentLeague)
         } catch (error) {
           console.error("Error fetching league details:", error);
@@ -144,12 +142,48 @@
         console.error("Error fetching user leagues:", error);
       }
     },
+    FetchFixtureGames() {
+        this.axios.get(`${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/matches`)
+        .then(response => {
+            this.fixtureGames = response.data;
+        })
+        .catch(error => {
+            console.error("Error fetching fixture games:", error);
+        });
+      },
+      FetchRules() {
+        this.axios.get(`${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/rules`).then((response) => {
+          var generalTab = [{
+            id: this.fixturesData.fixtures.find((element) => element.fixture == null).fixture,
+            title: 'General',
+            order: 0,
+          }];
+          
+          this.tabs = generalTab.concat(response.data.map(function(fix) {
+          var newFix = {
+                id: fix.fixture.id,
+                title: fix.fixture.name,
+                order: fix.fixture.id,
+              } 
+              return newFix;
+              
+            }))
+            .filter(
+              (tab) => this.fixturesData.fixtures.map(f => f.fixture).includes(tab.id)
+            )
+            .sort((a, b) => a.order - b.order);
+          }).catch(error => {
+              console.log(error.response);
+          });
+      }
     },
     mounted() {
         this.invitationCode = this.$route.params.leagueCode;
       // Fetch the list of leagues the user is in when the component is mounted
         // this.getLeagueDetails(this.invitationCode);
         this.getLeagueDetailsWithFixtures(this.invitationCode);
+        this.FetchFixtureGames();
+        
     },
     
   };
