@@ -30,7 +30,12 @@
           <div class="col-2" 
             v-if="!((match.team1 != null && match.team1.wins != null) && (match.team2 != null && match.team2.wins != null))"
           >
-            {{ this.$func_global.formatTime(match.startTime) }}
+            <div class="match-result">
+              Bo{{ match.maxGames }}
+            </div>
+            <div class="match-result">
+              {{ this.$func_global.formatTime(match.startTime) }}
+            </div>
           </div>
           <div class="col-2"><img v-if="match.team2 != null" :src="match.team2.imageUrl" class="team-photo" alt="Player Photo" /> </div>
           <div class="col-2">{{ match.team2 != null ? match.team2.code : "TBD" }}</div>
@@ -144,4 +149,7 @@
   
 }
 
+.match-result {
+  font-size: 14px;
+}
 </style>
