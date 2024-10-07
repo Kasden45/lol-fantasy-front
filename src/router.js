@@ -8,6 +8,7 @@ import CurrentPointsView from "./views/CurrentPointsView.vue"; // Import your co
 import SingleLeagueView from "./views/SingleLeagueView.vue"; // Import your component
 import MatchesView from "./views/MatchesView.vue"; // Import your component
 import MatchDetailsView from "./views/MatchDetailsView.vue";
+import SettingsView from "./views/SettingsView.vue"; // Import your component
 
 const routes = [
   { name: "Home", path: "/", component: HomeView },
@@ -15,6 +16,7 @@ const routes = [
   { name: "PlayersView", path: "/players", component: PlayersView },
   { name: "LeaguesView", path: "/leagues", component: LeaguesView },
   { name: "MatchesView", path: "/matches", component: MatchesView },
+  { name: "SettingsView", path: "/settings", component: SettingsView },
   { name: "SingleLeagueView", path: "/leagues/:leagueCode", component: SingleLeagueView },
   { name: "CurrentPointsView", path: "/current-points/:userId", component: CurrentPointsView },
   { name: "MatchDetailsView", path: "/match-details/:matchId", component: MatchDetailsView },

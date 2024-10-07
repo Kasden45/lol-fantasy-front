@@ -87,6 +87,14 @@
                   aria-labelledby="dropdownMenuAccount"
                 >
                   <li>
+                    <a @click="this.$router.push({ name: 'SettingsView' })"
+                    class="dropdown-item"
+                    href="#">
+                      <span>Settings</span>
+                      <span class="inform"> NEW</span>
+                  </a>
+                  </li>
+                  <li>
                     <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.worlds_2023 }" class="dropdown-item" href="#" @click="switchTournament(this.worlds_2023)">
                       WORLDS 2023
                     </a>
@@ -203,6 +211,10 @@
 }
 .active-tournament {
   background-color: var(--GREY-LIGHT);
+  color: var(--PRIMARY);
+}
+
+.inform{
   color: var(--PRIMARY);
 }
   </style>
