@@ -50,6 +50,7 @@
         this.axios.get(`${this.apiURL}User/${this.$store.getters.getProfileId}/settings`)
         .then((response) => {
           this.userSettings = response.data;
+          this.userSettings.settings[0].value = this.userSettings.settings[0].value == 1 ? true : false;
         })
         .catch((error) => {
           console.error("Error fetching team players:", error);
