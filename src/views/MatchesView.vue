@@ -132,7 +132,7 @@ name: 'MatchesView',
 
             this.axios.get(url).then((response) => {
               if(this.oneFixtureId == null) {
-                this.matchesByFixture = response.data.fixturesWithMatches;
+                this.matchesByFixture = response.data.fixturesWithMatches.sort((a, b) => a.fixture.order - b.fixture.order);
               }
               else{
                 this.matchesByFixture = response.data.fixturesWithMatches.filter((f) => f.fixture.fixtureId == this.oneFixtureId)

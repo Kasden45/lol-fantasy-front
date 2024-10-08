@@ -134,7 +134,7 @@
         </div>
       </div>
       <div class="row w-100 justify-content-md-center m-auto">
-        <div class="col-md-7">
+        <div class="col-md-6">
           <PlayerTeam :captain="selectedUserTeam.captain" :currently-picked="this.roleToAddPlayer" @playerRemove="playerRemoved" @rolePick="(r) => roleToAddPlayer = r" :userTeam="selectedUserTeam"/>
             <div class="row justify-content-md-center m-auto py-2">
               <div class="col-3 d-flex justify-content-start ps-0">
@@ -165,7 +165,7 @@
       </div>
     </div>
         
-        <div class="game-points col-md-5" >
+        <div class="game-points col-md-6" >
           <div class="game-tabs ms-2">
           <div
             v-for="(game, index) in tabs"
@@ -175,6 +175,9 @@
           >
             {{ game }}
           </div>
+          <p>
+            Checkout new sorting options!
+          </p>
         </div>
           <div class="players-list-container" v-if="selectedTabIndex == 0">
             <PlayersList :teamsPlayingNextFixture="teamsPlayingInNextFixture" @playerSelect="playerSelected" :selectedRole="roleToAddPlayer" :players="allPlayers" v-if="allPlayers.length > 0"/>

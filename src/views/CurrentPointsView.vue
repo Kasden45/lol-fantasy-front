@@ -1,7 +1,4 @@
 <template>
-  <div>
-      <h1 v-if="this.tabs[this.selectedTabIndex] != null">Points in fixture {{ this.tabs[this.selectedTabIndex].title }}</h1>
-  </div>
   <div class="game-points col-md-12" >
     <div class="game-tabs ms-2 justify-content-md-center">
       <div
@@ -170,7 +167,7 @@
             this.axios.get(url).then((response) => {
                 this.$store.commit('setFixtureId', response.data);
                 console.log("Current fixture: ", this.$store.getters.getFixtureId)
-                this.selectedTabIndex = this.$store.getters.getFixtureId;
+                
                 // this.$router.push({name: 'LeaguesView'})
             }).catch(error => {
                 console.log(error.response);
@@ -259,12 +256,13 @@
           var newFix = {
                 id: fix.fixture.id,
                 title: fix.fixture.name,
-                order: fix.fixture.id,
+                order: fix.fixture.order,
               } 
               return newFix;
               
             }).sort((a, b) => a.order - b.order);
             this.fetchUserTeam()
+            this.selectedTabIndex = this.tabs.find((element) => element.id == this.$store.getters.getFixtureId).order;
                 // this.$router.push({name: 'LeaguesView'})
             // this.getCurrentFixture().then((response) => {
             //     this.selectedTabIndex = this.$store.getters.getFixtureId;

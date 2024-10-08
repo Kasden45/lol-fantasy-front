@@ -1,10 +1,19 @@
 <template>
     <img :src="team.imageUrl" class="player-photo " alt="Player Photo" /> 
-    <span class="pe-2"><strong>{{ team.name }}  </strong></span>
+    <!-- <span class="pe-2"><strong>{{ team.name }}  </strong></span>
     <span class="px-1">{{ team.code }}</span>
     <span class="px-1">{{ team.league   }}</span>
     <span class="px-1">{{ team.points }}pts</span>
-    <span class="px-1">{{ team.price }}$</span>
+    <span class="px-1">{{ team.price }}$</span> -->
+    <div class="container">
+    <div class="row align-items-center">
+      <div class="pe-2 col-4 text-start"><strong>{{ team.name }}  </strong></div>
+      <div class="px-1 col-2"><strong>{{ team.code }}</strong></div>
+      <div class="px-1 col-2">{{ team.league }}</div>
+      <div class="px-1 col-2">{{ team.points.toFixed(0) }}pts</div>
+      <div class="px-1 col-2">{{ team.price }}$</div>
+    </div>
+  </div>
 </template>
 
 <script>

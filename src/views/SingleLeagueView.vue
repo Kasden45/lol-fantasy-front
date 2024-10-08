@@ -163,7 +163,7 @@
           var newFix = {
                 id: fix.fixture.id,
                 title: fix.fixture.name,
-                order: fix.fixture.id,
+                order: fix.fixture.order,
               } 
               return newFix;
               

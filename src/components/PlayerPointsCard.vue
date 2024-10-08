@@ -7,7 +7,8 @@
             <p>{{ playerDetails.summonerName }}</p>
             <p class="role">{{ playerDetails.role }}</p>
             <p>{{ playerDetails.team.name }}</p>
-            <p class="points" v-if="totalPoints != null">{{ totalPoints.toFixed(2) }} pts</p>
+            <p class="points" :class="{'crossed':this.isCaptain}" v-if="totalPoints != null">{{ totalPoints.toFixed(2) }} pts</p>
+            <p class="points fs-6" v-if="this.isCaptain">{{ (totalPoints*2).toFixed(2) }} pts</p>
           </div>
         </div>
         <div class="col-md-9">
@@ -29,7 +30,9 @@
                     </tbody>
                 </table>
                 <div class="total-points pe-2">
-                    <p>Game points: {{ playerDetails.points.toFixed(2) }}</p>
+                    <span >Game points: </span>
+                    <span :class="{'crossed':this.isCaptain}">{{ playerDetails.points.toFixed(2) }} </span>
+                    <span v-if="this.isCaptain">  => {{ (playerDetails.points*2).toFixed(2) }}</span>
                 </div>
             </div>
         </div>
@@ -177,5 +180,8 @@
 }
 .sub {
   background-color: rgba(114, 106, 106, 0.432);
+}
+.crossed {
+  text-decoration: line-through;
 }
 </style>

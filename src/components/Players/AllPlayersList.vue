@@ -20,6 +20,8 @@
       <label class="me-1"  for="sorting-method">Sort by: </label>
       <select id="sorting-method" v-model="selectedSorting" @change="orderPlayers(selectedSorting)">
         <option value="points">Points</option>
+        <option value="pointsGame">Pts/game</option>
+        <option value="pointsGamePrice">Pts/game/$</option>
         <option value="priceAsc">Price ASC</option>
         <option value="priceDesc">Price DESC</option>
         <option value="summonerName">Summoner Name</option>
@@ -33,20 +35,26 @@
             <th>Player</th>
             <th>Role</th>
             <th>Team</th>
-            <th>Points</th>
+            <th>Games</th>
+            <th>Pts</th>
+            <th>Pts/g</th>
+            <th>Pts/g/$</th>
             <th>Price</th>
             <th></th>
         </thead>
         <tbody>
             <tr v-for="player in sortedPlayers.filter((p) => p.price > 0)" :key="player.esportsPlayerId" :class="{'player-inactive' :this.teamsPlayingNextFixture.length > 0 && !this.teamsPlayingNextFixture.includes(player.team.code)}">
-                <td><img :src="player.imageUrl" class="player-photo" alt="Player Photo" /></td>
+                <td><img :src="player.imageUrl" class="player-photo-list" alt="Player Photo" /></td>
                 <!-- <div class="player-info row"> -->
                     
                 <td><strong>{{ player.summonerName }}</strong></td>
                 <td>{{ player.role }}</td>
                 <td>{{ player.team.code }}</td>
-                <td>{{ player.points }}</td>
-                <td>{{ player.price }}</td>
+                <td class="text-center">{{ player.gamesPlayed }}</td>
+                <td class="text-center" :class="{'higlighted':this.selectedSorting=='points'}">{{ player.points.toFixed(0) }}</td>
+                <td class="text-center" :class="{'higlighted':this.selectedSorting=='pointsGame'}">{{ (player.points/player.gamesPlayed).toFixed(0) }}</td>
+                <td class="text-center" :class="{'higlighted':this.selectedSorting=='pointsGamePrice'}">{{ (player.points/player.gamesPlayed/player.price).toFixed(2) }}</td>
+                <td class="text-center" :class="{'higlighted':this.selectedSorting=='priceAsc' || this.selectedSorting=='priceDesc'}">{{ player.price }}</td>
                 <td ><button :class="{ 'btn-secondary' : selectedRole != player.role && selectedRole != 'sub', 'btn-info' : (selectedRole == player.role || selectedRole == 'sub') && this.teamsPlayingNextFixture.includes(player.team.code)}" class="btn btn-secondary" @click="selectPlayer(player)" :disabled="(!this.teamsPlayingNextFixture.includes(player.team.code)) || (selectedRole != player.role && selectedRole != 'sub')">+</button></td>
                 <!-- </div> -->
             </tr>
@@ -77,6 +85,13 @@ export default {
       if (option == "points") {
         this.sortedPlayers = this.sortedPlayers.sort((a,b) => (a.points < b.points) ? 1 : (a.points > b.points) ? -1 : 0)
       }
+      if (option == "pointsGame") {
+        this.sortedPlayers = this.sortedPlayers.sort((a,b) => ((a.points/a.gamesPlayed) < (b.points/b.gamesPlayed)) ? 1 : ((a.points/a.gamesPlayed) > (b.points/b.gamesPlayed)) ? -1 : 0)
+      }
+      if (option == "pointsGamePrice") {
+        this.sortedPlayers = this.sortedPlayers.sort((a,b) => ((a.points/a.gamesPlayed/a.price) < (b.points/b.gamesPlayed/b.price)) ? 1 : ((a.points/a.gamesPlayed/a.price) > (b.points/b.gamesPlayed/b.price)) ? -1 : 0)
+      }
+      
       if (option == "summonerName") {
         this.sortedPlayers = this.sortedPlayers.sort((a,b) => {
         if (a.summonerName.toLowerCase() === b.summonerName.toLowerCase()) return 0;
@@ -147,7 +162,15 @@ export default {
   height: 50px;
   object-fit: cover;
   border-radius: 50%;
-  margin-right: 20px;
+  /* margin-right: 20px; */
+}
+
+.player-photo-list {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 50%;
+  /* margin-right: 20px; */
 }
 
 .player-info {
@@ -195,6 +218,11 @@ th {
 }
 .player-inactive {
   --bs-table-bg: #f85a6746 !important;
+}
+.higlighted {
+  color: VAR(--PRIMARY) !important;
+  font-weight: 800 !important;
+  font-style: italic;
 }
 /* Add any other styling you need */
 </style>

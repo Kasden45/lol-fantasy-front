@@ -13,6 +13,8 @@
         <label class="me-1" for="sorting-method">Sort by: </label>
         <select id="sorting-method" v-model="selectedSorting" @change="orderTeams(selectedSorting)">
           <option value="points">Points</option>
+          <option value="pointsGame">Pts/game</option>
+          <option value="pointsGamePrice">Pts/game/$</option>
           <option value="priceAsc">Price ASC</option>
           <option value="priceDesc">Price DESC</option>
           <option value="name">Team name</option>
@@ -26,7 +28,10 @@
             <th>Name</th>
             <th>Code</th>
             <th>League</th>
-            <th>Points</th>
+            <th>Games</th>
+            <th>Pts</th>
+            <th>Pts/g</th>
+            <th>Pts/g/$</th>
             <th>Price</th>
             <th></th>
         </thead>
@@ -38,8 +43,11 @@
                 <td><strong>{{ team.name }}</strong></td>
                 <td>{{ team.code }}</td>
                 <td>{{ team.league }}</td>
-                <td>{{ team.points }}</td>
-                <td>{{ team.price }}</td>
+                <td>{{ team.gamesPlayed }}</td>
+                <td :class="{'higlighted':this.selectedSorting=='points'}">{{ team.points.toFixed(0) }}</td>
+                <td :class="{'higlighted':this.selectedSorting=='pointsGame'}">{{ (team.points/team.gamesPlayed).toFixed(0) }}</td>
+                <td :class="{'higlighted':this.selectedSorting=='pointsGamePrice'}">{{ (team.points/team.gamesPlayed/team.price).toFixed(2) }}</td>
+                <td :class="{'higlighted':this.selectedSorting=='priceAsc' || this.selectedSorting=='priceDesc'}">{{ team.price }}</td>
                 <td ><button :class="{ 'btn-secondary' : selectedRole != 'team', 'btn-info' : selectedRole == 'team' && this.teamsPlayingNextFixture.includes(team.code)}" class="btn" @click="selectTeam(team)" :disabled="!this.teamsPlayingNextFixture.includes(team.code) || selectedRole != 'team'">+</button></td>
                 <!-- </div> -->
             </tr>
@@ -67,8 +75,14 @@ export default {
   },
   methods: {
     orderTeams(option) {
+      if (option == "pointsGame") {
+        this.sortedTeams = this.sortedTeams.sort((a,b) => ((a.points/a.gamesPlayed) < (b.points/b.gamesPlayed)) ? 1 : ((a.points/a.gamesPlayed) > (b.points/b.gamesPlayed)) ? -1 : 0)
+      }
       if (option == "points") {
         this.sortedTeams = this.sortedTeams.sort((a,b) => (a.points < b.points) ? 1 : (a.points > b.points) ? -1 : 0)
+      }
+      if (option == "pointsGamePrice") {
+        this.sortedTeams = this.sortedTeams.sort((a,b) => ((a.points/a.gamesPlayed/a.price) < (b.points/b.gamesPlayed/b.price)) ? 1 : ((a.points/a.gamesPlayed/a.price) > (b.points/b.gamesPlayed/b.price)) ? -1 : 0)
       }
       if (option == "name") {
         this.sortedTeams = this.sortedTeams.sort((a,b) => {
@@ -192,6 +206,12 @@ th {
 
 .team-inactive {
   --bs-table-bg: #f85a6746 !important;
+}
+
+.higlighted {
+  color: VAR(--PRIMARY) !important;
+  font-weight: 800 !important;
+  font-style: italic;
 }
 /* Add any other styling you need */
 </style>
