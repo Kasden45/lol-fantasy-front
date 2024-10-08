@@ -44,7 +44,7 @@
         </thead>
         <tbody>
             <tr v-for="player in sortedPlayers.filter((p) => p.price > 0)" :key="player.esportsPlayerId" :class="{'player-inactive' :this.teamsPlayingNextFixture.length > 0 && !this.teamsPlayingNextFixture.includes(player.team.code)}">
-                <td><img :src="player.imageUrl" class="player-photo-list" alt="Player Photo" /></td>
+                <td><img :src="player.imageUrl" class="player-photo-list" alt="" /></td>
                 <!-- <div class="player-info row"> -->
                     
                 <td><strong>{{ player.summonerName }}</strong></td>
