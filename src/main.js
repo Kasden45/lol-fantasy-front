@@ -11,8 +11,8 @@ import router from "./router"; // Import your Vue Router instance if used
 // Create a Vue app instance
 const app = createApp(App);
 
-// app.config.globalProperties.apiURL = 'https://worlds-fantasy-5b89dfe65b80.herokuapp.com/'
-app.config.globalProperties.apiURL = 'https://localhost:7061/'
+app.config.globalProperties.apiURL = 'https://worlds-fantasy-5b89dfe65b80.herokuapp.com/'
+// app.config.globalProperties.apiURL = 'https://localhost:7061/'
 app.config.globalProperties.currentTournament = '112966669920590211'
 app.config.globalProperties.worlds_2023 = '110852926142971547'
 app.config.globalProperties.msi_2024 = '112099354464733424'
