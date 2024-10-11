@@ -7,11 +7,12 @@
     <span class="px-1">{{ team.price }}$</span> -->
     <div class="container">
     <div class="row align-items-center">
-      <div class="pe-2 col-4 text-start"><strong>{{ team.name }}  </strong></div>
-      <div class="px-1 col-2"><strong>{{ team.code }}</strong></div>
+      <div class="pe-2 col-3 text-start fw-bold">{{ team.name }}</div>
+      <div class="px-1 col-2 text-end">{{ team.code }}</div>
       <div class="px-1 col-2">{{ team.league }}</div>
       <div class="px-1 col-2">{{ team.points.toFixed(0) }}pts</div>
-      <div class="px-1 col-2">{{ team.price }}$</div>
+      <div class="px-1 col-2 fw-bold">{{ (team.points/team.gamesPlayed).toFixed(0) }}pts/g</div>
+      <div class="px-1 col-1 text-end">{{ team.price }}$</div>
     </div>
   </div>
 </template>

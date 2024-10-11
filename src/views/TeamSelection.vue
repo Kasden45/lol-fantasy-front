@@ -134,7 +134,7 @@
         </div>
       </div>
       <div class="row w-100 justify-content-md-center m-auto">
-        <div class="col-md-6">
+        <div class="col-md-7">
           <PlayerTeam :captain="selectedUserTeam.captain" :currently-picked="this.roleToAddPlayer" @playerRemove="playerRemoved" @rolePick="(r) => roleToAddPlayer = r" :userTeam="selectedUserTeam"/>
             <div class="row justify-content-md-center m-auto py-2">
               <div class="col-3 d-flex justify-content-start ps-0">
@@ -165,7 +165,7 @@
       </div>
     </div>
         
-        <div class="game-points col-md-6" >
+        <div class="game-points col-md-5" >
           <div class="game-tabs ms-2">
           <div
             v-for="(game, index) in tabs"
@@ -175,15 +175,12 @@
           >
             {{ game }}
           </div>
-          <p>
-            Checkout new sorting options!
-          </p>
         </div>
           <div class="players-list-container" v-if="selectedTabIndex == 0">
-            <PlayersList :teamsPlayingNextFixture="teamsPlayingInNextFixture" @playerSelect="playerSelected" :selectedRole="roleToAddPlayer" :players="allPlayers" v-if="allPlayers.length > 0"/>
+            <PlayersList :userTeam="pickedPlayersIds" :teamsPlayingNextFixture="teamsPlayingInNextFixture" @playerSelect="playerSelected" :selectedRole="roleToAddPlayer" :players="allPlayers" v-if="allPlayers.length > 0"/>
           </div>
           <div class="players-list-container" v-if="selectedTabIndex == 1">
-            <TeamsList :teamsPlayingNextFixture="teamsPlayingInNextFixture" @teamSelect="teamSelected" :selectedRole="roleToAddPlayer" :teams="allTeams" v-if="allTeams.length > 0"/>
+            <TeamsList :userTeam="selectedUserTeam.team.team != null ? selectedUserTeam.team.team.slug : ''" :teamsPlayingNextFixture="teamsPlayingInNextFixture" @teamSelect="teamSelected" :selectedRole="roleToAddPlayer" :teams="allTeams" v-if="allTeams.length > 0"/>
           </div>
           <!-- <PlayerPointsCard :playerDetails="selectedGame" :totalPoints="totalPointsA" v-if="selectedGame" /> -->
         </div>
@@ -290,6 +287,25 @@
       },
       teamIsCorrect() {
         return !(this.teamValue > this.nextFixture.fixture.teamValueLimit || this.selectedUserTeam.transfersAvailable < this.selectedUserTeam.transfersMade || this.pickedPlayersNumber < 7)
+      },
+      pickedPlayersIds() {
+        
+        let pickedPlayers = [];
+    // Iterate through the player roles and team
+        for (const role in this.selectedUserTeam) {
+          // eslint-disable-next-line
+          if (this.selectedUserTeam.hasOwnProperty(role)) {
+            const player = this.selectedUserTeam[role].player;
+// eslint-disable-next-line
+            if (player != null && player.hasOwnProperty("price")) {
+              pickedPlayers.push(player.esportsPlayerId);
+            }
+          }
+        }
+
+        // Add the team price
+        // eslint-disable-next-line
+        return pickedPlayers;
       },
       pickedPlayersNumber() {
         

@@ -43,7 +43,7 @@
             <th></th>
         </thead>
         <tbody>
-            <tr v-for="player in sortedPlayers.filter((p) => p.price > 0)" :key="player.esportsPlayerId" :class="{'player-inactive' :this.teamsPlayingNextFixture.length > 0 && !this.teamsPlayingNextFixture.includes(player.team.code)}">
+            <tr v-for="player in sortedPlayers.filter((p) => p.price > 0)" :key="player.esportsPlayerId" :class="{'player-inactive' : !this.teamsPlayingNextFixture.includes(player.team.code), 'already-owned': this.userTeam.includes(player.esportsPlayerId)}">
                 <td><img :src="player.imageUrl" class="player-photo-list" alt="" /></td>
                 <!-- <div class="player-info row"> -->
                     
@@ -65,6 +65,7 @@
 <script>
 export default {
     props: {
+        userTeam: Array,
         teamsPlayingNextFixture: Array,
         selectedRole: String,
         players: Array
@@ -81,6 +82,9 @@ export default {
     };
   },
   methods: {
+    checkIfPlayerIsInTeam(player) {
+      return this.userTeam.players.some((p) => p.esportsPlayerId == player.esportsPlayerId);
+    },
     orderPlayers(option) {
       if (option == "points") {
         this.sortedPlayers = this.sortedPlayers.sort((a,b) => (a.points < b.points) ? 1 : (a.points > b.points) ? -1 : 0)
@@ -219,6 +223,11 @@ th {
 .player-inactive {
   --bs-table-bg: #f85a6746 !important;
 }
+
+.already-owned {
+  --bs-table-bg: #007BFF46 !important;
+}
+
 .higlighted {
   color: VAR(--PRIMARY) !important;
   font-weight: 800 !important;

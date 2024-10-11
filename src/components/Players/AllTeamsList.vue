@@ -36,7 +36,7 @@
             <th></th>
         </thead>
         <tbody>
-            <tr v-for="team in sortedTeams" :key="team.esportsTeamId" :class="{'team-inactive' : !this.teamsPlayingNextFixture.includes(team.code)}">
+            <tr v-for="team in sortedTeams" :key="team.esportsTeamId" :class="{'team-inactive' : !this.teamsPlayingNextFixture.includes(team.code), 'already-owned': this.userTeam.includes(team.slug)}">
                 <td><img :src="team.imageUrl" class="player-photo" alt="Player Photo" /></td>
                 <!-- <div class="player-info row"> -->
                     
@@ -44,11 +44,11 @@
                 <td>{{ team.code }}</td>
                 <td>{{ team.league }}</td>
                 <td>{{ team.gamesPlayed }}</td>
-                <td :class="{'higlighted':this.selectedSorting=='points'}">{{ team.points.toFixed(0) }}</td>
-                <td :class="{'higlighted':this.selectedSorting=='pointsGame'}">{{ (team.points/team.gamesPlayed).toFixed(0) }}</td>
-                <td :class="{'higlighted':this.selectedSorting=='pointsGamePrice'}">{{ (team.points/team.gamesPlayed/team.price).toFixed(2) }}</td>
-                <td :class="{'higlighted':this.selectedSorting=='priceAsc' || this.selectedSorting=='priceDesc'}">{{ team.price }}</td>
-                <td ><button :class="{ 'btn-secondary' : selectedRole != 'team', 'btn-info' : selectedRole == 'team' && this.teamsPlayingNextFixture.includes(team.code)}" class="btn" @click="selectTeam(team)" :disabled="!this.teamsPlayingNextFixture.includes(team.code) || selectedRole != 'team'">+</button></td>
+                <td class="text-center" :class="{'higlighted':this.selectedSorting=='points'}">{{ team.points.toFixed(0) }}</td>
+                <td class="text-center" :class="{'higlighted':this.selectedSorting=='pointsGame'}">{{ (team.points/team.gamesPlayed).toFixed(0) }}</td>
+                <td class="text-center" :class="{'higlighted':this.selectedSorting=='pointsGamePrice'}">{{ (team.points/team.gamesPlayed/team.price).toFixed(2) }}</td>
+                <td class="text-center" :class="{'higlighted':this.selectedSorting=='priceAsc' || this.selectedSorting=='priceDesc'}">{{ team.price }}</td>
+                <td ><button :class="{ 'btn-secondary' : selectedRole != 'team', 'btn-info' : selectedRole == 'team' && this.teamsPlayingNextFixture.includes(team.code)}" class="btn btn-secondary" @click="selectTeam(team)" :disabled="!this.teamsPlayingNextFixture.includes(team.code) || selectedRole != 'team'">+</button></td>
                 <!-- </div> -->
             </tr>
         </tbody>
@@ -58,6 +58,7 @@
 <script>
 export default {
     props: {
+        userTeam: String,
         teamsPlayingNextFixture: Array,
         selectedRole: String,
         teams: Array
@@ -206,6 +207,10 @@ th {
 
 .team-inactive {
   --bs-table-bg: #f85a6746 !important;
+}
+
+.already-owned {
+  --bs-table-bg: #007BFF46 !important;
 }
 
 .higlighted {
