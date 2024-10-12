@@ -1,17 +1,17 @@
 <template>
   <div class="row">
-      <div class="filter-div col-5 my-1">
+      <div class="filter-div col-4 my-1">
         <label class="me-1" for="filter-method">Filter by: </label>
-        <select id="filter-method" v-model="selectedFilter" @change="filterTeams(selectedFilter)">
+        <br><select id="filter-method" v-model="selectedFilter" @change="filterTeams(selectedFilter)">
           <option value="any">All</option>
           <optgroup label="Region">
               <option v-for="uniqueTeamCode in uniqueLeagues" :key="uniqueTeamCode" :value="uniqueTeamCode">{{ uniqueTeamCode }}</option>
           </optgroup>
         </select>
       </div>
-      <div class="sorting-div col-7 my-1">
+      <div class="sorting-div col-5 my-1">
         <label class="me-1" for="sorting-method">Sort by: </label>
-        <select id="sorting-method" v-model="selectedSorting" @change="orderTeams(selectedSorting)">
+        <br><select id="sorting-method" v-model="selectedSorting" @change="orderTeams(selectedSorting)">
           <option value="points">Points</option>
           <option value="pointsGame">Pts/game</option>
           <option value="pointsGamePrice">Pts/game/$</option>
@@ -20,6 +20,10 @@
           <option value="name">Team name</option>
           <option value="league">League</option>
         </select>
+      </div>
+      <div class="sorting-div col-3 my-1">
+        <label class="me-1"  for="sorting-method">Active only: </label>
+        <br><input type="checkbox" v-model="hideInactive" />
       </div>
     </div>
     <table class="table table-striped list-scrollable">
@@ -36,7 +40,9 @@
             <th></th>
         </thead>
         <tbody>
-            <tr v-for="team in sortedTeams" :key="team.esportsTeamId" :class="{'team-inactive' : !this.teamsPlayingNextFixture.includes(team.code), 'already-owned': this.userTeam.includes(team.slug)}">
+            <tr v-for="team in sortedTeams.filter(
+              (t) => t.price > 0 && (!hideInactive || (hideInactive && this.teamsPlayingNextFixture.includes(t.code)))
+            )" :key="team.esportsTeamId" :class="{'team-inactive' : !this.teamsPlayingNextFixture.includes(team.code), 'already-owned': this.userTeam.includes(team.slug)}">
                 <td><img :src="team.imageUrl" class="player-photo" alt="Player Photo" /></td>
                 <!-- <div class="player-info row"> -->
                     
@@ -66,6 +72,7 @@ export default {
     name: "TeamsList",
   data() {
     return {
+      hideInactive: true,
       selectedSorting: 'points',
       selectedFilter: 'any',
         sorting: "",

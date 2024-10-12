@@ -1,8 +1,8 @@
 <template>
   <div class="row">
-    <div class="filter-div  col-5 my-1">
-      <label class="me-1" for="filter-method">Filter by: </label>
-      <select id="filter-method" v-model="selectedFilter" @change="filterPlayers(selectedFilter)">
+    <div class="filter-div  col-4 my-1">
+      <label class="me-1" for="filter-method">Filter by:</label>
+      <br><select id="filter-method" v-model="selectedFilter" @change="filterPlayers(selectedFilter)">
         <option value="any">All</option>
         <optgroup label="Role">
             <option value="top">Top</option>
@@ -16,17 +16,21 @@
         </optgroup>
       </select>
     </div>
-    <div class="sorting-div col-7 my-1">
+    <div class="sorting-div col-4 my-1">
       <label class="me-1"  for="sorting-method">Sort by: </label>
-      <select id="sorting-method" v-model="selectedSorting" @change="orderPlayers(selectedSorting)">
+      <br><select id="sorting-method" v-model="selectedSorting" @change="orderPlayers(selectedSorting)">
         <option value="points">Points</option>
         <option value="pointsGame">Pts/game</option>
         <option value="pointsGamePrice">Pts/game/$</option>
         <option value="priceAsc">Price ASC</option>
         <option value="priceDesc">Price DESC</option>
-        <option value="summonerName">Summoner Name</option>
+        <option value="summonerName">Name</option>
         <option value="team">Team</option>
       </select>
+    </div>
+    <div class="sorting-div col-3 my-1">
+      <label class="me-1"  for="sorting-method">Active only: </label>
+      <br><input type="checkbox" v-model="hideInactive" />
     </div>
   </div>
     <table class="table table-striped list-scrollable">
@@ -43,7 +47,15 @@
             <th></th>
         </thead>
         <tbody>
-            <tr v-for="player in sortedPlayers.filter((p) => p.price > 0)" :key="player.esportsPlayerId" :class="{'player-inactive' : !this.teamsPlayingNextFixture.includes(player.team.code), 'already-owned': this.userTeam.includes(player.esportsPlayerId)}">
+            <tr v-for="player in sortedPlayers.filter(
+                  (p) => p.price > 0 && (!hideInactive || (hideInactive && this.teamsPlayingNextFixture.includes(p.team.code)))
+                )"
+                :key="player.esportsPlayerId" 
+                :class="{
+                  'player-inactive' : !this.teamsPlayingNextFixture.includes(player.team.code), 
+                  'already-owned': this.userTeam.includes(player.esportsPlayerId)
+                  }"
+                >
                 <td><img :src="player.imageUrl" class="player-photo-list" alt="" /></td>
                 <!-- <div class="player-info row"> -->
                     
@@ -73,6 +85,7 @@ export default {
     name: "PlayersList",
   data() {
     return {
+      hideInactive: true,
       selectedSorting: 'points',
       selectedFilter: 'any',
         sorting: "",
