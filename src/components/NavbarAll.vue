@@ -72,6 +72,14 @@
               >
             </li>
             <li class="nav-item pe-3">
+              <router-link
+                class="nav-link"
+                :class="{ active: this.$route.name === 'StatsView' }"
+                :to="{ name: 'StatsView' }"
+                >Stats<span class="inform"> NEW</span></router-link
+              >
+            </li>
+            <li class="nav-item pe-3">
               <div class="dropdown">
                 <button
                   class="btn first-letter"
@@ -216,5 +224,6 @@
 
 .inform{
   color: var(--PRIMARY);
+  font-size:  x-small;
 }
   </style>

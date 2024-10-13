@@ -1,19 +1,34 @@
 <template>
-    <td v-if="participantData != null">{{ participantData.userId }}</td>
-    <td v-if="participantData != null">{{ participantData.userLogin }}
+    <td v-if="participantData != null">
+        <div v-if="participantData != null && participantData.userTeam != null && showDetails" class="team-points vh-80 align-content-center py-auto fill-height d-flex align-items-center">
+            <div class="col-6 d-flex justify-self-start">
+                <button class="btn btn-info btn-purple" @click="scrollLeft">&lt;</button>
+            </div>
+        </div>
+    </td>
+    <td  v-if="participantData != null">{{ participantData.userLogin }}
 
-        <div v-if="participantData != null && participantData.userTeam != null && showDetails" >
-                            <PlayerPointsGamesCard :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 1" :gamesPointsDetails="participantData.userTeam.topPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.topPlayerPoints.totalPoints"/>
-                            <PlayerPointsGamesCard :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 2" :gamesPointsDetails="participantData.userTeam.junglePlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.junglePlayerPoints.totalPoints"/>
-                            <PlayerPointsGamesCard :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 3" :gamesPointsDetails="participantData.userTeam.midPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.midPlayerPoints.totalPoints"/>
-                            <PlayerPointsGamesCard :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 4" :gamesPointsDetails="participantData.userTeam.bottomPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.bottomPlayerPoints.totalPoints"/>
-                            <PlayerPointsGamesCard :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 5" :gamesPointsDetails="participantData.userTeam.supportPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.supportPlayerPoints.totalPoints"/>
-                            <PlayerPointsGamesCard :gamesList="fixtureGames" :isSub="true" :gamesPointsDetails="participantData.userTeam.subPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.subPlayerPoints.totalPoints"/>
-                            <TeamPointsGamesCard :gamesList="fixtureGames" :gamesPointsDetails="participantData.userTeam.teamPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.teamPoints.totalPoints"/>
-                </div>
+        <div v-if="participantData != null && participantData.userTeam != null && showDetails" class="team-points" ref="pointsContainer">
+            <PlayerPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 1" :gamesPointsDetails="participantData.userTeam.topPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.topPlayerPoints.totalPoints"/>
+            <PlayerPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 3" :gamesPointsDetails="participantData.userTeam.midPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.midPlayerPoints.totalPoints"/>
+            <PlayerPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 4" :gamesPointsDetails="participantData.userTeam.bottomPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.bottomPlayerPoints.totalPoints"/>
+            <PlayerPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 5" :gamesPointsDetails="participantData.userTeam.supportPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.supportPlayerPoints.totalPoints"/>
+            <PlayerPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 2" :gamesPointsDetails="participantData.userTeam.junglePlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.junglePlayerPoints.totalPoints"/>
+            <PlayerPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :isSub="true" :gamesPointsDetails="participantData.userTeam.subPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.subPlayerPoints.totalPoints"/>
+            <TeamPointsGamesCard  class="team-points-details" :gamesList="fixtureGames" :gamesPointsDetails="participantData.userTeam.teamPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.teamPoints.totalPoints"/>
+        </div>
 
     </td>
-    <td :class="{'showing-details' : showDetails}" v-if="participantData != null">{{ participantData.userTeam ? participantData.userTeam.totalPoints : (participantData.points != null ? participantData.points : 0) }} pts</td>
+    <td :class="{'showing-details' : showDetails}" v-if="participantData != null">
+        <div v-if="!showDetails">
+            {{ participantData.userTeam ? participantData.userTeam.totalPoints : (participantData.points != null ? participantData.points : 0) }} pts        
+        </div>
+        <div v-if="participantData != null && participantData.userTeam != null && showDetails" class="team-points position-center">
+            <div class="col-6 d-flex justify-content-end sticky-end">
+                <button class="btn btn-info btn-purple" @click="scrollRight">></button>
+            </div>
+        </div>
+    </td>
     <!-- <td>{{ participant.joinedAt }}</td> -->
     <td :class="{'showing-details' : showDetails}" v-if="participantData != null && participantData.userTeam != null" >
         <button @click="toggleDetailsVisibility" data-toggle="modal" data-target="#sda" >
@@ -69,6 +84,16 @@
     },
   },
     methods: {
+    scrollRight() {
+      const cardWidth = this.$refs.pointsContainer.children[0].offsetWidth; // get width of the first card
+      const scrollAmount = cardWidth; // scroll width for 4 cards
+      this.$refs.pointsContainer.scrollLeft += scrollAmount; // scroll right
+    },
+    scrollLeft() {
+      const cardWidth = this.$refs.pointsContainer.children[0].offsetWidth; // get width of the first card
+      const scrollAmount = cardWidth; // scroll width for 4 cards
+      this.$refs.pointsContainer.scrollLeft -= scrollAmount; // scroll left
+    },
     toggleDetailsVisibility() {
       this.showDetails = !this.showDetails;
     //   if(this.showDetails) 
@@ -119,6 +144,27 @@
 
 </script>
 <style scoped>
+.fill-height {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.team-points {
+  display: flex;
+  max-width: 700px;
+  overflow-x: auto;
+}
+
+.team-points-details {
+  flex: 0 0 auto; /* Optional: Add some space between cards */
+  height: 100%;
+  min-width: 500px;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 20px;
+}
 #panel {
     height: 100%;
 }
@@ -167,7 +213,6 @@ p.has-error {
     color: pink;
     /*font-weight: bold;*/
 }
-
 .register-btn {
     color: white;
     font-size: 120%;
@@ -176,7 +221,11 @@ p.has-error {
     border: none;
     width: 100%;
 }
-.showing-details {
-    vertical-align: top; 
+
+.btn-purple {
+  background-color: var(--PRIMARY-LIGHTER);
+  font-weight: 800;
+  color: white;
+  border: none;
 }
 </style>

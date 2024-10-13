@@ -17,58 +17,31 @@
           </div>
         </div>
         <div class="container">
-      <div class="row justify-content-md-center" v-if="currentLeague ">
-        <div class="col-md-auto">
-          <table class="table table-striped px-2">
-            <thead>
-            <tr>
-                <th>Lp</th>
-                <th>UserId</th>
-                <th>User</th>
-                <th>Points</th>
-                <!-- <th>Joined at</th> -->
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(participant, index) in currentLeague.participants.sort(calculatePosition)" :key="participant.userId">
-              <td>{{ index+1 }}.</td>  
-              <ParticipantDetails :participant="participant" :fixtureGames="this.fixtureGames"/>
+          <div class="row justify-content-md-center" v-if="currentLeague ">
+            <div class="col-md-auto">
+              <table class="table table-striped px-2">
+                <thead>
+                <tr>
+                    <th>Lp</th>
+                    <th>UserId</th>
+                    <th>User</th>
+                    <th>Points</th>
+                    <!-- <th>Joined at</th> -->
+                    <th></th>
                 </tr>
-            </tbody>
-          </table>
-        </div>
-        
-      </div>
-    </div>
-          <!-- <div class="players-list-container" v-if="selectedTabIndex == 0">
-            <PlayersList @playerSelect="playerSelected" :selectedRole="roleToAddPlayer" :players="allPlayers" v-if="allPlayers.length > 0"/>
-          </div>
-          <div class="players-list-container" v-if="selectedTabIndex == 1">
-            Tu teamki
-          </div> -->
-          <!-- <PlayerPointsCard :playerDetails="selectedGame" :totalPoints="totalPointsA" v-if="selectedGame" /> -->
-        </div>
-        
-<!-- End -->
-      
-    </div>
-    <!-- <div id="sda" aria-hidden="true" aria-labelledby="infoExerciseModalLabel" class="modal fade show"
-             tabindex="-1" style="display:block">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 id="infoExerciseModalLabel" class="modal-title ms-2">Szczegóły ćwiczenia</h5>
-                        
-                        <button ref="closeModal" aria-label="Close" class="btn-close" data-dismiss="modal"
-                                type="button" ></button>
-                    </div>
-                    <div class="modal-body">
-                        Cos tu jest
-                    </div>
-                </div>
+                </thead>
+                <tbody>
+                  <tr v-for="(participant, index) in currentLeague.participants.sort(calculatePosition)" :key="participant.userId">
+                  <td>{{ index+1 }}.</td>  
+                  <ParticipantDetails :participant="participant" :fixtureGames="this.fixtureGames"/>
+                    </tr>
+                </tbody>
+              </table>
             </div>
-        </div> -->
+          </div>
+        </div>
+      </div>      
+    </div>
   </template>
   
   <script>

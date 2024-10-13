@@ -112,7 +112,7 @@ name: 'MatchesView',
                 console.log(error.response);
             });
         },
-        getFixtures() {
+      getFixtures() {
             const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixtures`
 
             this.axios.get(url).then((response) => {

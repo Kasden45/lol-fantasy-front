@@ -18,7 +18,8 @@
           <div class="player-info">
             <div class="player-name">{{ player.summonerName }}</div>
             <div class="player-role">{{ player.role }}</div>
-            <div class="player-points">{{ player.points.toFixed(2) }}</div>
+            <div v-if="!player.captain" class="player-points">{{ player.points.toFixed(2) }}</div>
+            <div v-if="player.captain" class="player-points"><span class="crossed">{{ player.points.toFixed(2) }}</span><br>{{ player.points.toFixed(2)*2 }}</div>
           </div>
           <!-- <PlayerPointsGamesCard :isCaptain="teamPlayers.captain == 1" :key="teamPlayers" :gamesPointsDetails="teamPlayers.topPlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.topPlayerPoints.totalPoints"/> -->
         </div>
@@ -35,19 +36,25 @@
     <div class="container">
       <h1 v-if="teamPlayers != null">POINTS DETAILS</h1>
       <div class="row justify-content-md-center">
-        <div class="col-md-auto">
-          <div v-if="teamPlayers != null">
-            <PlayerPointsGamesCard :gamesList="fixtureGames" :isCaptain="teamPlayers.captain == 1" :key="teamPlayers" :gamesPointsDetails="teamPlayers.topPlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.topPlayerPoints.totalPoints"/>
-            <PlayerPointsGamesCard :gamesList="fixtureGames" :isCaptain="teamPlayers.captain == 2" :key="teamPlayers" :gamesPointsDetails="teamPlayers.junglePlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.junglePlayerPoints.totalPoints"/>
-            <PlayerPointsGamesCard :gamesList="fixtureGames" :isCaptain="teamPlayers.captain == 3" :key="teamPlayers" :gamesPointsDetails="teamPlayers.midPlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.midPlayerPoints.totalPoints"/>
-            <PlayerPointsGamesCard :gamesList="fixtureGames" :isCaptain="teamPlayers.captain == 4" :key="teamPlayers" :gamesPointsDetails="teamPlayers.bottomPlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.bottomPlayerPoints.totalPoints"/>
-            <PlayerPointsGamesCard :gamesList="fixtureGames" :isCaptain="teamPlayers.captain == 5" :key="teamPlayers" :gamesPointsDetails="teamPlayers.supportPlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.supportPlayerPoints.totalPoints"/>
-            <PlayerPointsGamesCard :gamesList="fixtureGames" :isSub="true" :key="teamPlayers" :gamesPointsDetails="teamPlayers.subPlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.subPlayerPoints.totalPoints"/>
-            <TeamPointsGamesCard :gamesList="fixtureGames" :key="teamPlayers" :gamesPointsDetails="teamPlayers.teamPoints.gamesPointsDetails" :totalPointsA="teamPlayers.teamPoints.totalPoints"/>
+        <div class="col-2 d-flex justify-content-end sticky-end" v-if="teamPlayers != null">
+          <button class="btn btn-info btn-purple" @click="scrollLeft">&lt;</button>
+        </div>
+        <div class="col-8">
+          <div v-if="teamPlayers != null" class="team-points" ref="pointsContainer">
+            <PlayerPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :isCaptain="teamPlayers.captain == 1" :key="teamPlayers" :gamesPointsDetails="teamPlayers.topPlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.topPlayerPoints.totalPoints"/>
+            <PlayerPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :isCaptain="teamPlayers.captain == 2" :key="teamPlayers" :gamesPointsDetails="teamPlayers.junglePlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.junglePlayerPoints.totalPoints"/>
+            <PlayerPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :isCaptain="teamPlayers.captain == 3" :key="teamPlayers" :gamesPointsDetails="teamPlayers.midPlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.midPlayerPoints.totalPoints"/>
+            <PlayerPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :isCaptain="teamPlayers.captain == 4" :key="teamPlayers" :gamesPointsDetails="teamPlayers.bottomPlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.bottomPlayerPoints.totalPoints"/>
+            <PlayerPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :isCaptain="teamPlayers.captain == 5" :key="teamPlayers" :gamesPointsDetails="teamPlayers.supportPlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.supportPlayerPoints.totalPoints"/>
+            <PlayerPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :isSub="true" :key="teamPlayers" :gamesPointsDetails="teamPlayers.subPlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.subPlayerPoints.totalPoints"/>
+            <TeamPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :key="teamPlayers" :gamesPointsDetails="teamPlayers.teamPoints.gamesPointsDetails" :totalPointsA="teamPlayers.teamPoints.totalPoints"/>
           </div>
-          <div v-else>
+          <div v-else class="col-8">
             {{ this.errorUserTeamFixture }}
           </div>
+        </div>
+        <div class="col-2 d-flex justify-content-start sticky-start" v-if="teamPlayers != null">
+            <button class="btn btn-info btn-purple" @click="scrollRight">></button>
         </div>
       </div>
     </div>
@@ -113,6 +120,16 @@
       };
     },
     methods: {
+    scrollRight() {
+      const cardWidth = this.$refs.pointsContainer.children[0].offsetWidth; // get width of the first card
+      const scrollAmount = cardWidth; // scroll width for 4 cards
+      this.$refs.pointsContainer.scrollLeft += scrollAmount; // scroll right
+    },
+    scrollLeft() {
+      const cardWidth = this.$refs.pointsContainer.children[0].offsetWidth; // get width of the first card
+      const scrollAmount = cardWidth; // scroll width for 4 cards
+      this.$refs.pointsContainer.scrollLeft -= scrollAmount; // scroll left
+    },
       getTeamPosition() {
         return { top: '70%', left: '30%' };
       },
@@ -279,6 +296,16 @@
 </script>
 
 <style scoped>
+.team-points {
+  display: flex;
+  overflow-x: auto;
+}
+
+.team-points-details {
+  flex: 0 0 auto; /* Optional: Add some space between cards */
+  height: 100%;
+  min-width: 500px;
+}
 .game-tabs {
   display: flex;
   margin-bottom: 20px;
@@ -337,5 +364,19 @@
   font-style: italic;
   color: white;
   text-transform: capitalize;
+}
+.crossed {
+  text-decoration: line-through;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 20px;
+}
+.btn-purple {
+  background-color: var(--PRIMARY-LIGHTER);
+  font-weight: 800;
+  color: white;
+  border: none;
 }
 </style>
