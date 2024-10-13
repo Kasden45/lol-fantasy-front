@@ -64,8 +64,8 @@
                 <td>{{ player.team.code }}</td>
                 <td class="text-center">{{ player.gamesPlayed }}</td>
                 <td class="text-center" :class="{'higlighted':this.selectedSorting=='points'}">{{ player.points.toFixed(0) }}</td>
-                <td class="text-center" :class="{'higlighted':this.selectedSorting=='pointsGame'}">{{ (player.points/player.gamesPlayed).toFixed(0) }}</td>
-                <td class="text-center" :class="{'higlighted':this.selectedSorting=='pointsGamePrice'}">{{ (player.points/player.gamesPlayed/player.price).toFixed(2) }}</td>
+                <td class="text-center" :class="{'higlighted':this.selectedSorting=='pointsGame'}">{{ player.gamesPlayed == 0 ? "-" :   (player.points/player.gamesPlayed).toFixed(0) }}</td>
+                <td class="text-center" :class="{'higlighted':this.selectedSorting=='pointsGamePrice'}">{{ player.gamesPlayed == 0 ? "-" :   (player.points/player.gamesPlayed/player.price).toFixed(2) }}</td>
                 <td class="text-center" :class="{'higlighted':this.selectedSorting=='priceAsc' || this.selectedSorting=='priceDesc'}">{{ player.price }}</td>
                 <td ><button :class="{ 'btn-secondary' : selectedRole != player.role && selectedRole != 'sub', 'btn-info' : (selectedRole == player.role || selectedRole == 'sub') && this.teamsPlayingNextFixture.includes(player.team.code)}" class="btn btn-secondary" @click="selectPlayer(player)" :disabled="(!this.teamsPlayingNextFixture.includes(player.team.code)) || (selectedRole != player.role && selectedRole != 'sub')">+</button></td>
                 <!-- </div> -->
@@ -77,6 +77,7 @@
 <script>
 export default {
     props: {
+        nextFixture: Object,
         userTeam: Array,
         teamsPlayingNextFixture: Array,
         selectedRole: String,
@@ -85,7 +86,8 @@ export default {
     name: "PlayersList",
   data() {
     return {
-      hideInactive: true,
+      hideInactive: false,
+      selectedForm: 0,
       selectedSorting: 'points',
       selectedFilter: 'any',
         sorting: "",
@@ -103,10 +105,10 @@ export default {
         this.sortedPlayers = this.sortedPlayers.sort((a,b) => (a.points < b.points) ? 1 : (a.points > b.points) ? -1 : 0)
       }
       if (option == "pointsGame") {
-        this.sortedPlayers = this.sortedPlayers.sort((a,b) => ((a.points/a.gamesPlayed) < (b.points/b.gamesPlayed)) ? 1 : ((a.points/a.gamesPlayed) > (b.points/b.gamesPlayed)) ? -1 : 0)
+        this.sortedPlayers = this.sortedPlayers.sort((a,b) =>(a.gamesPlayed == 0 && b.gamesPlayed == 0) ? 0 : (a.gamesPlayed == 0 || (a.points/(a.gamesPlayed) < (b.points/b.gamesPlayed))) ? 1 : b.gamesPlayed == 0 ||((a.points/a.gamesPlayed) > (b.points/b.gamesPlayed)) ? -1 : 0)
       }
       if (option == "pointsGamePrice") {
-        this.sortedPlayers = this.sortedPlayers.sort((a,b) => ((a.points/a.gamesPlayed/a.price) < (b.points/b.gamesPlayed/b.price)) ? 1 : ((a.points/a.gamesPlayed/a.price) > (b.points/b.gamesPlayed/b.price)) ? -1 : 0)
+        this.sortedPlayers = this.sortedPlayers.sort((a,b) => (a.gamesPlayed == 0 && b.gamesPlayed == 0) ? 0 : (a.gamesPlayed == 0 || (a.points/a.gamesPlayed/a.price) < (b.points/b.gamesPlayed/b.price)) ? 1 : b.gamesPlayed == 0 || ((a.points/a.gamesPlayed/a.price) > (b.points/b.gamesPlayed/b.price)) ? -1 : 0)
       }
       
       if (option == "summonerName") {
@@ -144,6 +146,10 @@ export default {
       }
       this.orderPlayers(this.selectedSorting);
     },
+    changeRange(numberOfFixtures) {
+      // Emit an event to notify the parent component (App) about the selected player
+      this.$emit("rangeChange", numberOfFixtures);
+    },
     selectPlayer(player) {
       // Emit an event to notify the parent component (App) about the selected player
       console.log("leci", player)
@@ -161,6 +167,18 @@ export default {
     this.fetchPlayers();
     this.extractUniqueTeamCodes();
   },
+  watch: {
+    players: {
+      // the callback will be called immediately after the start of the observation
+      immediate: true, 
+      handler (val, oldVal) {
+        this.fetchPlayers();
+        this.filterPlayers(this.selectedFilter);
+        this.orderPlayers(this.selectedSorting);
+        // do your stuff
+      }
+    }
+  }
 };
 </script>
 

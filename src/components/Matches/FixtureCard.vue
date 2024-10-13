@@ -3,38 +3,38 @@
     <div class="card-header">
       <h4>{{ fixture.fixture.name }} - {{ this.$func_global.formatDate(fixture.fixture.deadlineDate) }}</h4>
     </div>
-    <div class="match-list">
+    <div class="match-list container">
       <div v-for="(time, index) in 
         fixture.matches.map(m => this.$func_global.formatDateOnly(m.startTime)).filter((value, index, self) => self.indexOf(value) === index)" 
         :key="index" class=" row">
-        <div>
+        
           <div class="col-12 fixture-headline">
             {{this.$func_global.getDayOfWeek(time)}} {{ time}}
           </div>
-        </div>
         <div v-for="(match, index) in fixture.matches.filter(m => this.$func_global.formatDateOnly(m.startTime) == time)" 
           :key="index" 
           class="match-item"
+          :class="{'active-match-item': isInPlay(match)}"
           >
           <div class="col-2">{{ match.team1 != null ? match.team1.code : "TBD"}}</div>
           <div class="col-2"><img v-if="match.team1 != null" :src="match.team1.imageUrl" class="team-photo" alt="Player Photo" /> </div>
           <router-link
           :to="{ name: 'MatchDetailsView', params: {matchId: match.id} }"
           class="col-2 router-black" v-if="(this.$store.getters.getProfileId != null && this.$store.getters.getProfileId == 5) && (match.team1 != null && match.team1.wins != null && match.team2 != null && match.team2.wins != null)">
-            {{ match.team1.wins }} - {{ match.team2.wins }}
+            {{ match.team1.wins }} - {{ match.team2.wins }} {{ isInPlay(match) ? '🔴' : '' }} 
           </router-link>
           <div
           class="col-2" v-if="(this.$store.getters.getProfileId == null || this.$store.getters.getProfileId != 5) && (match.team1 != null && match.team1.wins != null && match.team2 != null && match.team2.wins != null)">
-            {{ match.team1.wins }} - {{ match.team2.wins }}
+            {{ match.team1.wins }} - {{ match.team2.wins }} {{ isInPlay(match) ? '🔴' : '' }} 
         </div>
           <div class="col-2" 
             v-if="!((match.team1 != null && match.team1.wins != null) && (match.team2 != null && match.team2.wins != null))"
           >
             <div class="match-result">
-              Bo{{ match.maxGames }}
+              Bo{{ match.maxGames }} 
             </div>
             <div class="match-result">
-              {{ this.$func_global.formatTime(match.startTime) }}
+              {{ this.$func_global.formatTime(match.startTime) }} {{ isInPlay(match) ? '🔴' : '' }}
             </div>
           </div>
           <div class="col-2"><img v-if="match.team2 != null" :src="match.team2.imageUrl" class="team-photo" alt="Player Photo" /> </div>
@@ -62,6 +62,12 @@
         }
     },
     methods: {
+    isInPlay(match, addHours) {
+      var date = Date.now();
+      if(addHours != null)
+        date += 3600*1000*addHours;
+      return date - 3600*1000*match.maxGames < new Date(match.startTime) && new Date(match.startTime) < date;
+    },
     calculateTotalPoints(pointsDetails) {
       return Object.values(pointsDetails).reduce((total, points) => total + points.points, 0);
     },
@@ -136,6 +142,11 @@
   justify-content: space-between;
   align-items: center;
 }
+
+.active-match-item {
+  background-color: rgba(248, 90, 90, 0.26);
+}
+
 .team-photo {
   width: 30px;
   height: 30px;

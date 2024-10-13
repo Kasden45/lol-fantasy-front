@@ -172,15 +172,25 @@
             :key="index"
             @click="selectTab(index)"
             :class="{ active: selectedTabIndex === index }"
+            class="game-tab"
           >
             {{ game }}
           </div>
+          <div class="sorting-div my-1 sticky-right" v-if="nextFixture != null">
+            <label class="me-1"  for="range">Last </label>
+            <select id="range" v-model="selectedForm" @change="rangeChanged(selectedForm)" onhov="as">
+              <option v-for="fixtureOrder in Array.from(Array(nextFixture.fixture.order-1).keys())" :key="order" :value="fixtureOrder">{{ fixtureOrder == 0 ? "All" : fixtureOrder }}</option>
+              
+            </select>
+            <label class="mx-1"  for="range"> fixtures form</label>
+          </div>
         </div>
+        
           <div class="players-list-container" v-if="selectedTabIndex == 0">
-            <PlayersList :userTeam="pickedPlayersIds" :teamsPlayingNextFixture="teamsPlayingInNextFixture" @playerSelect="playerSelected" :selectedRole="roleToAddPlayer" :players="allPlayers" v-if="allPlayers.length > 0"/>
+            <PlayersList :userTeam="pickedPlayersIds" :nextFixture="nextFixture" :teamsPlayingNextFixture="teamsPlayingInNextFixture" @rangeChange="rangeChanged" @playerSelect="playerSelected" :selectedRole="roleToAddPlayer" :players="allPlayers" v-if="allPlayers.length > 0"/>
           </div>
           <div class="players-list-container" v-if="selectedTabIndex == 1">
-            <TeamsList :userTeam="selectedUserTeam.team.team != null ? selectedUserTeam.team.team.slug : ''" :teamsPlayingNextFixture="teamsPlayingInNextFixture" @teamSelect="teamSelected" :selectedRole="roleToAddPlayer" :teams="allTeams" v-if="allTeams.length > 0"/>
+            <TeamsList :userTeam="selectedUserTeam.team.team != null ? selectedUserTeam.team.team.slug : ''" :nextFixture="nextFixture" :teamsPlayingNextFixture="teamsPlayingInNextFixture" @rangeChange="rangeChanged" @teamSelect="teamSelected" :selectedRole="roleToAddPlayer" :teams="allTeams" v-if="allTeams.length > 0"/>
           </div>
           <!-- <PlayerPointsCard :playerDetails="selectedGame" :totalPoints="totalPointsA" v-if="selectedGame" /> -->
         </div>
@@ -208,6 +218,8 @@
     },
     data() {
       return {
+        selectedForm: 0,
+        formNumberOfGames: 0,
         teamsPlayingInNextFixture: [],
         showMatches:false,
         errorSubmittingTeam:false,
@@ -380,6 +392,12 @@
       },
     },
     methods: {
+      rangeChanged(numberOfGames) {
+        console.log(numberOfGames);
+        this.numberOfGames = numberOfGames;
+        this.fetchPlayers();
+        this.fetchTeams();
+      },
       formatDate(inputDate) {
     // Create a Date object from the input string
         const date = new Date(inputDate);
@@ -470,7 +488,7 @@
       },
       async fetchPlayers() {
         try {
-            const response = await this.axios.get(`${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/players`);
+            const response = await this.axios.get(`${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/players${this.numberOfGames > 0 ? `/form/${this.numberOfGames}` : ''}`);
             this.allPlayers = response.data;
             // this.sortedPlayers = this.players;
           } catch (error) {
@@ -480,7 +498,7 @@
       },
       async fetchTeams() {
         try {
-            const response = await this.axios.get(`${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/teams`);
+            const response = await this.axios.get(`${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/teams${this.numberOfGames > 0 ? `/form/${this.numberOfGames}`: ''}`);
             this.allTeams = response.data;
             this.fetchUserTeam();
             // this.sortedPlayers = this.players;
@@ -677,7 +695,7 @@
   margin-bottom: 20px;
 }
 
-.game-tabs div {
+.game-tabs, .game-tab {
   cursor: pointer;
   padding: 10px 20px;
   border: 1px solid #ccc;

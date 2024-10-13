@@ -16,40 +16,6 @@
         />
     </div>
   </div>
-    <div v-if="false" v-for="fixture in this.matchesByFixture" :key="fixture.id" class="w-75 m-auto matches-back">
-        
-        <div class="row justify-content-md-center m-auto fixture-header">
-            <h2>{{ fixture.fixture.name }}</h2>
-            <h2>Deadline: {{ this.$func_global.formatDate(fixture.fixture.deadlineDate) }}</h2>
-        </div>
-        
-        <div class="row d-flex align-items-center justify-content-md-center m-auto" v-for="match in fixture.matches" :key="match.id">
-            <div class="col-md-2">
-                {{ match.team1 != null ? match.team1.name : "TBD" }}
-                <!-- {{ match.team1 != null ? match.team1.code : "TBD" }} -->
-            </div>
-            <div class="col-md-1" >
-                <img v-if="match.team1 != null" :src="match.team1.imageUrl" class="player-photo" alt="Player Photo" /> 
-            </div>
-            <div class="col-md-1">
-                {{ match.team1 != null ? match.team1.wins : "0" }}
-            </div>
-            <div class="col-md-2">
-                Bo{{ match.maxGames }}
-                <h5>{{ this.$func_global.formatDate(match.startTime) }}</h5>
-            </div>
-            <div class="col-md-1 d-flex align-items-center">
-                {{ match.team2 != null ? match.team2.wins : "0" }}
-            </div>
-            <div class="col-md-1" >
-                <img v-if="match.team2 != null" :src="match.team2.imageUrl" class="player-photo" alt="Player Photo" /> 
-            </div>
-            <div class="col-md-2 d-flex align-items-center">
-                <!-- {{ match.team2 != null ? match.team2.code : "TBD" }} -->
-                {{ match.team2 != null ? match.team2.name : "TBD" }}
-            </div>
-        </div>
-    </div>
 </template>
 
 <script>
@@ -77,6 +43,10 @@ name: 'MatchesView',
     // this.profile = 
     console.log(this.profile)
   },
+  updated() {
+    // this.getFixtures();
+    this.positionScroll();
+  },
   methods: {
     scrollRight() {
       const cardWidth = this.$refs.fixturesContainer.children[0].offsetWidth; // get width of the first card
@@ -87,6 +57,21 @@ name: 'MatchesView',
       const cardWidth = this.$refs.fixturesContainer.children[0].offsetWidth; // get width of the first card
       const scrollAmount = cardWidth; // scroll width for 4 cards
       this.$refs.fixturesContainer.scrollLeft -= scrollAmount; // scroll left
+    },
+    positionScroll() {
+      var continueCheck = true;
+      this.matchesByFixture.forEach(element => {
+        console.log(new Date(element.fixture.deadlineDate), "vs", Date.now());
+        if(continueCheck && element.fixture.fixtureId != this.$store.getters.getFixtureId) {
+          console.log("scrolling right");
+          console.log(element.fixture.fixtureId);
+          console.log(this.$store.getters.getFixtureId);
+          this.scrollRight();
+        } else {
+          console.log("not scrolling right");
+          continueCheck = false;
+        }
+      }); 
     },
     formatDate(inputDate) {
     // Create a Date object from the input string
@@ -137,6 +122,7 @@ name: 'MatchesView',
               else{
                 this.matchesByFixture = response.data.fixturesWithMatches.filter((f) => f.fixture.fixtureId == this.oneFixtureId)
               }
+              this.positionScroll();
                 // this.$router.push({name: 'LeaguesView'})
             }).catch(error => {
                 console.log(error.response);

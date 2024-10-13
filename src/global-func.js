@@ -4,11 +4,9 @@ const apiURL = 'https://localhost:7061'
 
 export const func_global = {
     getDayOfWeek(inputDate) {
-        console.log(inputDate)
         var dateFormat = inputDate.split('.')
         const today = new Date(2000+dateFormat[2], dateFormat[1] - 1, dateFormat[0]);
-        console.log(today)
-        
+                
         const dayOfWeekNumber = today.getDay();
         const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         return daysOfWeek[dayOfWeekNumber];
