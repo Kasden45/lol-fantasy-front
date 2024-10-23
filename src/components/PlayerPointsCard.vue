@@ -79,16 +79,19 @@
   .role:first-letter {
     text-transform: capitalize;
   }
-.player-card {
-    width: auto;
-  display: flex;
-  border: 1px solid #ddd;
-  margin: 10px;
-  padding: 10px;
-  /* max-width: 400px; */
-  /* max-height: 250px; */
-}
 
+
+@media (max-width: 1000px) {
+  .player-card {
+    width: auto;
+    display: flex;
+    border: 1px solid #ddd;
+    margin: 3px;
+    padding: 3px;
+    /* max-width: 400px; */
+    /* max-height: 250px; */
+}
+}
 .player-details {
   display: flex;
   width: 100%;

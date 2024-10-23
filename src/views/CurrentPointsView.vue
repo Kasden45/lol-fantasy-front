@@ -36,7 +36,7 @@
     <div class="container">
       <h1 v-if="teamPlayers != null">POINTS DETAILS</h1>
       <div class="row justify-content-md-center">
-        <div class="col-2 d-flex justify-content-end sticky-end" v-if="teamPlayers != null">
+        <div class="col-1 d-flex justify-content-end sticky-end" v-if="teamPlayers != null">
           <button class="btn btn-info btn-purple" @click="scrollLeft">&lt;</button>
         </div>
         <div class="col-8">
@@ -53,7 +53,7 @@
             {{ this.errorUserTeamFixture }}
           </div>
         </div>
-        <div class="col-2 d-flex justify-content-start sticky-start" v-if="teamPlayers != null">
+        <div class="col-1 d-flex justify-content-start sticky-start" v-if="teamPlayers != null">
             <button class="btn btn-info btn-purple" @click="scrollRight">></button>
         </div>
       </div>
@@ -304,11 +304,68 @@
 .team-points-details {
   flex: 0 0 auto; /* Optional: Add some space between cards */
   height: 100%;
-  min-width: 500px;
+  min-width: 50vw;
 }
 .game-tabs {
   display: flex;
   margin-bottom: 20px;
+}
+
+.summoners-rift {
+  position: relative;
+  width: 1200px; 
+  height: 1000px;
+  background-image: url('https://2.bp.blogspot.com/--A1wNZhS868/U7L4xKhbQTI/AAAAAAAAS04/rfzak1JCZFY/s1600/srdb3-1.jpg'); /* Replace with your Summoner's Rift map image */
+  background-size: cover;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+.player-image {
+  width: 100px; /* Adjust the size of the player image */
+  height: 85px;
+  border-radius: 50%;
+}
+
+.player-card {
+  display: flex;
+  border: 1px solid #ccc;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+@media (max-width: 1000px) {
+  .game-tabs {
+    display: block;
+    margin-bottom: 20px;
+  }
+  
+  .summoners-rift {
+    position: relative;
+    width: 90vw;
+    height: 80vw;
+    /* width: 400px;  */
+    /* height: 333px; */
+    background-image: url('https://2.bp.blogspot.com/--A1wNZhS868/U7L4xKhbQTI/AAAAAAAAS04/rfzak1JCZFY/s1600/srdb3-1.jpg'); /* Replace with your Summoner's Rift map image */
+    background-size: cover;
+    image-rendering: -webkit-optimize-contrast;
+  }
+
+  .player-card {
+    display: flex;
+    border: 1px solid #ccc;
+    margin: 3px;
+    padding: 3px;
+    border-radius: 1px;
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0.2);
+    font-size: x-small;
+    width: min-content;
+  }
+  .player-image {
+    width: 33px; /* Adjust the size of the player image */
+    height: 28px;
+    border-radius: 50%;
+  }
 }
 
 .game-tabs div {
@@ -324,14 +381,6 @@
   color: #fff;
 }
 
-.summoners-rift {
-  position: relative;
-  width: 1200px; 
-  height: 1000px;
-  background-image: url('https://2.bp.blogspot.com/--A1wNZhS868/U7L4xKhbQTI/AAAAAAAAS04/rfzak1JCZFY/s1600/srdb3-1.jpg'); /* Replace with your Summoner's Rift map image */
-  background-size: cover;
-  image-rendering: -webkit-optimize-contrast;
-}
 
 .player-card {
   /* background-color: #fde9a8d0; */
@@ -340,11 +389,7 @@
   transform: translate(-50%, -50%);
 }
 
-.player-image {
-  width: 100px; /* Adjust the size of the player image */
-  height: 85px;
-  border-radius: 50%;
-}
+
 
 .player-info {
   text-align: center;

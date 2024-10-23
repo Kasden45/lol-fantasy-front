@@ -1,5 +1,5 @@
 <template>
-  <div class="fixture-card col-4 mx-2">
+  <div class="fixture-card col-lg-4 col-md-8 col-sm-12 mx-2">
     <div class="card-header">
       <h4>{{ fixture.fixture.name }} - {{ this.$func_global.formatDate(fixture.fixture.deadlineDate) }}</h4>
     </div>

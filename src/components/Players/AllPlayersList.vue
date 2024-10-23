@@ -183,14 +183,6 @@ export default {
 </script>
 
 <style>
-.player-card {
-  display: flex;
-  border: 1px solid #ccc;
-  margin: 10px;
-  padding: 10px;
-  border-radius: 5px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-}
 
 .player-photo {
   width: 50px;
