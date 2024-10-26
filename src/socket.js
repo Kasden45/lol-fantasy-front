@@ -1,5 +1,5 @@
 import io from 'socket.io-client';
 const port = process.env.PORT || 8080
-const socket = io(`http://localhost:${port}`);
+const socket = io(`https://fantasy-2kpi-2d84171087be.herokuapp.com:${port}`);
 
 export default socket;
