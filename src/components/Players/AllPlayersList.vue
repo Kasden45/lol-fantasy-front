@@ -86,7 +86,7 @@ export default {
     name: "PlayersList",
   data() {
     return {
-      hideInactive: false,
+      hideInactive: true,
       selectedForm: 0,
       selectedSorting: 'points',
       selectedFilter: 'any',

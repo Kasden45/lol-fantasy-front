@@ -80,6 +80,14 @@
               >
             </li>
             <li class="nav-item pe-3">
+              <router-link
+                class="nav-link"
+                :class="{ active: this.$route.name === 'DraftView' }"
+                :to="{ name: 'DraftView' }"
+                >Draft<span class="inform"> ??</span></router-link
+              >
+            </li>
+            <li class="nav-item pe-3">
               <div class="dropdown">
                 <button
                   class="btn first-letter"
