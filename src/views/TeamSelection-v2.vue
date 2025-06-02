@@ -102,7 +102,7 @@
                     text-anchor="middle"
                     dominant-baseline="middle"
                   >
-                    {{ this.selectedUserTeam.chipActivated == 3 ? '∞' : `$${this.nextFixture.fixture.teamValueLimit - teamValue} / $${this.nextFixture.fixture.teamValueLimit}` }}
+                    {{ this.selectedUserTeam.chipActivated == 2 ? '∞' : `$${this.nextFixture.fixture.teamValueLimit - teamValue} / $${this.nextFixture.fixture.teamValueLimit}` }}
                   </text>
                   </g>
                 </svg>
@@ -161,7 +161,7 @@
                     text-anchor="middle"
                     dominant-baseline="middle"
                   >
-                  {{ this.selectedUserTeam.chipActivated == 3 || this.selectedUserTeam.chipActivated == 4 || this.selectedUserTeam.transfersAvailable > 10 ? '∞' : `${this.selectedUserTeam.transfersAvailable - this.transfersMade} / ${this.nextFixture.fixture.transfersLimit}` }}
+                  {{ this.selectedUserTeam.chipActivated == 3 || this.selectedUserTeam.chipActivated == 2 || this.selectedUserTeam.transfersAvailable > 10 ? '∞' : `${this.selectedUserTeam.transfersAvailable - this.transfersMade} / ${this.nextFixture.fixture.transfersLimit}` }}
                   </text>
                   </g>
                 </svg>
@@ -287,7 +287,8 @@
           captain: 1,
           transfersMade: 0,
           transfersAvailable: 100,
-          chipActivated: 0
+          chipActivated: 0,
+          chips: []
         },
         selectedPlayers: [],
         loadedPlayers: [],
@@ -335,7 +336,7 @@
       },
       strokeDashoffset() {
         let percent = 0;
-        if (this.selectedUserTeam.chipActivated == 3) {
+        if (this.selectedUserTeam.chipActivated == 2) {
           percent = 1 // Infinite budget
         } else {
           percent = Math.min(this.teamValue / this.nextFixture.fixture.teamValueLimit, 1);
@@ -344,7 +345,7 @@
       },
       strokeDashoffsetTransfer() {
         let percent = 0;
-        if (this.selectedUserTeam.chipActivated == 3 || this.selectedUserTeam.chipActivated == 4 || this.selectedUserTeam.transfersAvailable > 10) {
+        if (this.selectedUserTeam.chipActivated == 2 || this.selectedUserTeam.chipActivated == 3 || this.selectedUserTeam.transfersAvailable > 10) {
           percent = 1 // Infinite transfers
         } else {
           percent = (this.selectedUserTeam.transfersAvailable - this.transfersMade) / this.nextFixture.fixture.transfersLimit;
@@ -352,16 +353,16 @@
         return this.circumference - percent * this.circumference;
       },
       teamIsCorrect() {
-        return !(this.teamValue > this.nextFixture.fixture.teamValueLimit || this.selectedUserTeam.transfersAvailable < this.selectedUserTeam.transfersMade || this.pickedPlayersNumber < 7)
+        return !(this.teamValue > this.nextFixture.fixture.teamValueLimit || this.selectedUserTeam.transfersAvailable < this.transfersMade || this.pickedPlayersNumber < 7)
       },
       pickedPlayersIds() {
         
         let pickedPlayers = [];
     // Iterate through the player roles and team
-        for (const role in this.selectedUserTeam) {
+        for (const property in this.selectedUserTeam) {
           // eslint-disable-next-line
-          if (this.selectedUserTeam.hasOwnProperty(role)) {
-            const player = this.selectedUserTeam[role].player;
+          if (property.endsWith('Player') || property.endsWith('team')) {
+            const player = this.selectedUserTeam[property].player;
 // eslint-disable-next-line
             if (player != null && player.hasOwnProperty("price")) {
               pickedPlayers.push(player.esportsPlayerId);
@@ -377,10 +378,10 @@
         
         let pickedPlayers = 0;
     // Iterate through the player roles and team
-        for (const role in this.selectedUserTeam) {
+        for (const property in this.selectedUserTeam) {
           // eslint-disable-next-line
-          if (this.selectedUserTeam.hasOwnProperty(role)) {
-            const player = this.selectedUserTeam[role].player;
+          if (property.endsWith('Player')) {
+            const player = this.selectedUserTeam[property].player;
 // eslint-disable-next-line
             if (player != null && player.hasOwnProperty("price")) {
               pickedPlayers += 1;
@@ -405,7 +406,8 @@
     // Iterate through the player roles and team
         for (const role in this.selectedUserTeam) {
           // eslint-disable-next-line
-          if (this.selectedUserTeam.hasOwnProperty(role)) {
+          if (role.endsWith('Player')) {
+            console.log("SPRAWDZAM ROLE:", this.selectedUserTeam[role])
             const player = this.selectedUserTeam[role].player;
 // eslint-disable-next-line
             if (player != null && player.hasOwnProperty("price")) {
@@ -430,6 +432,7 @@
           // this.loadedPlayers
           var currentLineup = [];
           for (const key in this.selectedUserTeam) {
+            console.log('Key:', key, 'Value:', this.selectedUserTeam[key])
             if (this.selectedUserTeam[key].player != null) {
               console.log("taki jest", this.selectedUserTeam[key].player.esportsPlayerId)
               currentLineup.push(this.selectedUserTeam[key].player.esportsPlayerId);
@@ -529,8 +532,10 @@
             this.selectedUserTeam.captain = userTeam.captain;
             this.selectedUserTeam.transfersMade = userTeam.transfersMade;
             this.selectedUserTeam.transfersAvailable = userTeam.transfersAvailable;
-            this.selectedUserTeam.chipActivated = 0;
-            
+            this.selectedUserTeam.chipActivated = userTeam.chipUsed ?? 0;
+            // this.selectedUserTeam.chipUsed = userTeam.chipUsed
+            this.selectedUserTeam.chips = userTeam.extraChips;
+
             this.loadedPlayers = [
               userTeam.topPlayer.esportsPlayerId,
               userTeam.junglePlayer.esportsPlayerId,
@@ -597,7 +602,7 @@
               "subPlayerId": this.selectedUserTeam.subPlayer.player.esportsPlayerId,
               "teamSlug": this.selectedUserTeam.team.team.slug,
               "captain": this.selectedUserTeam.captain,
-              "activateChip": this.selectedUserTeam.chipActivated != null ? this.selectedUserTeam.chipActivated : 0,
+              "chipUsed": this.selectedUserTeam.chipActivated != null ? this.selectedUserTeam.chipActivated : 0,
             }
             const url = `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/user_team`
             this.axios.post(url, data).then((response) => {
@@ -633,6 +638,7 @@
               "subPlayerId": this.selectedUserTeam.subPlayer.player.esportsPlayerId,
               "teamSlug": this.selectedUserTeam.team.team.slug,
               "captain": this.selectedUserTeam.captain,
+              "chipUsed": this.selectedUserTeam.chipActivated != null ? this.selectedUserTeam.chipActivated : 0,
             }
             const url = `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/user_team`
             this.axios.put(url, data).then((response) => {

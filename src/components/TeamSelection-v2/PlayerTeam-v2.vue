@@ -1,7 +1,19 @@
 <template>
     <div class="container">
       <div class="row chips justify-content-center mb-3">
-        <Chip v-if="userTeam != null"
+        <Chip v-if="userTeam != null" v-for="(chip, index) in userTeam.chips.sort((a,b) => a.id > b.id ? 1 : -1)"
+        :id="chip.id"
+        class="col-2"
+        :isActive="userTeam.chipActivated == chip.id"
+        :userStatus="chip.userStatus"
+        :type="chip.type"
+        :isDisabled="chip.userStatus == 4"
+        :name="chip.name"
+        :description="chip.description"
+        :iconUrl="role_images['team']"
+        @useChip="chipUsed"
+        />
+        <!-- <Chip v-if="userTeam != null"
         :id="1"
         class="col-2"
         :isActive="userTeam.chipActivated == 3"
@@ -40,7 +52,7 @@
         :description="'Make unlimited transfers for this fixture.'"
         :iconUrl="role_images['top']"
         @useChip="chipUsed"
-        />
+        /> -->
       </div>
       <div class="row  justify-content-center mb-3">
         <div class="col-xl-3 col-sm-4 col-sm-4 align-content-center">

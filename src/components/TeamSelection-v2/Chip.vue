@@ -31,7 +31,9 @@ props:{
     name: String,
     iconUrl: String,
     isActive: Boolean,
-    isDisabled: Boolean
+    isDisabled: Boolean,
+    userStatus: Number,
+    type: Number
 },
 data() {
     return {
@@ -55,6 +57,11 @@ data() {
         chipActivated: {},
     },
     };
+},
+computed: {
+  changeChips(){
+    return 
+  }
 },
 methods: {
     activateChip() {

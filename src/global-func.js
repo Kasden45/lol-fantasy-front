@@ -3,6 +3,18 @@ import axios from "axios";
 const apiURL = 'https://localhost:7061'
 
 export const func_global = {
+    nation_flag:{
+        'South Korea' : 'https://cdn-icons-png.flaticon.com/512/5373/5373301.png',
+        'China' : 'https://cdn-icons-png.flaticon.com/512/323/323363.png',
+        'Taiwan': 'https://cdn-icons-png.flaticon.com/512/323/323363.png',
+        'Poland': 'https://cdn-icons-png.flaticon.com/512/323/323338.png',
+        'Germany': 'https://cdn-icons-png.flaticon.com/128/197/197571.png',
+        'United States': 'https://cdn-icons-png.flaticon.com/128/3909/3909383.png',
+        'Belgium': 'https://cdn-icons-png.flaticon.com/128/12339/12339450.png',
+        'Denmark': 'https://cdn-icons-png.flaticon.com/128/16022/16022060.png',
+        'Slovenia': 'https://cdn-icons-png.flaticon.com/128/13980/13980407.png',
+        'Default': 'https://cdn-icons-png.flaticon.com/128/594/594903.png'
+    },
     leagues_icons:{
         'LTA North':'https://static.lolesports.com/leagues/1731566778368_LTANORTH-LOGO_Blue_RGB2000px.png',
         'LTA South': 'https://static.lolesports.com/leagues/1731566868757_LTASOUTH-LOGO_Red_RGB2000px.png',
@@ -11,6 +23,7 @@ export const func_global = {
         'LPL': 'https://static.lolesports.com/leagues/1592516115322_LPL-01-FullonDark.png',
         'LCK':'https://static.lolesports.com/leagues/lck-color-on-black.png',
         'LTA':'https://static.lolesports.com/leagues/1731566966819_LTA-LOGO-LightGold_RGB2000px.png',
+        'LLA':'https://static.lolesports.com/leagues/1731566868757_LTASOUTH-LOGO_Red_RGB2000px.png',
         'LCP':'https://static.lolesports.com/leagues/1733468139601_lcp-color-golden.png',
         'WORLDS': 'https://static.lolesports.com/leagues/1592594612171_WorldsDarkBG.png',
         'MSI':'https://static.lolesports.com/leagues/1592594634248_MSIDarkBG.png'

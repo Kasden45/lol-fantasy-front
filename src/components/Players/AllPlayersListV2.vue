@@ -176,13 +176,13 @@ export default {
     },
     searchPlayers() {
       this.sortedPlayers = this.players.filter(p =>
-        p.summonerName.toLowerCase().includes(this.searchQuery.toLowerCase())
+        p.summonerName.toLowerCase().includes(this.searchQuery.toLowerCase()) || p.team.code.toLowerCase().includes(this.searchQuery.toLowerCase())
       );
       this.orderPlayers(this.selectedSorting);
     },
     orderPlayers(option) {
       this.sortedPlayers = this.sortedPlayers.filter(p =>
-        p.summonerName.toLowerCase().includes(this.searchQuery.toLowerCase())
+        p.summonerName.toLowerCase().includes(this.searchQuery.toLowerCase()) || p.team.code.toLowerCase().includes(this.searchQuery.toLowerCase())
       );
       if (option == "points") {
         this.sortedPlayers = this.sortedPlayers.sort((a,b) => (a.points < b.points) ? 1 : (a.points > b.points) ? -1 : 0)

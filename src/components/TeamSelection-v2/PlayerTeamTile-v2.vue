@@ -37,7 +37,7 @@
         <img
           
           class="flag"
-          :src="getFlag('')"
+          :src="getFlag(teamPlayer?.nationality)"
           alt="flag"
         />
       </div>
@@ -160,7 +160,14 @@ export default {
         return this.$func_global.leagues_icons[league];
       },
       getFlag(countryCode) {
-        return 'https://cdn-icons-png.flaticon.com/512/323/323363.png'
+        if (countryCode == null)
+          return this.$func_global.nation_flag['Default']
+        else {
+          if (countryCode in this.$func_global.nation_flag)
+            return this.$func_global.nation_flag[countryCode]
+          else
+            return this.$func_global.nation_flag['Default']
+        }
         return `/flags/${countryCode.toLowerCase()}.png`; // or use CDN
       },
         removePlayerFromRole(role) {
