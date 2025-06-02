@@ -3,6 +3,11 @@
       <!-- Create League Section -->
       <div>
         <h2>Create a League</h2>
+          <label for="league-mode">League Mode:</label>
+          <select id="league-mode" v-model="selectedMode" class="me-2">
+            <option value="Normal">Regular Mode</option>
+            <option value="Draft">Draft Mode</option>
+          </select>
         <input v-model="newLeagueName" placeholder="Enter league name" />
         <button @click="createLeague">Create League</button>
       </div>
@@ -19,14 +24,17 @@
       <div class="container">
 
         <div class="row w-50 justify-content-md-center m-auto my-2" v-for="league in userLeagues" :key="league.invitationCode">
-          <div class="col-md-6 league-name ">
+          <div class="col-md-2 league-name fw-normal fst-italic">
+            {{ league.mode }}
+          </div>
+          <div class="col-md-3 league-name ">
             {{ league.name }}
           </div>
-          <div class="col-md-6">
+          <div class="col-md-3">
             <router-link
               class="btn details btn-info"
               :class="{ active: this.$route.name === 'Offer' }"
-              :to="{ name: 'SingleLeagueView', params: {leagueCode: league.invitationCode} }"
+              :to="{ name: 'SingleLeagueView', params: {leagueCode: league.invitationCode, leagueMode: league.mode} }"
               >Details</router-link>
           </div>
         </div>
@@ -43,6 +51,7 @@
     data() {
       return {
         newLeagueName: "",
+        selectedMode: 'Normal',
         invitationCode: "",
         userLeagues: [],
         currentLeague: null,
@@ -54,6 +63,7 @@
           const response = await this.axios.post(`${this.apiURL}User/${this.$store.getters.getCurrentTournamentId}/league/create`, {
             idOwner: this.$store.getters.getProfileId, // Set the user's ID
             name: this.newLeagueName,
+            mode: this.selectedMode
           });
           // Add the created league to the list of user leagues
           this.userLeagues.push(response.data);
@@ -111,6 +121,16 @@
   display: flex;
     align-items: flex-start;
     width: fit-content;
+}
+.mode-selection {
+  margin: 15px 0;
+}
+
+select {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  margin-left: 10px;
 }
 </style>
   

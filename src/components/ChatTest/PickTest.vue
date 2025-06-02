@@ -1,5 +1,5 @@
   <template>
-    <div>
+    <div class="container">
       <button @click="joinDraft" v-if="!this.draftOrder.includes(this.$store.getters.getProfileId)">Join Draft</button>
       <a v-if="this.draftOrder.includes(this.$store.getters.getProfileId)">Current players in draft: {{ this.draftOrder }}</a>
       <div v-if="isCurrentDrafter">
@@ -8,21 +8,7 @@
       <div v-else>
         <h3>Waiting for other players to pick...</h3>
       </div>
-      <div class="draft-container row">
-        <div class="filter-div  col-1 my-1">
-            <label class="me-1" for="picked-position">Pick player for position:</label>
-            <br>
-            <select id="picked-position" v-model="roleToAddPlayer">
-                <optgroup label="Role">
-                    <option value="top">Top</option>
-                    <option value="jungle">Jungle</option>
-                    <option value="mid">Mid</option>
-                    <option value="bottom">Bot</option>
-                    <option value="support">Support</option>
-                    <option value="sub">Sub</option>
-                </optgroup>
-            </select>
-        </div>
+      <div class="draft-container justify-content-md-center m-auto row">
         <div class="players-list-container col-5" >
             <PlayersList :userTeam="pickedPlayersIds" :nextFixture="null" :teamsPlayingNextFixture="teamsPlayingInNextFixture" @rangeChange="()=>{}" @playerSelect="playerSelected" :selectedRole='roleToAddPlayer' :players="availablePlayers" v-if="availablePlayers.length > 0"/>
         </div>
@@ -30,7 +16,7 @@
           <h3>Your Team</h3>
           <h4>Team {{ this.$store.getters.getProfileId }}</h4>
           <ul>
-            <li v-for="(position, key) in selectedTeam" :key="key">
+            <li v-for="(position, key) in selectedTeam" :key="key" @click="position.player ? null : choseRole(position.role)">
               {{ position.role }}: {{ position.player ? position.player.summonerName : 'None' }}
             </li>
           </ul>
@@ -47,6 +33,14 @@
           </div>
         </div>
       </div>
+      <div>
+        <button
+        class="btn btn-success"
+        @click="finishDraft()"
+        >
+          Finish draft
+        </button>
+      </div>
     </div>
   </template>
   
@@ -55,6 +49,9 @@
   import PlayersList from "@/components/Players/AllPlayersList.vue" 
   
   export default {
+    props: {
+      leagueId: String
+    },
     components: {
       PlayersList,
     },
@@ -84,7 +81,7 @@
       },
         // selectedPlayers: [],
         otherTeams: {},
-        teamsPlayingInNextFixture: ['BLG','T1','DK','GEN'],
+        teamsPlayingInNextFixture: ['BLG','T1','DK','GEN', 'FNC', 'FLY', 'G2'],
         currentDrafter: null,
         draftOrder: [],
       };
@@ -114,14 +111,20 @@
         return pickedPlayers;
       },
     },
+    mounted() {
+      var leagueId = this.leagueId;
+      socket.emit('startDraft', leagueId)
+      socket.emit('getCurrentState', ({message:'get players', invitationCode: this.leagueId}));
+    },
     async created() {
         await this.fetchPlayers();
         
       socket.on('connect', () => {
         console.log('Connected to server');
       });
-
-      socket.emit('getCurrentState', 'get players');
+      var leagueId = this.leagueId;
+      socket.emit('startDraft', leagueId)
+      socket.emit('getCurrentState', ({message:'get players', invitationCode: this.leagueId}));
 
       socket.on('currentState', ({pickedPlayers, draftOrder, currentDrafter}) => {
         this.otherTeams = {...pickedPlayers};
@@ -188,56 +191,87 @@
       socket.on('disconnect', () => {
         console.log('Disconnected from server');
       });
+
+      socket.on('finishedDraft', ({pickedPlayers, draftOrder, currentDrafter}) => {
+        console.log('Finishing the draft');
+        for (const [key, value] of Object.entries(pickedPlayers)) {
+          console.log(key, value);
+          this.axios.post(`${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/user_team`,{
+            OwnerId: this.$store.getters.getProfileId, // Set the user's ID
+            TopPlayerId: pickedPlayers[key]["topPlayer"].player.esportsPlayerId,
+            JunglePlayerId : pickedPlayers[key]["junglePlayer"].player.esportsPlayerId,
+            MidPlayerId : pickedPlayers[key]["midPlayer"].player.esportsPlayerId,
+            BottomPlayerId : pickedPlayers[key]["bottomPlayer"].player.esportsPlayerId,
+            SupportPlayerId :pickedPlayers[key]["supportPlayer"].player.esportsPlayerId,
+            SubPlayerId : pickedPlayers[key]["subPlayer"].player.esportsPlayerId,
+            TeamSlug : "weibo-gaming",
+            LeagueId : 11,
+            Captain : 1
+          }
+        );
+        }
+        
+        console.log('Finishing the draft - end');
+        // Create all teams
+      });
     },
     methods: {
-    async fetchPlayers() {
-        try {
-            const response = await this.axios.get(`${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/players${this.numberOfGames > 0 ? `/form/${this.numberOfGames}` : ''}`);
-            this.availablePlayers = response.data;
-            // this.sortedPlayers = this.players;
-          } catch (error) {
-            console.error("Error fetching players:", error);
-          }
-        
+      finishDraft() {
+        console.log(this.leagueId)
+        socket.emit('finishDraft', this.leagueId);
       },
-    joinDraft() {
-        var userId = this.$store.getters.getProfileId;
-        socket.emit('joinDraft', userId);
-    },
-    selectPlayer(player) {
-        if (!this.isCurrentDrafter) {
-            console.log('It is not your turn to pick');
-            return;
-        }
-        var userId = this.$store.getters.getProfileId;
-        const roleKey = `${player.role}Player`;
-        if (this.selectedTeam[roleKey]) {
-            this.selectedTeam[roleKey].player = player;
-        }
+      choseRole(role) {
+        console.log(role)
+        this.roleToAddPlayer = role
+      },
+      async fetchPlayers() {
+          try {
+              const response = await this.axios.get(`${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/players${this.numberOfGames > 0 ? `/form/${this.numberOfGames}` : ''}`);
+              this.availablePlayers = response.data;
+              // this.sortedPlayers = this.players;
+            } catch (error) {
+              console.error("Error fetching players:", error);
+            }
+          
+        },
+      joinDraft() {
+          var userId = this.$store.getters.getProfileId;
+          socket.emit('joinDraft', ({userId: userId, invitationCode: this.leagueId}));
+      },
+      selectPlayer(player) {
+          if (!this.isCurrentDrafter) {
+              console.log('It is not your turn to pick');
+              return;
+          }
+          var userId = this.$store.getters.getProfileId;
+          const roleKey = `${this.roleToAddPlayer}Player`;
+          if (this.selectedTeam[roleKey]) {
+              this.selectedTeam[roleKey].player = player;
+          }
 
-        this.availablePlayers = this.availablePlayers.filter(p => p.esportsPlayerId !== player.esportsPlayerId);
-        socket.emit('playerSelected', { clientId: userId, player });
-    },
-    playerSelected (player){
-        
-        console.log("trying to add ",player.summonerName, ' to ', player.role);
-        if (player.role == this.roleToAddPlayer || this.roleToAddPlayer == "sub")
-        {
-            // this.addToRole(player, this.roleToAddPlayer);
-            this.selectPlayer(player);
-        }            
-        else 
-            console.log("WRONG ROLE");
-    },
-    addToRole(player, role){
-        var teamPlayer = this.selectPlayerByRole(role);
-        if( teamPlayer != null) {
-          console.log("mamy to, dodaje", player, "do", teamPlayer)
-          this.selectedUserTeam[teamPlayer].player = player;
-          this.roleToAddPlayer = ''
-        }
-    },
-    selectPlayerByRole(role) {
+          this.availablePlayers = this.availablePlayers.filter(p => p.esportsPlayerId !== player.esportsPlayerId);
+          socket.emit('playerSelected', { clientId: userId, player: player, invitationCode: this.leagueId, role: this.roleToAddPlayer });
+      },
+      playerSelected (player){
+          
+          console.log("trying to add ",player.summonerName, ' to ', this.roleToAddPlayer);
+          if (player.role == this.roleToAddPlayer || this.roleToAddPlayer == "sub")
+          {
+              // this.addToRole(player, this.roleToAddPlayer);
+              this.selectPlayer(player);
+          }            
+          else 
+              console.log("WRONG ROLE");
+      },
+      addToRole(player, role){
+          var teamPlayer = this.selectPlayerByRole(role);
+          if( teamPlayer != null) {
+            console.log("mamy to, dodaje", player, "do", teamPlayer)
+            this.selectedUserTeam[teamPlayer].player = player;
+            this.roleToAddPlayer = ''
+          }
+      },
+      selectPlayerByRole(role) {
         console.log("rola",role);
         for (const key in this.selectedUserTeam) {
           if (this.selectedUserTeam[key].role === role && this.selectedUserTeam[key].player === null) {
@@ -259,6 +293,7 @@
   
   <style scoped>
 .draft-container {
+  width: 85vw;
   display: flex;
   justify-content: space-between;
 }

@@ -1,6 +1,6 @@
 <!-- TeamSelection.vue -->
 <template>
-  <PickTest/>
+  <PickTest :leagueId="this.leagueId"/>
   <Chat/>
     
   </template>
@@ -9,6 +9,9 @@
   import PickTest from '@/components/ChatTest/PickTest.vue';
   import Chat from '@/components/ChatTest/Chat.vue';
   export default {
+    props:{
+      leagueId: String
+    },
     components: {
       PickTest,
       Chat

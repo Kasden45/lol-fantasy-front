@@ -7,6 +7,7 @@ import store from '@/store';
 import VueAxios from "vue-axios";
 import App from "./App.vue";
 import router from "./router"; // Import your Vue Router instance if used
+import '@fortawesome/fontawesome-free/css/all.css';
 
 // Create a Vue app instance
 const app = createApp(App);
@@ -17,11 +18,21 @@ app.config.globalProperties.currentTournament = '112966669920590211'
 app.config.globalProperties.worlds_2023 = '110852926142971547'
 app.config.globalProperties.msi_2024 = '112099354464733424'
 app.config.globalProperties.worlds_2024 = '112966669920590211'
+app.config.globalProperties.worlds_2025 = '113475452383887518'
 
 app.config.globalProperties.tournaments = {
     '110852926142971547': 'Worlds 2023',
     '112099354464733424': 'MSI 2024',
-    '112966669920590211': 'Worlds 2024'
+    '112966669920590211': 'Worlds 2024',
+    '113475452383887518': 'Worlds 2025',
+
+}
+
+app.config.globalProperties.tournaments_icons = {
+    '110852926142971547': 'WORLDS',
+    '112099354464733424': 'MSI',
+    '112966669920590211': 'WORLDS',
+    '113475452383887518': 'WORLDS',
 
 }
 

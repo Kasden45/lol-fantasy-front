@@ -3,6 +3,28 @@ import axios from "axios";
 const apiURL = 'https://localhost:7061'
 
 export const func_global = {
+    leagues_icons:{
+        'LTA North':'https://static.lolesports.com/leagues/1731566778368_LTANORTH-LOGO_Blue_RGB2000px.png',
+        'LTA South': 'https://static.lolesports.com/leagues/1731566868757_LTASOUTH-LOGO_Red_RGB2000px.png',
+        'PCS': 'https://static.lolesports.com/leagues/1592515942679_PCS-01-FullonDark.png',
+        'LEC': 'https://static.lolesports.com/leagues/1592516184297_LEC-01-FullonDark.png',
+        'LPL': 'https://static.lolesports.com/leagues/1592516115322_LPL-01-FullonDark.png',
+        'LCK':'https://static.lolesports.com/leagues/lck-color-on-black.png',
+        'LTA':'https://static.lolesports.com/leagues/1731566966819_LTA-LOGO-LightGold_RGB2000px.png',
+        'LCP':'https://static.lolesports.com/leagues/1733468139601_lcp-color-golden.png',
+        'WORLDS': 'https://static.lolesports.com/leagues/1592594612171_WorldsDarkBG.png',
+        'MSI':'https://static.lolesports.com/leagues/1592594634248_MSIDarkBG.png'
+        
+    },
+    role_images:{
+          top: "https://cdn3.emoji.gg/emojis/7990-lol-role-top.png",
+          jungle: "https://cdn3.emoji.gg/emojis/1152-lol-role-jungle.png",
+          mid: "https://cdn3.emoji.gg/emojis/6934-lol-role-mid.png",
+          bottom: "https://cdn3.emoji.gg/emojis/9366-lol-role-bot.png",
+          support: "https://cdn3.emoji.gg/emojis/7990-lol-role-support.png",
+          sub: "https://cdn3.emoji.gg/emojis/2724-lol-role-fill.png",
+          team: "https://i.imgur.com/bLArMp2.png"
+        },
     getDayOfWeek(inputDate) {
         var dateFormat = inputDate.split('.')
         const today = new Date(2000+dateFormat[2], dateFormat[1] - 1, dateFormat[0]);

@@ -5,7 +5,7 @@
           {{ message }}
         </div>
       </div>
-      <input v-model="newMessage" @keyup.enter="sendMessage" placeholder="Type a message...">
+      <input class="chat-input" v-model="newMessage" @keyup.enter="sendMessage" placeholder="Type a message...">
     </div>
   </template>
   
@@ -51,7 +51,7 @@
     padding: 2px;
     border-bottom: 1px solid #ccc;
   }
-  input {
+  .chat-input {
     padding: 10px;
     border: 1px solid #ccc;
     width: 100%;

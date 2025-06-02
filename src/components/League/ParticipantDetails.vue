@@ -1,11 +1,11 @@
 <template>
-    <td v-if="participantData != null">
+    <!-- <td v-if="participantData != null">
         <div v-if="participantData != null && participantData.userTeam != null && showDetails" class="team-points vh-80 align-content-center py-auto fill-height d-flex align-items-center">
             <div class="col-6 d-flex justify-self-start">
                 <button class="btn btn-info btn-purple" @click="scrollLeft">&lt;</button>
             </div>
         </div>
-    </td>
+    </td> -->
     <td  v-if="participantData != null">{{ participantData.userLogin }}
 
         <div v-if="participantData != null && participantData.userTeam != null && showDetails" class="team-points" ref="pointsContainer">
@@ -23,19 +23,7 @@
         <div v-if="!showDetails">
             {{ participantData.userTeam ? participantData.userTeam.totalPoints : (participantData.points != null ? participantData.points : 0) }} pts        
         </div>
-        <div v-if="participantData != null && participantData.userTeam != null && showDetails" class="team-points position-center">
-            <div class="col-6 d-flex justify-content-end sticky-end">
-                <button class="btn btn-info btn-purple" @click="scrollRight">></button>
-            </div>
-        </div>
-    </td>
-    <!-- <td>{{ participant.joinedAt }}</td> -->
-    <td :class="{'showing-details' : showDetails}" v-if="participantData != null && participantData.userTeam != null" >
-        <button @click="toggleDetailsVisibility" data-toggle="modal" data-target="#sda" >
-            {{ showDetails ? 'Hide team' : 'Show team' }}
-        </button>
-    </td>
-          
+    </td>  
        
         
 </template>
@@ -84,6 +72,9 @@
     },
   },
     methods: {
+    setActiveUser(user) {
+        this.$emit('setActive', user);
+    },
     scrollRight() {
       const cardWidth = this.$refs.pointsContainer.children[0].offsetWidth; // get width of the first card
       const scrollAmount = cardWidth; // scroll width for 4 cards
@@ -95,7 +86,8 @@
       this.$refs.pointsContainer.scrollLeft -= scrollAmount; // scroll left
     },
     toggleDetailsVisibility() {
-      this.showDetails = !this.showDetails;
+    //   this.showDetails = !this.showDetails;
+      this.setActiveUser(this.participantData);
     //   if(this.showDetails) 
     //     this.openModal();
     },
