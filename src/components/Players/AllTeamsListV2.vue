@@ -44,7 +44,7 @@
           </div>
     </div>
     <div class="players-list players-list-container-a d-flex row">
-      <table class="table table-hover text-center align-middle">
+      <table class="table table-striped table-hover text-center align-middle">
         <thead>
           <tr>
             <th></th>
@@ -62,7 +62,7 @@
         <tbody>
           <tr
             v-for="team in sortedTeams.filter(
-                  (p) => p.price > 0 && (!hideInactive || (hideInactive && this.teamsPlayingNextFixture.includes(p.team.code)))
+                  (p) => p.price > 0 && (!hideInactive || (hideInactive && this.teamsPlayingNextFixture.includes(p.code)))
                 )"
                 :key="team.esportsTeamId" 
                 :class="{
@@ -79,12 +79,12 @@
             <button 
               @click="selectTeam(team)"  
               class=" action-icon" 
-              :disabled=" (selectedRole != 'team')"
+              :disabled="!this.teamsPlayingNextFixture.includes(team.code) || (selectedRole != 'team')"
             >
               <i
                 :class="[
                   '',
-                  !userTeam.includes(team.slug) && (selectedRole == 'team' )
+                  this.teamsPlayingNextFixture.includes(team.code) && !userTeam.includes(team.slug) && (selectedRole == 'team' )
                   ? 'fas fa-plus-circle text-primary fa-xl'
                   : 'fas fa-plus-circle fa-xl inactive'
                 ]"
@@ -130,66 +130,6 @@
       </table>
     </div>
   </div>
-  <!-- <div class="row">
-      <div class="filter-div col-4 my-1">
-        <label class="me-1" for="filter-method">Filter by: </label>
-        <br><select id="filter-method" v-model="selectedFilter" @change="filterTeams(selectedFilter)">
-          <option value="any">All</option>
-          <optgroup label="Region">
-              <option v-for="uniqueTeamCode in uniqueLeagues" :key="uniqueTeamCode" :value="uniqueTeamCode">{{ uniqueTeamCode }}</option>
-          </optgroup>
-        </select>
-      </div>
-      <div class="sorting-div col-5 my-1">
-        <label class="me-1" for="sorting-method">Sort by: </label>
-        <br><select id="sorting-method" v-model="selectedSorting" @change="orderTeams(selectedSorting)">
-          <option value="points">Points</option>
-          <option value="pointsGame">Pts/game</option>
-          <option value="pointsGamePrice">Pts/game/$</option>
-          <option value="priceAsc">Price ASC</option>
-          <option value="priceDesc">Price DESC</option>
-          <option value="name">Team name</option>
-          <option value="league">League</option>
-        </select>
-      </div>
-      <div class="sorting-div col-3 my-1">
-        <label class="me-1"  for="sorting-method">Active only: </label>
-        <br><input type="checkbox" v-model="hideInactive" />
-      </div>
-    </div>
-    <table class="table table-striped list-scrollable">
-        <thead>
-            <th></th>
-            <th>Name</th>
-            <th>Code</th>
-            <th>League</th>
-            <th>Games</th>
-            <th>Pts</th>
-            <th>Pts/g</th>
-            <th>Pts/g/$</th>
-            <th>Price</th>
-            <th></th>
-        </thead>
-        <tbody>
-            <tr v-for="team in sortedTeams.filter(
-              (t) => t.price > 0 && (!hideInactive || (hideInactive && this.teamsPlayingNextFixture.includes(t.code)))
-            )" :key="team.esportsTeamId" :class="{'team-inactive' : !this.teamsPlayingNextFixture.includes(team.code), 'already-owned': this.userTeam.includes(team.slug)}">
-                <td><img :src="team.imageUrl" class="player-photo" alt="Player Photo" /></td>
-                
-                    
-                <td><strong>{{ team.name }}</strong></td>
-                <td>{{ team.code }}</td>
-                <td>{{ team.league }}</td>
-                <td>{{ team.gamesPlayed }}</td>
-                <td class="text-center" :class="{'higlighted':this.selectedSorting=='points'}">{{ team.points.toFixed(0) }}</td>
-                <td class="text-center" :class="{'higlighted':this.selectedSorting=='pointsGame'}">{{ team.gamesPlayed == 0 ? "-" :  (team.points/team.gamesPlayed).toFixed(0) }}</td>
-                <td class="text-center" :class="{'higlighted':this.selectedSorting=='pointsGamePrice'}">{{ team.gamesPlayed == 0 ? "-" : (team.points/team.gamesPlayed/team.price).toFixed(2) }}</td>
-                <td class="text-center" :class="{'higlighted':this.selectedSorting=='priceAsc' || this.selectedSorting=='priceDesc'}">{{ team.price }}</td>
-                <td ><button :class="{ 'btn-secondary' : selectedRole != 'team', 'btn-info' : selectedRole == 'team' && this.teamsPlayingNextFixture.includes(team.code)}" class="btn btn-secondary" @click="selectTeam(team)" :disabled="!this.teamsPlayingNextFixture.includes(team.code) || selectedRole != 'team'">+</button></td>
-               
-            </tr>
-        </tbody>
-</table> -->
   </template>
 
 <script>
@@ -206,7 +146,7 @@ export default {
     return {
       showFilters: false,
       searchQuery: '',
-      hideInactive: false,
+      hideInactive: true,
       selectedSorting: 'points',
       selectedFilter: 'any',
         sorting: "",

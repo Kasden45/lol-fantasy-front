@@ -51,7 +51,7 @@ export default {
 }
 .modal {
   position: fixed;
-  z-index: 999;
+  z-index: 9999;
   top: 10%;
   left: 10%;
   

@@ -1,35 +1,44 @@
 <template>
-    <div id="panel" class="justify-content-center">
+    <div id="panel" class="justify-content-center align-content-center w-50 mx-auto">
 
-        <div class="row w-80 mb-1 ">
-            <label class="form-label text-start text-white fw-bolder" for="login-mail">Adres e-mail:</label>
-            <input
-                id="login-mail"
-                v-model="email"
-                :class="{ 'has-error': submittingLogin && invalidEmail || wrongLoginData}"
-                class="login-input"
-                placeholder="Adres-email"
-                type="email"
-                @focus="clearStatus"
-                @keypress="clearStatus"
-                @keydown.enter="login"
-            />
+        <div class=" mb-1 ">
+            <!-- <div class="col-3 text-center align-content-center mb-2"> -->
+                <label class="form-label text-start fw-bolder" for="login-mail">Adres e-mail:</label>
+            <!-- </div> -->
+            <!-- <div class="col-8 text-center mb-2"> -->
+                <input
+                    id="login-mail"
+                    v-model="email"
+                    :class="{ 'has-error': submittingLogin && invalidEmail || wrongLoginData}"
+                    class="login-input"
+                    placeholder="Adres-email"
+                    type="email"
+                    @focus="clearStatus"
+                    @keypress="clearStatus"
+                    @keydown.enter="login"
+                />
+            <!-- </div> -->
         </div>
-        <div class="row w-80 mb-1">
-            <label class="form-label text-start text-white fw-bolder" for="login-password">Hasło:</label>
-            <input
-                id="login-password"
-                v-model="password"
-                :class="{ 'has-error': submittingLogin && invalidPassword || wrongLoginData}"
-                class="login-input"
-                placeholder="Hasło"
-                type="password"
-                @focus="clearStatus"
-                @keypress="clearStatus"
-                @keydown.enter="login"
-            />
+        <div class="w-auto mb-1">
+            <!-- <div class="col-3 text-center align-content-center mb-2"> -->
+
+                <label class="form-label text-start fw-bolder" for="login-password">Hasło:</label>
+            <!-- </div> -->
+            <!-- <div class="col-8 text-center mb-2"> -->
+                <input
+                    id="login-password"
+                    v-model="password"
+                    :class="{ 'has-error': submittingLogin && invalidPassword || wrongLoginData}"
+                    class="login-input"
+                    placeholder="Hasło"
+                    type="password"
+                    @focus="clearStatus"
+                    @keypress="clearStatus"
+                    @keydown.enter="login"
+                />
+            <!-- </div> -->
         </div>
-        <div class="row w-80 text-end">
+        <div class="w-auto text-end">
             <p v-if="wrongLoginData" class="has-error">
                 Niepoprawne dane logowania!
             </p>
@@ -37,13 +46,13 @@
                 Proszę uzupełnić wszystkie dane poprawnie!
             </p>
         </div>
-        <div class="row w-80 mt-4 mb-2">
+        <div class="w-auto mt-4 mb-2">
             <button class="account-btn pink-btn" @click="login">
                 Zaloguj się
             </button>
         </div>
 
-        <div class="row w-80">
+        <div class="w-auto">
             <button class="account-btn grey-btn" data-bs-target="#registerModal" data-bs-toggle="modal"
                     @click="this.submittingLogin=false">
                 Utwórz nowe konto
@@ -316,7 +325,7 @@ export default {
 
 <style scoped>
 #panel {
-    height: 100%;
+    height: 80%;
 }
 
 .w-80 {
@@ -326,6 +335,7 @@ export default {
 .login-input, .account-btn {
     border-radius: 15px;
     border: none;
+    width:  100%;
 
 }
 
@@ -371,5 +381,8 @@ p.has-error {
     border-radius: 15px;
     border: none;
     width: 100%;
+}
+input, label {
+    display:block;
 }
 </style>

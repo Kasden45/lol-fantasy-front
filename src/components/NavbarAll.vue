@@ -40,7 +40,7 @@
             <li class="nav-item pe-3" v-if="(this.$store.getters.getProfileId != null && this.$store.getters.getProfileId != '')">
               <router-link
                 class="nav-link"
-                :class="{ active: this.$route.name === 'TeamSelection' }"
+                :class="{ active: this.$route.name === 'TeamSelection' || this.$route.name === 'TeamSelectionV2' }"
                 :to="{ name: 'TeamSelection' }"
                 >Team Selection</router-link
               >
@@ -155,13 +155,18 @@
                     </a>
                   </li>
                   <li>
+                    <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.msi_2024 }" class="dropdown-item" href="#" @click="switchTournament(this.msi_2024)">
+                      MSI 2024
+                    </a>
+                  </li>
+                  <li>
                     <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.worlds_2024 }" class="dropdown-item" href="#" @click="switchTournament(this.worlds_2024)">
                       WORLDS 2024
                     </a>
                   </li>
                   <li>
-                    <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.msi_2024 }" class="dropdown-item" href="#" @click="switchTournament(this.msi_2024)">
-                      MSI 2024
+                    <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.msi_2025 }" class="dropdown-item" href="#" @click="switchTournament(this.msi_2025)">
+                      MSI 2025
                     </a>
                   </li>
                   <li>

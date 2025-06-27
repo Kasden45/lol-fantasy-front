@@ -1,7 +1,13 @@
 <!-- TeamSelection.vue -->
 <template>
     <div class="container">
-      
+      <button class="btn btn-info mb-2">
+          <router-link
+          class="nav-link"
+          :to="{ name: 'TeamSelection' }"
+          >Team Selection v1</router-link
+        >
+    </button>
       <div class="row w-100 justify-content-md-center m-auto">
         <div class=" col-md-12 col-lg-6">
           <PlayerTeamV2 

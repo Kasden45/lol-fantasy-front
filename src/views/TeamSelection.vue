@@ -1,6 +1,16 @@
 <!-- TeamSelection.vue -->
 <template>
     <div class="container">
+      
+      <button class="btn btn-info mb-2">
+          <router-link
+          class="nav-link"
+          :class="{ active: this.$route.name === 'TeamSelectionV2' }"
+          :to="{ name: 'TeamSelectionV2' }"
+          >Team Selection v2</router-link
+        >
+    </button>
+
       <div class="row">
       <div class="progress-ring col-3 offset-1 d-flex align-content-start" v-if="this.nextFixture != null">
           <svg

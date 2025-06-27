@@ -2,7 +2,7 @@
   <div class="player-list-wrapper container">
     <div class="search-bar d-flex align-items-center mb-2">
       <input type="text" class="form-control search-input" v-model="searchQuery" placeholder="Search player" v-on:input="searchPlayers"/>
-      <button class="btn btn-outline-secondary filter-button" @click="toggleFilters">
+      <button class="btn btn-outline-secondary filter-button"  @click="toggleFilters">
         <i class="fas fa-filter"></i> 
       </button>
     </div>
@@ -51,7 +51,7 @@
           </div>
     </div>
     <div class="players-list players-list-container-a d-flex row">
-      <table class="table table-hover text-center align-middle">
+      <table class="table table-striped table-hover text-center align-middle">
         <thead>
           <tr>
             <th></th>
@@ -84,12 +84,12 @@
             <button 
               @click="selectPlayer(player)"  
               class=" action-icon" 
-              :disabled=" (selectedRole != player.role && selectedRole != 'sub')"
+              :disabled="(!this.teamsPlayingNextFixture.includes(player.team.code)) || (selectedRole != player.role && selectedRole != 'sub')"
             >
               <i
                 :class="[
                   '',
-                  !userTeam.includes(player.esportsPlayerId) && (selectedRole == player.role || selectedRole == 'sub')
+                  this.teamsPlayingNextFixture.includes(player.team.code) && !userTeam.includes(player.esportsPlayerId) && (selectedRole == player.role || selectedRole == 'sub')
                   ? 'fas fa-plus-circle text-primary fa-xl'
                   : 'fas fa-plus-circle fa-xl inactive'
                 ]"
@@ -154,7 +154,7 @@ export default {
         },
       showFilters: false,
       searchQuery: '',
-      hideInactive: false,
+      hideInactive: true,
       selectedForm: 0,
       selectedSorting: 'points',
       selectedFilter: 'any',
