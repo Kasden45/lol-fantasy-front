@@ -1,7 +1,13 @@
 <template>
-    <nav class="navbar navbar-expand-md navbar-light bg-white sticky-top">
+    <nav class="navbar navbar-expand-md  bg-white sticky-top">
       <div class="container">
         <a class="navbar-brand">{{ this.tournaments[this.$store.getters.getCurrentTournamentId] }} Fantasy2KPI</a>
+        <img
+          
+          class="flag"
+          :src="this.$func_global.leagues_icons[this.tournaments_icons[this.$store.getters.getCurrentTournamentId]]"
+          alt="flag"
+        />
         <button
           class="navbar-toggler"
           type="button"
@@ -34,7 +40,7 @@
             <li class="nav-item pe-3" v-if="(this.$store.getters.getProfileId != null && this.$store.getters.getProfileId != '')">
               <router-link
                 class="nav-link"
-                :class="{ active: this.$route.name === 'TeamSelection' }"
+                :class="{ active: this.$route.name === 'TeamSelection' || this.$route.name === 'TeamSelectionV2' }"
                 :to="{ name: 'TeamSelection' }"
                 >Team Selection</router-link
               >
@@ -79,13 +85,46 @@
                 >Stats<span class="inform"> NEW</span></router-link
               >
             </li>
-            <li class="nav-item pe-3">
+            <!-- <li class="nav-item pe-3">
               <router-link
                 class="nav-link"
                 :class="{ active: this.$route.name === 'DraftView' }"
                 :to="{ name: 'DraftView' }"
                 >Draft<span class="inform"> ??</span></router-link
               >
+            </li> -->
+            <li class="nav-item pe-3">
+              <div class="dropdown">
+                <button
+                  class="nav-link"
+                  id="dropdownMenuLeagues"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  Leagues
+                </button>
+                <ul
+                  class="dropdown-menu dropdown-menu-end"
+                  aria-labelledby="dropdownMenuLeagues"
+                >
+                  <li>
+                    <a @click="this.$router.push({ name: 'LeaguesView' })"
+                    class="dropdown-item"
+                    href="#">
+                      <span>Regular</span>
+                      <span class="inform"> NEW</span>
+                  </a>
+                  </li>
+                  <li>
+                    <a @click="this.$router.push({ name: 'DraftView' })"
+                    class="dropdown-item"
+                    href="#">
+                      <span>Draft</span>
+                      <span class="inform"> NEW</span>
+                  </a>
+                  </li>
+                </ul>
+              </div>
             </li>
             <li class="nav-item pe-3">
               <div class="dropdown">
@@ -116,13 +155,23 @@
                     </a>
                   </li>
                   <li>
+                    <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.msi_2024 }" class="dropdown-item" href="#" @click="switchTournament(this.msi_2024)">
+                      MSI 2024
+                    </a>
+                  </li>
+                  <li>
                     <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.worlds_2024 }" class="dropdown-item" href="#" @click="switchTournament(this.worlds_2024)">
                       WORLDS 2024
                     </a>
                   </li>
                   <li>
-                    <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.msi_2024 }" class="dropdown-item" href="#" @click="switchTournament(this.msi_2024)">
-                      MSI 2024
+                    <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.msi_2025 }" class="dropdown-item" href="#" @click="switchTournament(this.msi_2025)">
+                      MSI 2025
+                    </a>
+                  </li>
+                  <li>
+                    <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.worlds_2025 }" class="dropdown-item" href="#" @click="switchTournament(this.worlds_2025)">
+                      WORLDS 2025
                     </a>
                   </li>
                   <li v-if="(this.$store.getters.getProfileId != null && this.$store.getters.getProfileId != '')">
@@ -233,5 +282,15 @@
 .inform{
   color: var(--PRIMARY);
   font-size:  x-small;
+}
+
+.flag {
+  height: 5vh;
+  /* height: min-content; */
+  object-fit: cover;
+  border-radius: 2px;
+  color: VAR(--PRIMARY);
+  filter: invert(100%) opacity(0.8) drop-shadow(0 0 0 VAR(--PRIMARY)) ;
+  /* filter: invert(100%); */
 }
   </style>

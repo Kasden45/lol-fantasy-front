@@ -1,151 +1,24 @@
 <!-- TeamSelection.vue -->
 <template>
     <div class="container">
-      
       <button class="btn btn-info mb-2">
           <router-link
           class="nav-link"
-          :class="{ active: this.$route.name === 'TeamSelectionV2' }"
-          :to="{ name: 'TeamSelectionV2' }"
-          >Team Selection v2</router-link
+          :to="{ name: 'TeamSelection' }"
+          >Team Selection v1</router-link
         >
     </button>
-
-      <div class="row">
-      <div class="progress-ring col-3 offset-1 d-flex align-content-start" v-if="this.nextFixture != null">
-          <svg
-            class="progress-ring__svg"
-            :width="radius * 2"
-            :height="radius * 2"
-            viewBox="0 0 500 500"
-          >
-            <!-- Background Circle -->
-            <circle
-              class="progress-ring__background"
-              :r="normalizedRadius"
-              :cx="center"
-              :cy="center"
-              fill="transparent"
-              :stroke-width="strokeWidth"
-            />
-            <!-- Foreground Progress Circle -->
-            <circle
-              class="progress-ring__progress"
-              :r="normalizedRadius"
-              :cx="center"
-              :cy="center"
-              fill="transparent"
-              :stroke-width="strokeWidth"
-              :stroke-dasharray="circumference"
-              :stroke-dashoffset="strokeDashoffset"
-              stroke-linecap="round"
-            />
-            <g transform="rotate(90, 270, 270)">
-            <text
-              class="progress-ring__text"
-              :x="center"
-              :y="center"
-              fill="#000"
-              font-size="26"
-              font-weight="bold"
-              text-anchor="middle"
-              dominant-baseline="middle"
-            >
-             REMAINING BUDGET
-            </text>
-            </g>
-            <g transform="rotate(90, 165, 165)">
-            <text
-              :style="{fill: this.teamValue > this.nextFixture.fixture.teamValueLimit ? 'red' : black}"
-              :class="{'fill-primary' : this.teamValue <= this.nextFixture.fixture.teamValueLimit, 'fill-error' : this.teamValue > this.nextFixture.fixture.teamValueLimit}"
-              class="progress-ring__text"
-              :x="center"
-              :y="center"
-              font-size="34"
-              font-weight="bold"
-              text-anchor="middle"
-              dominant-baseline="middle"
-            >
-              {{ this.nextFixture.fixture.teamValueLimit - teamValue }}$ / {{this.nextFixture.fixture.teamValueLimit}}$
-            </text>
-            </g>
-          </svg>
-          <!--  -->
-        </div>
-        <div class="progress-ring col-4 d-flex align-content-start" v-if="this.nextFixture != null">
-          <svg
-            class="progress-ring__svg"
-            :width="radius * 2"
-            :height="radius * 2"
-            viewBox="0 0 500 500"
-          >
-            <!-- Background Circle -->
-            <circle
-              class="progress-ring__background"
-              :r="normalizedRadius"
-              :cx="center"
-              :cy="center"
-              fill="transparent"
-              :stroke-width="strokeWidth"
-            />
-            <!-- Foreground Progress Circle -->
-            <circle
-              class="progress-ring__progress"
-              :r="normalizedRadius"
-              :cx="center"
-              :cy="center"
-              fill="transparent"
-              :stroke-width="strokeWidth"
-              :stroke-dasharray="circumference"
-              :stroke-dashoffset="strokeDashoffsetTransfer"
-              stroke-linecap="round"
-            />
-            <g transform="rotate(90, 270, 270)">
-            <text
-              class="progress-ring__text"
-              :x="center"
-              :y="center"
-              fill="#000"
-              font-size="26"
-              font-weight="bold"
-              text-anchor="middle"
-              dominant-baseline="middle"
-            >
-             REMAINING TRANSFERS
-            </text>
-            </g>
-            <g transform="rotate(90, 165, 165)">
-            <text
-              :class="{'fill-primary' : this.selectedUserTeam.transfersAvailable - this.transfersMade >= 0, 'fill-error' : this.selectedUserTeam.transfersAvailable - this.transfersMade < 0}"
-              class="progress-ring__text"
-              :x="center"
-              :y="center"
-              font-size="34"
-              font-weight="bold"
-              text-anchor="middle"
-              dominant-baseline="middle"
-            >
-            {{ this.selectedUserTeam.transfersAvailable > 10 ? '∞' : this.selectedUserTeam.transfersAvailable - this.transfersMade }} / {{this.nextFixture.fixture.transfersLimit}}
-            </text>
-            </g>
-          </svg>
-          <!--  -->
-        </div>
-        <div class="col-4 d-flex align-items-end">
-          <h4 
-          v-if="this.nextFixture != null"
-          :class="{
-            'text-danger' : ((new Date(this.nextFixture.fixture.deadlineDate) - new Date())/ 36e5) < 48, 
-            'text-warning': ((new Date(this.nextFixture.fixture.deadlineDate) - new Date())/ 36e5) > 48 && ((new Date(this.nextFixture.fixture.deadlineDate) - new Date())/ 36e5) < 24*7}"
-          >Next deadline: {{ this.$func_global.formatDate(this.nextFixture.fixture.deadlineDate) }}</h4>
-          <!-- <h3 v-if="this.nextFixture != null" :class="{'error-text' : this.teamValue > this.nextFixture.fixture.teamValueLimit}">Price total {{ this.teamValue }}/{{ this.nextFixture.fixture.teamValueLimit }}$</h3>
-          <h3 >Transfers made: {{ this.transfersMade }}</h3>
-          <h3 v-if="this.nextFixture != null" :class="{'error-text' : this.selectedUserTeam.transfersAvailable - this.transfersMade < 0}">Transfers available: {{ this.selectedUserTeam.transfersAvailable > 10 ? '∞' : this.selectedUserTeam.transfersAvailable - this.transfersMade }}/{{ this.selectedUserTeam.transfersAvailable > 10 ? '∞' : this.nextFixture.fixture.transfersLimit }}</h3> -->
-        </div>
-      </div>
       <div class="row w-100 justify-content-md-center m-auto">
-        <div class="col-md-7">
-          <PlayerTeam :captain="selectedUserTeam.captain" :currently-picked="this.roleToAddPlayer" @playerRemove="playerRemoved" @rolePick="(r) => roleToAddPlayer = r" :userTeam="selectedUserTeam"/>
+        <div class=" col-md-12 col-lg-6">
+          <PlayerTeamV2 
+          :captain="selectedUserTeam.captain" 
+          :currently-picked="this.roleToAddPlayer" 
+          @playerRemove="playerRemoved" 
+          @rolePick="(r) => roleToAddPlayer = r" 
+          :userTeam="selectedUserTeam"
+          @captainPick="pickCaptain"
+          @chipUsed="chipUsed"
+          />
             <div class="row justify-content-md-center m-auto py-2">
               <div class="col-3 d-flex justify-content-start ps-0">
                 <label class="w-auto d-flex align-self-center me-1" for="captain">Captain: </label>
@@ -175,32 +48,173 @@
       </div>
     </div>
         
-        <div class="game-points col-md-5" >
-          <div class="game-tabs ms-2">
+        <div class="selection-col  col-md-12 col-lg-6" >
+          <div class="row">
+            <!-- <div v-if="this.selectedUserTeam.chipActivated != 0" class="col-12">
+              <h3 class="text-center">3x captain</h3>
+
+            </div> -->
+            <div class="progress-ring col-4 offset-2 d-flex align-content-center" v-if="this.nextFixture != null">
+                <svg
+                  class="progress-ring__svg"
+                  :width="radius * 1.2"
+                  :height="radius * 1.2"
+                  viewBox="0 0 500 500"
+                >
+                  <!-- Background Circle -->
+                  <circle
+                    class="progress-ring__background"
+                    :r="normalizedRadius"
+                    :cx="center"
+                    :cy="center"
+                    fill="transparent"
+                    :stroke-width="strokeWidth"
+                  />
+                  <!-- Foreground Progress Circle -->
+                  <circle
+                    class="progress-ring__progress"
+                    :r="normalizedRadius"
+                    :cx="center"
+                    :cy="center"
+                    fill="transparent"
+                    :stroke-width="strokeWidth"
+                    :stroke-dasharray="circumference"
+                    :stroke-dashoffset="strokeDashoffset"
+                    stroke-linecap="round"
+                  />
+                  <g transform="rotate(90, 270, 270)">
+                  <text
+                    class="progress-ring__text"
+                    :x="center"
+                    :y="center"
+                    fill="#000"
+                    font-size="26"
+                    font-weight="bold"
+                    text-anchor="middle"
+                    dominant-baseline="middle"
+                  >
+                  REMAINING BUDGET
+                  </text>
+                  </g>
+                  <g transform="rotate(90, 165, 165)">
+                  <text
+                    :style="{fill: this.teamValue > this.nextFixture.fixture.teamValueLimit ? 'red' : black}"
+                    :class="{'fill-primary' : this.teamValue <= this.nextFixture.fixture.teamValueLimit, 'fill-error' : this.teamValue > this.nextFixture.fixture.teamValueLimit}"
+                    class="progress-ring__text"
+                    :x="center"
+                    :y="center"
+                    font-size="34"
+                    font-weight="bold"
+                    text-anchor="middle"
+                    dominant-baseline="middle"
+                  >
+                    {{ this.selectedUserTeam.chipActivated == 2 ? '∞' : `$${this.nextFixture.fixture.teamValueLimit - teamValue} / $${this.nextFixture.fixture.teamValueLimit}` }}
+                  </text>
+                  </g>
+                </svg>
+                <!--  -->
+              </div>
+              <div class="progress-ring offset-2 col-4 d-flex align-content-start" v-if="this.nextFixture != null">
+                <svg
+                  class="progress-ring__svg"
+                  :width="radius * 1.2"
+                  :height="radius * 1.2"
+                  viewBox="0 0 500 500"
+                >
+                  <!-- Background Circle -->
+                  <circle
+                    class="progress-ring__background"
+                    :r="normalizedRadius"
+                    :cx="center"
+                    :cy="center"
+                    fill="transparent"
+                    :stroke-width="strokeWidth"
+                  />
+                  <!-- Foreground Progress Circle -->
+                  <circle
+                    class="progress-ring__progress"
+                    :r="normalizedRadius"
+                    :cx="center"
+                    :cy="center"
+                    fill="transparent"
+                    :stroke-width="strokeWidth"
+                    :stroke-dasharray="circumference"
+                    :stroke-dashoffset="strokeDashoffsetTransfer"
+                    stroke-linecap="round"
+                  />
+                  <g transform="rotate(90, 270, 270)">
+                  <text
+                    class="progress-ring__text"
+                    :x="center"
+                    :y="center"
+                    fill="#000"
+                    font-size="26"
+                    font-weight="bold"
+                    text-anchor="middle"
+                    dominant-baseline="middle"
+                  >
+                  REMAINING TRANSFERS
+                  </text>
+                  </g>
+                  <g transform="rotate(90, 165, 165)">
+                  <text
+                    :class="{'fill-primary' : this.selectedUserTeam.transfersAvailable - this.transfersMade >= 0, 'fill-error' : this.selectedUserTeam.transfersAvailable - this.transfersMade < 0}"
+                    class="progress-ring__text"
+                    :x="center"
+                    :y="center"
+                    font-size="34"
+                    font-weight="bold"
+                    text-anchor="middle"
+                    dominant-baseline="middle"
+                  >
+                  {{ this.selectedUserTeam.chipActivated == 3 || this.selectedUserTeam.chipActivated == 2 || this.selectedUserTeam.transfersAvailable > 10 ? '∞' : `${this.selectedUserTeam.transfersAvailable - this.transfersMade} / ${this.nextFixture.fixture.transfersLimit}` }}
+                  </text>
+                  </g>
+                </svg>
+                <!--  -->
+              </div>
+              
+            </div>
+          <div class="game-tabs">
           <div
             v-for="(game, index) in tabs"
             :key="index"
             @click="selectTab(index)"
             :class="{ active: selectedTabIndex === index }"
-            class="game-tab"
+            class="game-tab justify-content-center"
           >
-            {{ game }}
+            {{ index == 1 ? '' : game }}
+            <div class="vl" v-if="index == 1" ></div>
+            <div v-if="index == 0">
+              <span v-for="num in pickedPlayers" 
+              class="dot player-circle" 
+              :class="{ picked: num  }">
+                            <!-- < class="dot player-circle"></span> -->
+              </span>
+            </div>
+            <div v-if="index == 2">
+              <span v-for="num in pickedTeams" 
+              class="dot player-circle" 
+              :class="{ picked: num  }">
+                            <!-- < class="dot player-circle"></span> -->
+              </span>
+            </div>
           </div>
-          <div class="sorting-div my-1 sticky-right" v-if="nextFixture != null">
+          <!-- <div class="sorting-div my-1 sticky-right" v-if="nextFixture != null">
             <label class="me-1"  for="range">Last </label>
             <select id="range" v-model="selectedForm" @change="rangeChanged(selectedForm)" onhov="as">
               <option v-for="fixtureOrder in Array.from(Array(nextFixture.fixture.order-1).keys())" :key="order" :value="fixtureOrder">{{ fixtureOrder == 0 ? "All" : fixtureOrder }}</option>
               
             </select>
             <label class="mx-1"  for="range"> fixtures form</label>
-          </div>
+          </div> -->
         </div>
         
-          <div class="players-list-container" v-if="selectedTabIndex == 0">
-            <PlayersList :userTeam="pickedPlayersIds" :nextFixture="nextFixture" :teamsPlayingNextFixture="teamsPlayingInNextFixture" @rangeChange="rangeChanged" @playerSelect="playerSelected" :selectedRole="roleToAddPlayer" :players="allPlayers" v-if="allPlayers.length > 0"/>
+          <div class="" v-if="selectedTabIndex == 0">
+            <PlayersListV2 :userTeam="pickedPlayersIds" :nextFixture="nextFixture" :teamsPlayingNextFixture="teamsPlayingInNextFixture" @rangeChange="rangeChanged" @playerSelect="playerSelected" :selectedRole="roleToAddPlayer" :players="allPlayers" v-if="allPlayers.length > 0"/>
           </div>
-          <div class="players-list-container" v-if="selectedTabIndex == 1">
-            <TeamsList :userTeam="selectedUserTeam.team.team != null ? selectedUserTeam.team.team.slug : ''" :nextFixture="nextFixture" :teamsPlayingNextFixture="teamsPlayingInNextFixture" @rangeChange="rangeChanged" @teamSelect="teamSelected" :selectedRole="roleToAddPlayer" :teams="allTeams" v-if="allTeams.length > 0"/>
+          <div class="" v-if="selectedTabIndex == 2">
+            <TeamsListV2 :userTeam="selectedUserTeam.team.team != null ? selectedUserTeam.team.team.slug : ''" :nextFixture="nextFixture" :teamsPlayingNextFixture="teamsPlayingInNextFixture" @rangeChange="rangeChanged" @teamSelect="teamSelected" :selectedRole="roleToAddPlayer" :teams="allTeams" v-if="allTeams.length > 0"/>
           </div>
           <!-- <PlayerPointsCard :playerDetails="selectedGame" :totalPoints="totalPointsA" v-if="selectedGame" /> -->
         </div>
@@ -215,15 +229,15 @@
   </template>
   
   <script>
-  import PlayersList from "@/components/Players/AllPlayersList.vue" 
-  import TeamsList from "@/components/Players/AllTeamsList.vue" 
-  import PlayerTeam from "@/components/TeamSelection/PlayerTeam.vue" 
+  import PlayersListV2 from "@/components/Players/AllPlayersListV2.vue" 
+  import TeamsListV2 from "@/components/Players/AllTeamsListV2.vue" 
+  import PlayerTeamV2 from "@/components/TeamSelection-v2/PlayerTeam-v2.vue" 
   import MatchesView from "./MatchesView.vue";
   export default {
     components: {
-      PlayersList,
-      TeamsList,
-      PlayerTeam,
+      PlayersListV2,
+      TeamsListV2,
+      PlayerTeamV2,
       MatchesView
     },
     data() {
@@ -238,8 +252,15 @@
         allPlayers: [],
         allTeams: [],
         selectedTabIndex: 0,
-        tabs: ["Players", "Teams"],
+        tabs: ["Players", "|", "Teams"],
         roleToAddPlayer: "jungle",
+        roleIndex :{
+          top: 1,
+          jungle: 2,
+          mid: 3,
+          bottom: 4,
+          support: 5
+        },
         selectedUserTeam: {
           topPlayer: {
             role: "top",
@@ -271,7 +292,9 @@
           },
           captain: 1,
           transfersMade: 0,
-          transfersAvailable: 100
+          transfersAvailable: 100,
+          chipActivated: 0,
+          chips: []
         },
         selectedPlayers: [],
         loadedPlayers: [],
@@ -290,6 +313,24 @@
       // this.getFixtures();
     },
     computed: {
+      pickedPlayers() {
+        const playerKeys = Object.keys(this.selectedUserTeam).filter(key => key.endsWith('Player'));
+
+        const activeCount = playerKeys.reduce((count, key) => {
+          return this.selectedUserTeam[key].player !== null ? count + 1 : count;
+        }, 0);
+
+        return playerKeys.map((_, index) => index < activeCount);
+      },
+      pickedTeams() {
+        const playerKeys = Object.keys(this.selectedUserTeam).filter(key => key.endsWith('team'));
+
+        const activeCount = playerKeys.reduce((count, key) => {
+          return this.selectedUserTeam[key].team !== null ? count + 1 : count;
+        }, 0);
+
+        return playerKeys.map((_, index) => index < activeCount);
+      },
       center() {
       return this.radius + this.strokeWidth / 2;
       },
@@ -300,24 +341,34 @@
         return 2 * Math.PI * this.normalizedRadius;
       },
       strokeDashoffset() {
-        const percent = Math.min(this.teamValue / this.nextFixture.fixture.teamValueLimit, 1);
+        let percent = 0;
+        if (this.selectedUserTeam.chipActivated == 2) {
+          percent = 1 // Infinite budget
+        } else {
+          percent = Math.min(this.teamValue / this.nextFixture.fixture.teamValueLimit, 1);
+        }
         return this.circumference - percent * this.circumference;
       },
       strokeDashoffsetTransfer() {
-        const percent = (this.selectedUserTeam.transfersAvailable - this.transfersMade) / this.nextFixture.fixture.transfersLimit;
+        let percent = 0;
+        if (this.selectedUserTeam.chipActivated == 2 || this.selectedUserTeam.chipActivated == 3 || this.selectedUserTeam.transfersAvailable > 10) {
+          percent = 1 // Infinite transfers
+        } else {
+          percent = (this.selectedUserTeam.transfersAvailable - this.transfersMade) / this.nextFixture.fixture.transfersLimit;
+        }
         return this.circumference - percent * this.circumference;
       },
       teamIsCorrect() {
-        return !(this.teamValue > this.nextFixture.fixture.teamValueLimit || this.selectedUserTeam.transfersAvailable < this.selectedUserTeam.transfersMade || this.pickedPlayersNumber < 7)
+        return !(this.teamValue > this.nextFixture.fixture.teamValueLimit || this.selectedUserTeam.transfersAvailable < this.transfersMade || this.pickedPlayersNumber < 7)
       },
       pickedPlayersIds() {
         
         let pickedPlayers = [];
     // Iterate through the player roles and team
-        for (const role in this.selectedUserTeam) {
+        for (const property in this.selectedUserTeam) {
           // eslint-disable-next-line
-          if (this.selectedUserTeam.hasOwnProperty(role)) {
-            const player = this.selectedUserTeam[role].player;
+          if (property.endsWith('Player') || property.endsWith('team')) {
+            const player = this.selectedUserTeam[property].player;
 // eslint-disable-next-line
             if (player != null && player.hasOwnProperty("price")) {
               pickedPlayers.push(player.esportsPlayerId);
@@ -333,10 +384,10 @@
         
         let pickedPlayers = 0;
     // Iterate through the player roles and team
-        for (const role in this.selectedUserTeam) {
+        for (const property in this.selectedUserTeam) {
           // eslint-disable-next-line
-          if (this.selectedUserTeam.hasOwnProperty(role)) {
-            const player = this.selectedUserTeam[role].player;
+          if (property.endsWith('Player')) {
+            const player = this.selectedUserTeam[property].player;
 // eslint-disable-next-line
             if (player != null && player.hasOwnProperty("price")) {
               pickedPlayers += 1;
@@ -361,7 +412,8 @@
     // Iterate through the player roles and team
         for (const role in this.selectedUserTeam) {
           // eslint-disable-next-line
-          if (this.selectedUserTeam.hasOwnProperty(role)) {
+          if (role.endsWith('Player')) {
+            console.log("SPRAWDZAM ROLE:", this.selectedUserTeam[role])
             const player = this.selectedUserTeam[role].player;
 // eslint-disable-next-line
             if (player != null && player.hasOwnProperty("price")) {
@@ -386,6 +438,7 @@
           // this.loadedPlayers
           var currentLineup = [];
           for (const key in this.selectedUserTeam) {
+            console.log('Key:', key, 'Value:', this.selectedUserTeam[key])
             if (this.selectedUserTeam[key].player != null) {
               console.log("taki jest", this.selectedUserTeam[key].player.esportsPlayerId)
               currentLineup.push(this.selectedUserTeam[key].player.esportsPlayerId);
@@ -402,6 +455,13 @@
       },
     },
     methods: {
+      chipUsed(id) {
+        this.selectedUserTeam.chipActivated = id;
+      },
+      pickCaptain(role) {
+        console.log(role, 'lecimy')
+        this.selectedUserTeam.captain = this.roleIndex[role]
+      },
       rangeChanged(numberOfGames) {
         console.log(numberOfGames);
         this.numberOfGames = numberOfGames;
@@ -478,7 +538,10 @@
             this.selectedUserTeam.captain = userTeam.captain;
             this.selectedUserTeam.transfersMade = userTeam.transfersMade;
             this.selectedUserTeam.transfersAvailable = userTeam.transfersAvailable;
-            
+            this.selectedUserTeam.chipActivated = userTeam.chipUsed ?? 0;
+            // this.selectedUserTeam.chipUsed = userTeam.chipUsed
+            this.selectedUserTeam.chips = userTeam.extraChips;
+
             this.loadedPlayers = [
               userTeam.topPlayer.esportsPlayerId,
               userTeam.junglePlayer.esportsPlayerId,
@@ -545,6 +608,7 @@
               "subPlayerId": this.selectedUserTeam.subPlayer.player.esportsPlayerId,
               "teamSlug": this.selectedUserTeam.team.team.slug,
               "captain": this.selectedUserTeam.captain,
+              "chipUsed": this.selectedUserTeam.chipActivated != null ? this.selectedUserTeam.chipActivated : 0,
             }
             const url = `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/user_team`
             this.axios.post(url, data).then((response) => {
@@ -580,6 +644,7 @@
               "subPlayerId": this.selectedUserTeam.subPlayer.player.esportsPlayerId,
               "teamSlug": this.selectedUserTeam.team.team.slug,
               "captain": this.selectedUserTeam.captain,
+              "chipUsed": this.selectedUserTeam.chipActivated != null ? this.selectedUserTeam.chipActivated : 0,
             }
             const url = `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/user_team`
             this.axios.put(url, data).then((response) => {
@@ -681,12 +746,65 @@
         return null; // Return null if no player with the specified role is found
       }
     },
+    watch: {
+      roleToAddPlayer: {
+        handler(newroleToAddPlayer, oldroleToAddPlayer) {
+          // React to prop changes here
+          // playerDetails = 
+          console.log(newroleToAddPlayer, oldroleToAddPlayer);
+          if(newroleToAddPlayer != 'team') {
+            this.selectedTabIndex = 0
+          } else {
+            this.selectedTabIndex = 2
+          }
+        },
+        immediate: true, // This will trigger the handler immediately when the component is created
+      },
+    }
   };
   </script>
 
   <style scoped>
+  .player-circle {
+    background-color: var(--GREY-DARKER) !important;
+  }
+   .player-circle.picked {
+    background-color: var(--PRIMARY) !important;
+  }
+  .dot {
+  height: 10px;
+  width: 10px;
+  margin-right: 0.2rem;
+  margin-left: 0.2rem;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+}
+  .vl {
+  border-left: 3px solid var(--GREY-DARKER);
+  height: 100%;
+}
+.game-tabs {
+  display: flex;
+  justify-content: space-evenly;
+  font-size: 0.8rem;
+  font-weight: 600;
+  /* border-top: 2px solid var(--GREY); */
+  /* margin-top: 0.4rem; */
+  padding-top: 0.3rem;
+}
 .players-list-container {
-  height: 40vh;
+  background: #efefef;
+  height: 80vh;
+  overflow-y: scroll;
+  overflow-x: scroll;
+  padding-left: 0%;
+  padding-right: 0%;
+  /* border: 1px solid #ddd; */
+}
+.players-list-container-a {
+  background: #efefef;
+  height: 80vh;
   overflow-y: scroll;
   overflow-x: scroll;
   padding-left: 0%;
@@ -700,25 +818,39 @@
     background-color: var(--DARK-YELLOW);
 }
 
-.game-tabs {
+/* .game-tabs {
   display: flex;
   margin-bottom: 20px;
-}
+} */
 
 .game-tabs, .game-tab {
   cursor: pointer;
   padding: 10px 20px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-right: 10px;
+  /* width: inherit; */
+  /* border: 1px solid #ccc; */
+  /* border-radius: 4px; */
+  /* margin-right: 10px; */
 }
-
+/* .navbar-nav .nav-link.active:after {
+    display: block;
+    border-bottom: 2px solid var(--PRIMARY);
+    content: "";
+    width: 80%;
+    align-self: start;
+} */
 .game-tabs .active {
-  background-color: #007BFF;
-  color: #fff;
+  /* background-color: #007BFF; */
+  display: block;
+  border-bottom: 2px solid var(--PRIMARY);
+  content: "";
+  /* width: 50%; */
+  align-self: start;
 }
 
-.game-points {
+
+.selection-col {
+  height: fit-content;
+  /* width: fit-content; */
   border: 1px solid #ccc;
   padding: 10px;
   border-radius: 4px;

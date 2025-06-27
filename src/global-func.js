@@ -3,6 +3,55 @@ import axios from "axios";
 const apiURL = 'https://localhost:7061'
 
 export const func_global = {
+    nation_flag:{
+        'South Korea' : 'https://cdn-icons-png.flaticon.com/512/5373/5373301.png',
+        'China' : 'https://cdn-icons-png.flaticon.com/512/323/323363.png',
+        'Taiwan': 'https://cdn-icons-png.flaticon.com/512/323/323363.png',
+        'Poland': 'https://cdn-icons-png.flaticon.com/512/323/323338.png',
+        'Germany': 'https://cdn-icons-png.flaticon.com/128/197/197571.png',
+        'United States': 'https://cdn-icons-png.flaticon.com/128/3909/3909383.png',
+        'Belgium': 'https://cdn-icons-png.flaticon.com/128/12339/12339450.png',
+        'Denmark': 'https://cdn-icons-png.flaticon.com/128/16022/16022060.png',
+        'Slovenia': 'https://cdn-icons-png.flaticon.com/128/13980/13980407.png',
+        'Greece': 'https://cdn-icons-png.flaticon.com/128/14538/14538804.png',
+        'Turkey': 'https://cdn-icons-png.flaticon.com/128/16022/16022926.png',
+        'Bulgaria': 'https://cdn-icons-png.flaticon.com/128/16022/16022000.png',
+        'Spain': 'https://cdn-icons-png.flaticon.com/128/16022/16022729.png',
+        'Argentina': 'https://cdn-icons-png.flaticon.com/128/16021/16021893.png',
+        'Brazil': 'https://cdn-icons-png.flaticon.com/128/3909/3909370.png',
+        'Czech Republic': 'https://cdn-icons-png.flaticon.com/128/3909/3909197.png',
+        'Sweden': 'https://cdn-icons-png.flaticon.com/128/12339/12339666.png',
+        'Chile': 'https://cdn-icons-png.flaticon.com/128/323/323284.png',
+        'France': 'https://cdn-icons-png.flaticon.com/128/12339/12339500.png',
+        'Kuri': 'https://cdn-icons-png.flaticon.com/128/11849/11849683.png',
+        'Australia': 'https://cdn-icons-png.flaticon.com/128/9906/9906443.png',
+        'Japan': 'https://cdn-icons-png.flaticon.com/128/323/323308.png',
+        'Vietnam': 'https://cdn-icons-png.flaticon.com/128/323/323319.png',
+        'Default': 'https://cdn-icons-png.flaticon.com/128/594/594903.png'
+    },
+    leagues_icons:{
+        'LTA North':'https://static.lolesports.com/leagues/1731566778368_LTANORTH-LOGO_Blue_RGB2000px.png',
+        'LTA South': 'https://static.lolesports.com/leagues/1731566868757_LTASOUTH-LOGO_Red_RGB2000px.png',
+        'PCS': 'https://static.lolesports.com/leagues/1592515942679_PCS-01-FullonDark.png',
+        'LEC': 'https://static.lolesports.com/leagues/1592516184297_LEC-01-FullonDark.png',
+        'LPL': 'https://static.lolesports.com/leagues/1592516115322_LPL-01-FullonDark.png',
+        'LCK':'https://static.lolesports.com/leagues/lck-color-on-black.png',
+        'LTA':'https://static.lolesports.com/leagues/1731566966819_LTA-LOGO-LightGold_RGB2000px.png',
+        'LLA':'https://static.lolesports.com/leagues/1731566868757_LTASOUTH-LOGO_Red_RGB2000px.png',
+        'LCP':'https://static.lolesports.com/leagues/1733468139601_lcp-color-golden.png',
+        'WORLDS': 'https://static.lolesports.com/leagues/1592594612171_WorldsDarkBG.png',
+        'MSI':'https://static.lolesports.com/leagues/1592594634248_MSIDarkBG.png'
+        
+    },
+    role_images:{
+          top: "https://cdn3.emoji.gg/emojis/7990-lol-role-top.png",
+          jungle: "https://cdn3.emoji.gg/emojis/1152-lol-role-jungle.png",
+          mid: "https://cdn3.emoji.gg/emojis/6934-lol-role-mid.png",
+          bottom: "https://cdn3.emoji.gg/emojis/9366-lol-role-bot.png",
+          support: "https://cdn3.emoji.gg/emojis/7990-lol-role-support.png",
+          sub: "https://cdn3.emoji.gg/emojis/2724-lol-role-fill.png",
+          team: "https://i.imgur.com/bLArMp2.png"
+        },
     getDayOfWeek(inputDate) {
         var dateFormat = inputDate.split('.')
         const today = new Date(2000+dateFormat[2], dateFormat[1] - 1, dateFormat[0]);
