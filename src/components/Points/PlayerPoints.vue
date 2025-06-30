@@ -4,7 +4,8 @@
     :class="{
       'picked-position': currentlyPicked === role,
       'captain-player-tile': isCaptain,
-      'sub': role =='sub'
+      'sub': role =='sub',
+      'triple-captain-player-tile': isTriple && isCaptain
     }"
     @click="showDetails(playerPoints)"
   >
@@ -98,7 +99,7 @@
     <!-- Bottom Info: Price and Points -->
     <div class="tile-footer" v-if="teamPlayer && !details">
       <div class="price ps-2">{{ teamPlayer?.price?.toFixed(1) }}$</div>
-      <div class="points pe-2">{{ points ? points.toFixed(1) :playerPoints?.totalPoints?.toFixed(1) }}pts</div>
+      <div class="points pe-2" :class="{'captain-points': isCaptain, 'triple-points': isTriple && isCaptain}">{{ displayedPoints.toFixed(1) }}pts</div>
     </div>
     <div class="tile-footer second justify-content-center" v-if="teamPlayer && details">
         <div class="points details pe-2">{{ points ? points.toFixed(1) : playerPoints?.totalPoints?.toFixed(1) }}pts</div>
@@ -119,7 +120,8 @@ export default {
         playerPoints: Object,
         role: String,
         isCaptain: Boolean,
-        details: Boolean
+        details: Boolean,
+        isTriple: Boolean,
     },
     components: {
       PlayerTileV2
@@ -137,6 +139,19 @@ export default {
         return 'https://cdn-icons-png.flaticon.com/512/323/323363.png'
         return `/flags/${countryCode.toLowerCase()}.png`; // or use CDN
       }
+    },
+    computed:{
+      displayedPoints() {
+        if (this.isTriple && this.isCaptain) {
+          return this.points ? this.points * 3 : this.playerPoints?.totalPoints * 3;
+        }
+        if (this.isCaptain) {
+          return this.points ? this.points * 2 : this.playerPoints?.totalPoints * 2;
+        }
+        else {
+          return this.points ? this.points : this.playerPoints?.totalPoints;
+        }
+      },
     }
 }
 
@@ -159,6 +174,11 @@ export default {
   /* background-color: rgb(250, 212, 44) !important; */
   /* border: 2px solid var(--GOLDEN-CAPTAIN) !important; */
   box-shadow:  8px 8px 8px var(--GOLDEN-CAPTAIN) !important;
+}
+.triple-captain-player-tile {
+  /* background-color: rgb(250, 212, 44) !important; */
+  /* border: 2px solid var(--GOLDEN-CAPTAIN) !important; */
+  box-shadow:  8px 8px 8px var(--PRIMARY) !important;
 }
 .picked-position {
   /* background-color: rgb(52, 118, 194) !important; */
@@ -294,5 +314,14 @@ display: flex;
 }
 .border-bot {
   border-right: 2px solid black;
+}
+
+.captain-points {
+  color: var(--GOLDEN-CAPTAIN);
+  font-weight: bold;
+}
+.triple-points {
+  color: var(--PRIMARY);
+  font-weight: bold;
 }
 </style>

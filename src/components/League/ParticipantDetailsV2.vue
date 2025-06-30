@@ -40,6 +40,7 @@
       <div class="row team-row justify-content-start align-content-center">
         <div class="col-xl-3 col-lg-4  col-md-5  col-sm-6 col-8 align-content-center">
           <PlayerPoints 
+          :is-triple="participantData.userTeam.chipUsed == 1"
           :is-captain="participantData.userTeam.captain==1" 
           @showDetails="showDetailsModal"
           :playerPoints="participantData.userTeam.topPlayerPoints"
@@ -52,6 +53,7 @@
         </div>
         <div class="col-xl-3 col-lg-4  col-md-5  col-sm-6 col-8 align-content-center">
           <PlayerPoints 
+          :is-triple="participantData.userTeam.chipUsed == 1"
           :is-captain="participantData.userTeam.captain==2" 
           @showDetails="showDetailsModal"
           :playerPoints="participantData.userTeam.junglePlayerPoints"
@@ -65,6 +67,7 @@
         </div>
         <div class="col-xl-3 col-lg-4  col-md-5  col-sm-6 col-8 align-content-center">
           <PlayerPoints 
+          :is-triple="participantData.userTeam.chipUsed == 1"
           :is-captain="participantData.userTeam.captain==3" 
           @showDetails="showDetailsModal"
           :playerPoints="participantData.userTeam.midPlayerPoints"
@@ -80,6 +83,7 @@
       <div class="row justify-content-center mb-3"> -->
         <div class="col-xl-3 col-lg-4  col-md-5  col-sm-6 col-8 col-offset-2 align-content-center">
                 <PlayerPoints 
+                :is-triple="participantData.userTeam.chipUsed == 1"
                 :is-captain="participantData.userTeam.captain==4" 
                 @showDetails="showDetailsModal"
                 :playerPoints="participantData.userTeam.bottomPlayerPoints"
@@ -93,6 +97,7 @@
         </div>
         <div class="col-xl-3 col-lg-4  col-md-5  col-sm-6 col-8 align-content-center">
                 <PlayerPoints 
+                :is-triple="participantData.userTeam.chipUsed == 1"
                 :is-captain="participantData.userTeam.captain==5"
                 @showDetails="showDetailsModal"
                 :playerPoints="participantData.userTeam.supportPlayerPoints"
@@ -114,6 +119,7 @@
                 v-if="participantData.userTeam != null" 
                 :role="'team'" 
                 :teamTeam="participantData.userTeam.teamPoints.team" 
+                :teamPoints="participantData.userTeam.teamPoints"
                 :img_url="role_images['team']" 
                 :roles_img_url="role_images"
                 />
