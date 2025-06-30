@@ -28,8 +28,8 @@
             <label class="me-1"  for="sorting-method">Sort by: </label>
             <br><select id="sorting-method" v-model="selectedSorting" @change="orderPlayers(selectedSorting)">
               <option value="points">Points</option>
-              <option value="pointsGame">Pts/game</option>
-              <option value="pointsGamePrice">Pts/game/$</option>
+              <option value="pointsGame">Pts/match</option>
+              <option value="pointsGamePrice">Pts/match/$</option>
               <option value="priceAsc">Price ASC</option>
               <option value="priceDesc">Price DESC</option>
               <option value="summonerName">Name</option>
@@ -59,9 +59,9 @@
             <th>Player</th>
             <th class="text-center" :class="{'higlighted':this.selectedSorting=='priceAsc' || this.selectedSorting=='priceDesc'}">Price</th>
             <th class="text-center" :class="{'higlighted':this.selectedSorting=='points'}" >Points</th>
-            <th class="text-center">Games</th>
-            <th class="text-center" :class="{'higlighted':this.selectedSorting=='pointsGame'}">Pts/Game</th>
-            <th class="text-center" :class="{'higlighted':this.selectedSorting=='pointsGamePrice'}">Pts/Game/$</th>
+            <th class="text-center">Matches</th>
+            <th class="text-center" :class="{'higlighted':this.selectedSorting=='pointsGame'}">Pts/Match</th>
+            <th class="text-center" :class="{'higlighted':this.selectedSorting=='pointsGamePrice'}">Pts/Match/$</th>
           </tr>
         </thead>
         <tbody>
@@ -113,14 +113,14 @@
 
             <!-- Total Points -->
             <td class="text-center" >{{ player.points.toFixed(1) }} pts</td>
-            <td class="text-center">{{ player.gamesPlayed }}</td>
+            <td class="text-center">{{ player.matchesPlayed }}</td>
 
             <!-- Pts/Game -->
             <td class="text-center">
-              {{ player.gamesPlayed ? (player.points / player.gamesPlayed).toFixed(2) : '-' }}
+              {{ player.matchesPlayed ? (player.points / player.matchesPlayed).toFixed(2) : '-' }}
             </td>
             <td class="text-center">
-              {{ player.gamesPlayed == 0 ? "-" :   (player.points/player.gamesPlayed/player.price).toFixed(2) }}
+              {{ player.matchesPlayed == 0 ? "-" :   (player.points/player.matchesPlayed/player.price).toFixed(2) }}
             </td>
 
             <!-- Action -->
@@ -188,10 +188,10 @@ export default {
         this.sortedPlayers = this.sortedPlayers.sort((a,b) => (a.points < b.points) ? 1 : (a.points > b.points) ? -1 : 0)
       }
       if (option == "pointsGame") {
-        this.sortedPlayers = this.sortedPlayers.sort((a,b) =>(a.gamesPlayed == 0 && b.gamesPlayed == 0) ? 0 : (a.gamesPlayed == 0 || (a.points/(a.gamesPlayed) < (b.points/b.gamesPlayed))) ? 1 : b.gamesPlayed == 0 ||((a.points/a.gamesPlayed) > (b.points/b.gamesPlayed)) ? -1 : 0)
+        this.sortedPlayers = this.sortedPlayers.sort((a,b) =>(a.matchesPlayed == 0 && b.matchesPlayed == 0) ? 0 : (a.matchesPlayed == 0 || (a.points/(a.matchesPlayed) < (b.points/b.matchesPlayed))) ? 1 : b.matchesPlayed == 0 ||((a.points/a.matchesPlayed) > (b.points/b.matchesPlayed)) ? -1 : 0)
       }
       if (option == "pointsGamePrice") {
-        this.sortedPlayers = this.sortedPlayers.sort((a,b) => (a.gamesPlayed == 0 && b.gamesPlayed == 0) ? 0 : (a.gamesPlayed == 0 || (a.points/a.gamesPlayed/a.price) < (b.points/b.gamesPlayed/b.price)) ? 1 : b.gamesPlayed == 0 || ((a.points/a.gamesPlayed/a.price) > (b.points/b.gamesPlayed/b.price)) ? -1 : 0)
+        this.sortedPlayers = this.sortedPlayers.sort((a,b) => (a.matchesPlayed == 0 && b.matchesPlayed == 0) ? 0 : (a.matchesPlayed == 0 || (a.points/a.matchesPlayed/a.price) < (b.points/b.matchesPlayed/b.price)) ? 1 : b.matchesPlayed == 0 || ((a.points/a.matchesPlayed/a.price) > (b.points/b.matchesPlayed/b.price)) ? -1 : 0)
       }
       
       if (option == "summonerName") {

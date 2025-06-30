@@ -84,7 +84,7 @@
     <!-- Bottom Info: Price and Points -->
     <div class="tile-footer" v-if="teamTeam">
       <div class="price ps-2">{{ teamTeam?.price?.toFixed(1) }}$</div>
-      <div class="points pe-2">{{ teamTeam?.points?.toFixed(1) }} Pts</div>
+      <div class="points pe-2">{{ teamTeam?.points ? teamTeam?.points.toFixed(1) : teamPoints?.totalPoints?.toFixed(1) }} Pts</div>
     </div>
     <div class="tile-footer second" v-if="teamTeam">
       <div></div>
@@ -99,6 +99,7 @@ import TeamTileV2 from "@/components/TeamSelection-v2/TeamTile-v2.vue";
 export default {
     name: "TeamTeamTileV2",
     props:{
+        teamPoints: Object,
         roles_img_url: Object,
         img_url: String,
         teamTeam: Object,
