@@ -644,7 +644,7 @@
               "subPlayerId": this.selectedUserTeam.subPlayer.player.esportsPlayerId,
               "teamSlug": this.selectedUserTeam.team.team.slug,
               "captain": this.selectedUserTeam.captain,
-              "chipUsed": this.selectedUserTeam.chipActivated != null ? this.selectedUserTeam.chipActivated : 0,
+              "chipUsed": this.selectedUserTeam.chipActivated != null && this.selectedUserTeam.chipActivated != 0 ? this.selectedUserTeam.chipActivated : null,
             }
             const url = `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/user_team`
             this.axios.put(url, data).then((response) => {
