@@ -128,6 +128,7 @@
           <PlayerPoints 
           @showDetails="showDetailsModal"
           :playerPoints="participantData.userTeam.subPlayerPoints"
+          :isbenchboost="participantData.userTeam.chipUsed == 4"
           v-if="participantData.userTeam != null" 
           :role="'sub'" 
           :teamPlayer="participantData.userTeam.subPlayerPoints.player" 

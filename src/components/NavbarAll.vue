@@ -77,22 +77,48 @@
                 >Matches</router-link
               >
             </li>
-            <li class="nav-item pe-3">
+            <!-- <li class="nav-item pe-3">
               <router-link
                 class="nav-link"
                 :class="{ active: this.$route.name === 'StatsView' }"
                 :to="{ name: 'StatsView' }"
                 >Stats<span class="inform"> NEW</span></router-link
               >
-            </li>
-            <!-- <li class="nav-item pe-3">
-              <router-link
-                class="nav-link"
-                :class="{ active: this.$route.name === 'DraftView' }"
-                :to="{ name: 'DraftView' }"
-                >Draft<span class="inform"> ??</span></router-link
-              >
             </li> -->
+            <li class="nav-item pe-3">
+              <div class="dropdown">
+                <button
+                  class="nav-link"
+                  id="dropdownMenuStats"
+                  :class="{ active: this.$route.name === 'StatsView' || this.$route.name === 'DreamTeamView' }"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  Stats<span class="inform"> NEW</span>
+                </button>
+                <ul
+                  class="dropdown-menu dropdown-menu-end"
+                  aria-labelledby="dropdownMenuStats"
+                >
+                  <li>
+                    <a @click="this.$router.push({ name: 'DreamTeamView' })"
+                    class="dropdown-item"
+                    href="#">
+                      <span>Dream teams</span>
+                      <span class="inform"> NEW</span>
+                  </a>
+                  </li>
+                  <li>
+                    <a @click="this.$router.push({ name: 'StatsView' })"
+                    class="dropdown-item"
+                    href="#">
+                      <span>Player stats</span>
+                      <span class="inform"> NEW</span>
+                  </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
             <li class="nav-item pe-3">
               <div class="dropdown">
                 <button
