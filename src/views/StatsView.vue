@@ -28,6 +28,7 @@
                 <th>Player</th>
                 <th>Role</th>
                 <th>Team</th>
+                <th>Price</th>
                 <th>Value</th>
               </tr>
             </thead>
@@ -43,6 +44,7 @@
                   <img :src="entry.player?.team?.imageUrl" alt="team" width="18" height="18" style="border-radius:50%;margin-right:4px;">
                   {{ entry.player?.team?.code || 'Unknown' }}
                 </td>
+                <td>${{ entry.player?.price.toFixed(1) }}</td>
                 <td>{{ formatNumber(stat, entry.value) }}</td>
               </tr>
             </tbody>
@@ -68,6 +70,7 @@
                 <tr>
                   <th>Team</th>
                   <th>League</th>
+                  <th>Price</th>
                   <th>Value</th>
                 </tr>
               </thead>
@@ -81,6 +84,7 @@
                     <img :src="this.$func_global.leagues_icons[entry.team?.league]" alt="team" width="18" height="18" style="border-radius:50%;margin-right:4px;">
                     {{ entry.team?.league || 'Unknown' }}
                   </td>
+                  <td>${{ entry.team?.price.toFixed(1) }}</td>
                   <td>{{ formatNumberTeam(stat, entry.value) }}</td>
                 </tr>
               </tbody>
