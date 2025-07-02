@@ -4,8 +4,9 @@
     :class="{
       'picked-position': currentlyPicked === role,
       'captain-player-tile': isCaptain,
+      'bench-boost-tile': isbenchboost,
       'sub': role =='sub',
-      'triple-captain-player-tile': isTriple && isCaptain
+      'triple-captain-player-tile': isTriple && isCaptain,
     }"
     @click="showDetails(playerPoints)"
   >
@@ -27,7 +28,7 @@
         :class="{
           'captain-player': isCaptain
         }"
-        >{{ teamPlayer?.team.code + ' ' +teamPlayer?.summonerName }}</span>
+        >{{ teamPlayer?.team.code + ' ' +teamPlayer?.summonerName}}</span>
       </div>
       <div class="col-2 inline-text-flag role-sub">
         <!-- <div
@@ -99,7 +100,13 @@
     <!-- Bottom Info: Price and Points -->
     <div class="tile-footer" v-if="teamPlayer && !details">
       <div class="price ps-2">{{ teamPlayer?.price?.toFixed(1) }}$</div>
-      <div class="points pe-2" :class="{'captain-points': isCaptain, 'triple-points': isTriple && isCaptain}">{{ displayedPoints.toFixed(1) }}pts</div>
+      <div class="points pe-2" :class="{
+        'captain-points': isCaptain,
+        'triple-points': isTriple && isCaptain,
+        'bench-points': isbenchboost,
+        }">
+        {{ displayedPoints.toFixed(1) }}pts
+      </div>
     </div>
     <div class="tile-footer second justify-content-center" v-if="teamPlayer && details">
         <div class="points details pe-2">{{ points ? points.toFixed(1) : playerPoints?.totalPoints?.toFixed(1) }}pts</div>
@@ -122,6 +129,10 @@ export default {
         isCaptain: Boolean,
         details: Boolean,
         isTriple: Boolean,
+        isbenchboost: {
+          type: Boolean,
+          default: false
+        },
     },
     components: {
       PlayerTileV2
@@ -179,6 +190,11 @@ export default {
   /* background-color: rgb(250, 212, 44) !important; */
   /* border: 2px solid var(--GOLDEN-CAPTAIN) !important; */
   box-shadow:  8px 8px 8px var(--PRIMARY) !important;
+}
+.bench-boost-tile {
+  /* background-color: rgb(250, 212, 44) !important; */
+  /* border: 2px solid var(--GOLDEN-CAPTAIN) !important; */
+  box-shadow:  8px 8px 8px var(--BENCH-BOOST) !important;
 }
 .picked-position {
   /* background-color: rgb(52, 118, 194) !important; */
@@ -322,6 +338,10 @@ display: flex;
 }
 .triple-points {
   color: var(--PRIMARY);
+  font-weight: bold;
+}
+.bench-points {
+  color: var(--BENCH-BOOST);
   font-weight: bold;
 }
 </style>

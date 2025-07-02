@@ -1,10 +1,7 @@
 <!-- TeamSelection.vue -->
 <template>
-  <div>
-    <h1>Dream teams</h1>
-    <!-- <div class="row justify-content-center">
-
-    </div> -->
+  <div class="w-50 mx-auto">
+    
     <div class="game-tabs ms-2 justify-content-md-center">
       <div
         v-for="(fixture, index) in tabs"
@@ -15,27 +12,80 @@
         {{ fixture.title }}
       </div>
     </div>
-    <div v-if="playersForSummonersRiftView != null">
-      <div class="summoners-rift mx-auto">
-        <div class="player-card" v-for="player in playersForSummonersRiftView" :key="player.id" :style="getPlayerPosition(player)">
-          <img :src="player.imageUrl" :alt="player.summonerName" class="player-image" />
-          <div class="player-info">
-            <div class="player-name">{{ player.summonerName }}</div>
-            <div class="player-role">{{ player.role }}</div>
-            <div class="player-points">{{ player.points.toFixed(2) }}</div>
+    <div v-if="'isTotal' in playersSummary">
+      <h1>Players stats</h1>
+      <div class="stats-tables-row" style="display: flex; flex-wrap: wrap; gap: 16px;">
+        <div
+          v-for="(stat, idx) in ['kills','deaths','assists','cs','fb','tripleKills','quadraKills','pentaKills','pointsMatch','pointsMatchMoney']"
+          :key="stat"
+          class="mb-2 stats-table"
+          style="flex: 1 1 30%; min-width: 260px; max-width: 32%;"
+        >
+          <h3 class="mt-1 text-capitalize" style="font-size: 1.1rem;">{{ displayName[stat] }}</h3>
+          <table class="table table-sm table-striped table-bordered" style="font-size: 0.85rem;">
+            <thead>
+              <tr>
+                <th>Player</th>
+                <th>Role</th>
+                <th>Team</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="entry in playersSummary.players[stat]?.filter(player => player.player.matchesPlayed > 0).slice(0,10)" :key="entry.player?.esportsPlayerId || entry.esportsPlayerId">
+                <td>
+                  {{ entry.player?.summonerName || 'Unknown' }}
+                </td>
+                <td>
+                  {{ entry.player?.role || 'Unknown' }}
+                </td>
+                <td>
+                  <img :src="entry.player?.team?.imageUrl" alt="team" width="18" height="18" style="border-radius:50%;margin-right:4px;">
+                  {{ entry.player?.team?.code || 'Unknown' }}
+                </td>
+                <td>{{ formatNumber(stat, entry.value) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+        <!-- Team Stats -->
+      <div v-if="'isTotal' in teamsSummary">
+        <h1>Teams stats</h1>
+        <div class="stats-tables-row" style="display: flex; flex-wrap: wrap; gap: 16px;">
+          <div
+            v-for="(stat, idx) in ['dragons', 'nashors', 'towers',
+              'fb', 'voidgrubs', 'win', 'fastWin',
+              'pointsMatch', 'pointsMatchMoney']"
+            :key="stat"
+            class="mb-4 stats-table"
+            style="flex: 1 1 30%; min-width: 260px; max-width: 32%;"
+          >
+            <h3 class="mt-1 text-capitalize" style="font-size: 1.1rem;">{{ displayTeamName[stat] }}</h3>
+            <table class="table table-sm table-striped table-bordered" style="font-size: 0.85rem;">
+              <thead>
+                <tr>
+                  <th>Team</th>
+                  <th>League</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="entry in teamsSummary.teams[stat]?.filter(team => team.team.matchesPlayed > 0).slice(0,10)" :key="entry.team?.slug || entry.slug">
+                  <td>
+                    <img :src="entry.team?.imageUrl" alt="player" width="24" height="24" style="border-radius:50%;margin-right:6px;">
+                    {{ entry.team?.code || 'Unknown' }}
+                  </td>
+                  <td>
+                    <img :src="this.$func_global.leagues_icons[entry.team?.league]" alt="team" width="18" height="18" style="border-radius:50%;margin-right:4px;">
+                    {{ entry.team?.league || 'Unknown' }}
+                  </td>
+                  <td>{{ formatNumberTeam(stat, entry.value) }}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <!-- <PlayerPointsGamesCard :isCaptain="teamPlayers.captain == 1" :key="teamPlayers" :gamesPointsDetails="teamPlayers.topPlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.topPlayerPoints.totalPoints"/> -->
-        </div>
-        <div class="player-card" :style="getTeamPosition()" v-if="dreamTeam.dreamTeamTeam != null">
-          <img :src="dreamTeam.dreamTeamTeam.imageUrl" :alt="dreamTeam.dreamTeamTeam.name" class="player-image" />
-          <div class="player-info">
-            <div class="player-name">{{ dreamTeam.dreamTeamTeam.name }}</div>
-            <div class="player-points">{{ dreamTeam.dreamTeamTeam.points.toFixed(2) }}</div>
-          </div>
-        </div>
-        <div class="player-card" :style="getTotalPosition()" v-if="dreamTeam.totalPoints != null">
-          Total Points: {{ dreamTeam.totalPoints.toFixed(2) }}
-        </div>
       </div>
     </div>
   </div>
@@ -46,66 +96,59 @@
     data() {
       return {
         selectedTabIndex: 0,
-        playersForSummonersRiftView: [],
+        playersSummary: {},
+        teamsSummary: {},
         tabs: [],
         matchesByFixture: [],
-        dreamTeam: {},
+        displayName: {
+          'kills': 'Kills/game',
+          'deaths': 'Deaths/game',
+          'assists': 'Assists/game',
+          'cs': 'CS/game',
+          'fb': 'First Bloods',
+          'tripleKills': 'Triple Kills',
+          'quadraKills': 'Quadra Kills',
+          'pentaKills': 'Penta Kills',
+          'pointsMatch': 'Points/Match',
+          'pointsMatchMoney': 'Points/Match/$'
+        },
+        displayTeamName: {
+          'voidgrubs': 'Voidgrubs/game',
+          'fastWin': 'Fast Wins',
+          'win': 'Wins %',
+          'fb': 'First Bloods %',
+          'dragons': 'Dragons/game',
+          'nashors': 'Nashors/game',
+          'towers': 'Towers/game',
+          'pointsMatch': 'Points/Match',
+          'pointsMatchMoney': 'Points/Match/$'
+        },
       };
     },
     methods: {
-      getTotalPosition() {
-        return { top: '25%', left: '75%' };
-      },
-      getTeamPosition() {
-        return { top: '70%', left: '30%' };
-      },
-      getPlayerPosition(player) {
-      // Implement logic to calculate the position based on player's role
-      // Adjust the positioning according to your needs
-        
-        var backgroundColor = player.captain ? '#fde9a8d0' : '#faf3dd75'; 
-
-        switch (player.role) {
-          case 'top':
-            return { top: '15%', left: '25%', 'background-color': backgroundColor }; // Adjust the values accordingly
-          case 'jungle':
-            return { top: '33%', left: '35%', 'background-color': backgroundColor };
-          case 'mid':
-            return { top: '50%', left: '50%', 'background-color': backgroundColor }; // Adjust the values accordingly
-          case 'bottom':
-            return { top: '68%', left: '65%', 'background-color': backgroundColor };
-          case 'support':
-            return { top: '85%', left: '75%', 'background-color': backgroundColor }; // Adjust the values accordingly
-          // Add more cases for other roles
-          default:
-            return { top: '50%', left: '50%', 'background-color': backgroundColor }; // Default position
+      formatNumber(stat, value) {
+        if (stat === 'fb' || stat === 'tripleKills' || stat === 'quadraKills' || stat === 'pentaKills') {
+          return value;
         }
+        
+        return value.toFixed(2);
       },
-      teamPlayerToMapPlayer(teamPlayer, isCaptain) {
-          return {
-            points: teamPlayer.points,
-            id: teamPlayer.esportsPlayerId,
-            summonerName: teamPlayer.summonerName,
-            role: teamPlayer.role,
-            imageUrl: teamPlayer.imageUrl,
-            captain: isCaptain
-          }
-        },
-      fillMapPlayers() {
-          console.log('filling')
-          this.playersForSummonersRiftView = []
-          this.playersForSummonersRiftView.push(this.teamPlayerToMapPlayer(this.dreamTeam.dreamTeamPlayers.top, false))
-          this.playersForSummonersRiftView.push(this.teamPlayerToMapPlayer(this.dreamTeam.dreamTeamPlayers.jungle, false))
-          this.playersForSummonersRiftView.push(this.teamPlayerToMapPlayer(this.dreamTeam.dreamTeamPlayers.mid, false))
-          this.playersForSummonersRiftView.push(this.teamPlayerToMapPlayer(this.dreamTeam.dreamTeamPlayers.bottom, false))
-          this.playersForSummonersRiftView.push(this.teamPlayerToMapPlayer(this.dreamTeam.dreamTeamPlayers.support, false))
-        },
+      formatNumberTeam(stat, value) {
+        if (stat === 'win' || stat === 'fb') {
+          return (value * 100).toFixed(2) + '%'
+        }
+        if (stat === 'fastWin') {
+          return value;
+        }
+        return value.toFixed(2);
+      },
       selectTab(index, f){
         var fixture = f != 0 ? f : null;
         this.selectedTabIndex = index;
         console.log(this.selectedTabIndex);
         this.currentFixture = this.newRulesData.find((element) => element.fixture.id == fixture);
-        this.getDreamTeam(this.currentFixture.fixture.id);
+        this.getFixturePlayerSummaryStats(this.currentFixture == null ? null : this.currentFixture.fixture.id);
+        this.getFixtureTeamSummaryStats(this.currentFixture == null ? null : this.currentFixture.fixture.id);
       },
       getCurrentFixture() {
             const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixture`
@@ -134,9 +177,15 @@
                   
                 }).sort((a, b) => a.order - b.order);
                 console.log('tabs', this.tabs);
-
+            this.tabs.unshift({
+              id: 0,
+              title: 'Total',
+              order: -1
+            });      
             this.selectTab(this.tabs.find((element) => element.id == this.$store.getters.getFixtureId).order,this.$store.getters.getFixtureId);
-            this.getDreamTeam(this.$store.getters.getFixtureId);
+            console.log("Fixture ID:", this.$store.getters.getFixtureId);
+            this.getFixturePlayerSummaryStats(this.$store.getters.getFixtureId);
+            this.getFixtureTeamSummaryStats(this.$store.getters.getFixtureId);
           } catch (error) {
             console.error("Error fetching data:", error);
           }
@@ -147,21 +196,45 @@
             this.axios.get(url).then((response) => {
             this.matchesByFixture = response.data.fixturesWithMatches.sort((a, b) => a.fixture.order - b.fixture.order);
             this.selectTab(this.tabs.find((element) => element.id == this.$store.getters.getFixtureId).order,this.$store.getters.getFixtureId);
-            this.getDreamTeam(this.$store.getters.getFixtureId);
+            this.getFixturePlayerSummaryStats(this.$store.getters.getFixtureId);
+            this.getFixtureTeamSummaryStats(this.$store.getters.getFixtureId);
                 // this.$router.push({name: 'LeaguesView'})
             }).catch(error => {
                 console.log(error.response);
             });
         },
-      getDreamTeam(fixtureId) {
-        this.axios.get(`${this.apiURL}Stats/${this.$store.getters.getCurrentTournamentId}/dream_team/${fixtureId}`)
+      getTotalSummaryStats(){
+        this.axios.get(`${this.apiURL}Stats/${this.$store.getters.getCurrentTournamentId}/summary`)
         .then((response) => {
-          console.log("Dream team:", response.data);
-          this.dreamTeam = response.data;
-          this.fillMapPlayers();
+          console.log("Summary:", response.data);
+          this.playersSummary = response.data;
         })
         .catch((error) => {
-          console.error("Error fetching team players:", error);
+          console.error("Error fetching stats:", error);
+        });
+      },
+      getFixturePlayerSummaryStats(fixtureId) {
+        console.log("Fetch stats ");
+
+        this.axios.get(`${this.apiURL}Stats/${this.$store.getters.getCurrentTournamentId}/summary/players${fixtureId == null ? '' : '/' + fixtureId}`)
+        .then((response) => {
+          console.log("Summary:", response.data);
+          this.playersSummary = response.data;
+        })
+        .catch((error) => {
+          console.error("Error fetching stats:", error);
+        });
+      },
+      getFixtureTeamSummaryStats(fixtureId) {
+        console.log("Fetch stats ");
+
+        this.axios.get(`${this.apiURL}Stats/${this.$store.getters.getCurrentTournamentId}/summary/teams${fixtureId == null ? '' : '/'+fixtureId}`)
+        .then((response) => {
+          console.log("Summary:", response.data);
+          this.teamsSummary = response.data;
+        })
+        .catch((error) => {
+          console.error("Error fetching stats:", error);
         });
       }
     },
@@ -234,5 +307,15 @@
   font-style: italic;
   color: white;
   text-transform: capitalize;
+}
+/* Alternate row striping for tables */
+.table-striped tbody tr:nth-of-type(odd) td{
+  background-color: var(--TABLE-ROW-SECONDARY) !important;
+}
+.table-striped tbody tr:nth-of-type(1) td{
+  background-color: var(--GOLDEN-CAPTAIN) !important;
+}
+.table-striped tbody tr:nth-of-type(even) td{
+  background-color: var(--TABLE-ROW-MAIN) !important;
 }
 </style>

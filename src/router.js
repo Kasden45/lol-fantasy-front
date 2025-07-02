@@ -11,6 +11,7 @@ import MatchesView from "./views/MatchesView.vue"; // Import your component
 import MatchDetailsView from "./views/MatchDetailsView.vue";
 import SettingsView from "./views/SettingsView.vue"; // Import your component
 import StatsView from "./views/StatsView.vue"; // Import your component
+import DreamTeamView from "./views/DreamTeamView.vue"; // Import your component
 import DraftView from "./components/League/DraftView.vue"; // Import your component
 
 const routes = [
@@ -22,6 +23,7 @@ const routes = [
   { name: "MatchesView", path: "/matches", component: MatchesView },
   { name: "SettingsView", path: "/settings", component: SettingsView },
   { name: "StatsView", path: "/stats", component: StatsView },
+  { name: "DreamTeamView", path: "/dream-team", component: DreamTeamView },
   { name: "SingleLeagueView", path: "/leagues/:leagueCode", component: SingleLeagueView },
   { name: "DraftView", path: "/draft", component: DraftView },
   { name: "CurrentPointsView", path: "/current-points/:userId", component: CurrentPointsView },
