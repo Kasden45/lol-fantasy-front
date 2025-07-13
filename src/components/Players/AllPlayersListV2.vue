@@ -41,10 +41,10 @@
             <br><input type="checkbox" v-model="hideInactive" />
           </div>
         </div>
-        <div class="sorting-div my-1 justify-content-start" v-if="nextFixture != null">
+        <div class="sorting-div my-1 justify-content-start" v-if="currentFixture.fixture != null">
             <label class="me-1"  for="range">Last </label>
             <select id="range" v-model="selectedForm" @change="rangeChanged(selectedForm)" onhov="as">
-              <option v-for="fixtureOrder in Array.from(Array(nextFixture.fixture.order-1).keys())" :key="order" :value="fixtureOrder">{{ fixtureOrder == 0 ? "All" : fixtureOrder }}</option>
+              <option v-for="fixtureOrder in Array.from(Array(currentFixture.fixture.order).keys())" :key="order" :value="fixtureOrder">{{ fixtureOrder == 0 ? "All" : fixtureOrder }}</option>
               
             </select>
             <label class="mx-1"  for="range"> fixtures form</label>
@@ -134,6 +134,7 @@
 <script>
 export default {
     props: {
+        currentFixture: Object,
         nextFixture: Object,
         userTeam: Array,
         teamsPlayingNextFixture: Array,
