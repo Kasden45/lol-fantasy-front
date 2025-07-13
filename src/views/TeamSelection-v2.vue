@@ -99,7 +99,7 @@
                   <g transform="rotate(90, 165, 165)">
                   <text
                     :style="{fill: this.teamValue > this.nextFixture.fixture.teamValueLimit ? 'red' : black}"
-                    :class="{'fill-primary' : this.teamValue <= this.nextFixture.fixture.teamValueLimit, 'fill-error' : this.teamValue > this.nextFixture.fixture.teamValueLimit}"
+                    :class="{'fill-primary' : this.teamValue <= this.nextFixture.fixture.teamValueLimit, 'fill-error' : this.selectedUserTeam.chipActivated != 2 && this.teamValue > this.nextFixture.fixture.teamValueLimit}"
                     class="progress-ring__text"
                     :x="center"
                     :y="center"
@@ -158,7 +158,7 @@
                   </g>
                   <g transform="rotate(90, 165, 165)">
                   <text
-                    :class="{'fill-primary' : this.selectedUserTeam.transfersAvailable - this.transfersMade >= 0, 'fill-error' : this.selectedUserTeam.transfersAvailable - this.transfersMade < 0}"
+                    :class="{'fill-primary' : this.selectedUserTeam.transfersAvailable - this.transfersMade >= 0, 'fill-error' : this.selectedUserTeam.chipActivated != 2 && this.selectedUserTeam.chipActivated != 3 && this.selectedUserTeam.transfersAvailable - this.transfersMade < 0}"
                     class="progress-ring__text"
                     :x="center"
                     :y="center"
@@ -211,10 +211,10 @@
         </div>
         
           <div class="" v-if="selectedTabIndex == 0">
-            <PlayersListV2 :userTeam="pickedPlayersIds" :nextFixture="nextFixture" :teamsPlayingNextFixture="teamsPlayingInNextFixture" @rangeChange="rangeChanged" @playerSelect="playerSelected" :selectedRole="roleToAddPlayer" :players="allPlayers" v-if="allPlayers.length > 0"/>
+            <PlayersListV2 :currentFixture="this.lastPlayedFixture" :userTeam="pickedPlayersIds" :nextFixture="nextFixture" :teamsPlayingNextFixture="teamsPlayingInNextFixture" @rangeChange="rangeChanged" @playerSelect="playerSelected" :selectedRole="roleToAddPlayer" :players="allPlayers" v-if="allPlayers.length > 0"/>
           </div>
           <div class="" v-if="selectedTabIndex == 2">
-            <TeamsListV2 :userTeam="selectedUserTeam.team.team != null ? selectedUserTeam.team.team.slug : ''" :nextFixture="nextFixture" :teamsPlayingNextFixture="teamsPlayingInNextFixture" @rangeChange="rangeChanged" @teamSelect="teamSelected" :selectedRole="roleToAddPlayer" :teams="allTeams" v-if="allTeams.length > 0"/>
+            <TeamsListV2 :currentFixture="this.lastPlayedFixture" :userTeam="selectedUserTeam.team.team != null ? selectedUserTeam.team.team.slug : ''" :nextFixture="nextFixture" :teamsPlayingNextFixture="teamsPlayingInNextFixture" @rangeChange="rangeChanged" @teamSelect="teamSelected" :selectedRole="roleToAddPlayer" :teams="allTeams" v-if="allTeams.length > 0"/>
           </div>
           <!-- <PlayerPointsCard :playerDetails="selectedGame" :totalPoints="totalPointsA" v-if="selectedGame" /> -->
         </div>
@@ -242,6 +242,7 @@
     },
     data() {
       return {
+        lastPlayedFixture: 0,
         selectedForm: 0,
         formNumberOfGames: 0,
         teamsPlayingInNextFixture: [],
@@ -359,7 +360,7 @@
         return this.circumference - percent * this.circumference;
       },
       teamIsCorrect() {
-        return !(this.teamValue > this.nextFixture.fixture.teamValueLimit || this.selectedUserTeam.transfersAvailable < this.transfersMade || this.pickedPlayersNumber < 7)
+        return !((this.teamValue > this.nextFixture.fixture.teamValueLimit && this.selectedUserTeam.chipActivated != 2) || (this.transfersMade > this.selectedUserTeam.transfersAvailable && this.selectedUserTeam.chipActivated != 2 && this.selectedUserTeam.chipActivated != 3) || this.pickedPlayersNumber < 7)
       },
       pickedPlayersIds() {
         
@@ -515,11 +516,18 @@
                         // to get a value that is either negative, positive, or zero.
                         return new Date(a.fixture.deadlineDate) - new Date(b.fixture.deadlineDate);
                       })[0]
+                      
+                if(this.nextFixture != null) {
+                  this.teamsPlayingInNextFixture = this.nextFixture.matches
+                  .filter(m => m.team1 != null && m.team2 != null).map(m => m.team1).concat(this.nextFixture.matches.filter(m => m.team1 != null && m.team2 != null).map(m => m.team2))
+                  .map(m => m.code);
+                }
 
-            this.teamsPlayingInNextFixture = this.nextFixture.matches
-              .filter(m => m.team1 != null && m.team2 != null).map(m => m.team1).concat(this.nextFixture.matches.filter(m => m.team1 != null && m.team2 != null).map(m => m.team2))
-              .map(m => m.code);
-                // this.$router.push({name: 'LeaguesView'})
+            this.lastPlayedFixture = this.matchesByFixture
+                .filter(m => new Date(m.fixture.deadlineDate) <= new Date())
+                        .sort(function(a,b){
+                        return new Date(b.fixture.deadlineDate) - new Date(a.fixture.deadlineDate);
+                      })[0]
             }).catch(error => {
                 console.log(error.response);
             });
