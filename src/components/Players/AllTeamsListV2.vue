@@ -34,7 +34,7 @@
             <br><input type="checkbox" v-model="hideInactive" />
           </div>
         </div>
-        <div class="sorting-div my-1 justify-content-start" v-if="currentFixture.fixture != null">
+        <div class="sorting-div my-1 justify-content-start" v-if="currentFixture != null && currentFixture.fixture != null">
             <label class="me-1"  for="range">Last </label>
             <select id="range" v-model="selectedForm" @change="rangeChanged(selectedForm)" onhov="as">
               <option v-for="fixtureOrder in Array.from(Array(currentFixture.fixture.order).keys())" :key="order" :value="fixtureOrder">{{ fixtureOrder == 0 ? "All" : fixtureOrder }}</option>

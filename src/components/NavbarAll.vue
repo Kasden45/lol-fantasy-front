@@ -1,4 +1,7 @@
 <template>
+  <MyModal v-if="(this.$store.getters.getProfileId == null || this.$store.getters.getProfileId == '')" :openModal="this.openModal" @closeModal="closeDetailsModal" :title="''">
+                <login-panel/>
+            </MyModal>
     <nav class="navbar navbar-expand-md  bg-white sticky-top">
       <div class="container">
         <a class="navbar-brand">{{ this.tournaments[this.$store.getters.getCurrentTournamentId] }} Fantasy2KPI</a>
@@ -119,7 +122,7 @@
                 </ul>
               </div>
             </li>
-            <li class="nav-item pe-3">
+            <!-- <li class="nav-item pe-3">
               <div class="dropdown">
                 <button
                   class="nav-link"
@@ -151,7 +154,7 @@
                   </li>
                 </ul>
               </div>
-            </li>
+            </li> -->
             <li class="nav-item pe-3">
               <div class="dropdown">
                 <button
@@ -167,6 +170,14 @@
                   class="dropdown-menu dropdown-menu-end"
                   aria-labelledby="dropdownMenuAccount"
                 >
+                  <li v-if="(this.$store.getters.getProfileId == null || this.$store.getters.getProfileId == '')">
+                    <a @click="openDetailsModal"
+                    class="dropdown-item"
+                    href="#">
+                      <span>Login</span>
+                      <span class="inform"> NEW</span>
+                  </a>
+                  </li>
                   <li>
                     <a @click="this.$router.push({ name: 'SettingsView' })"
                     class="dropdown-item"
@@ -202,7 +213,7 @@
                   </li>
                   <li v-if="(this.$store.getters.getProfileId != null && this.$store.getters.getProfileId != '')">
                     <a @click="logout" class="dropdown-item" href="#"
-                      >Wyloguj się</a
+                      >Logout</a
                     >
                   </li> 
                   
@@ -229,8 +240,19 @@
   </template>
   
   <script>
+  import MyModal from "@/components/MyModal.vue";
+  import LoginPanel from "@/views/LoginView.vue";
   export default {
     name: "NavbarAll",
+    components: {
+      MyModal,
+      LoginPanel
+    },
+    data(){
+      return {
+        openModal: false,
+      }
+    },
     methods: {
       logout() {
         this.$store.commit("setProfileId", "");
@@ -239,7 +261,15 @@
       switchTournament(tournamentId){
         this.$store.commit("setCurrentTournamentId", tournamentId);
         this.$router.go();
-      }
+      },
+      closeDetailsModal(name) {
+        // console.log(detailsData)
+        this.openModal = false
+        // this.detailsData = detailsData
+      },
+      openDetailsModal() {
+        this.openModal = true;
+      },
     },
   };
   </script>
