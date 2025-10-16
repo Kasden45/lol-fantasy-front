@@ -6,8 +6,8 @@
             </div>
         </div>
     </td> -->
-    <td  v-if="participantData != null"><p>{{ participantData.userLogin }}</p>
-        <p><span v-for="chip in participantData.userChips" :key="chip.id">
+    <td  v-if="participantData != null"><p class="mb-0">{{ participantData.userLogin }}</p>
+        <p v-if="participantData.userChips !== null"><span v-for="chip in participantData.userChips" :key="chip.id">
             <i class="fa-solid"
             :class="{
                 'fa-star': chip.id == 1,
@@ -21,6 +21,17 @@
             ></i>
             
         </span></p>
+        
+        <span v-if="participantData.userTeam != null && participantData.userTeam.chipUsed != null">
+            <i class="fa-solid chip-active"
+            :class="{
+                'fa-star': participantData.userTeam.chipUsed == 1,
+                'fa-dollar-sign': participantData.userTeam.chipUsed == 2,
+                'fa-infinity': participantData.userTeam.chipUsed == 3,
+                'fa-chair': participantData.userTeam.chipUsed == 4
+            }"
+            ></i>
+        </span>
         <!-- <div v-if="participantData != null && participantData.userTeam != null && showDetails" class="team-points" ref="pointsContainer">
             <PlayerPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 1" :gamesPointsDetails="participantData.userTeam.topPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.topPlayerPoints.totalPoints"/>
             <PlayerPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 2" :gamesPointsDetails="participantData.userTeam.junglePlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.junglePlayerPoints.totalPoints"/>
