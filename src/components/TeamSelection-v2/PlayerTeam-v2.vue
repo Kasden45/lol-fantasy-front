@@ -8,6 +8,8 @@
         :userStatus="chip.userStatus"
         :type="chip.type"
         :isDisabled="chip.userStatus == 4"
+        :wasUsed="chip.userStatus == 3 || chip.userStatus == 2"
+        :usedFixture="chip.usedFixture"
         :name="chip.name"
         :description="chip.description"
         :iconUrl="role_images['team']"
