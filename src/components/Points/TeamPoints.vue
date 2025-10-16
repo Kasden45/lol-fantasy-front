@@ -1,11 +1,11 @@
 <template>
     <div
-    class="player-tile-container"
+    class="player-tile-container  align-content-center"
     :class="{
       'picked-position': currentlyPicked === role
     }"
+    @click="showDetails(teamPoints)"
   >
-    <!-- Team and Player Name -->
     <div class="tile-header row" v-if="teamTeam">
       <div class="col-2 inline-text-flag">
         <img
@@ -16,17 +16,9 @@
         />
       </div>
       <div class="col-8 align-content-center">
-        <!-- <div class="team-name">{{ teamTeam?.league || ' ' }}</div> -->
         <span class="player-name">{{ teamTeam?.code }}</span>
       </div>
       <div class="col-2 inline-text-flag role-sub">
-        <!-- <div
-          v-if="teamTeam"
-          class="action-button remove-button "
-          @click="removePlayerFromRole(role)"
-        >
-          <i class="flag fas fa-circle-minus fa-xl"></i>
-        </div> -->
         <img
           
           class="flag "
@@ -35,60 +27,13 @@
         />
       </div>
     </div>
-    <!-- <div class="tile-header row mt-1" v-if="teamTeam">
-      <div class="col-2 inline-text-flag">
-        <img
-          
-          class="flag"
-          :src="getFlag('')"
-          alt="flag"
-        />
-      </div>
-      <div class="col-8 align-content-center">
-        <span class="player-name">{{ teamTeam?.code }}</span>
-      </div>
-      <div class="col-2">
-        <div v-if="teamTeam" class="inline-text-flag role-sub" >
-           <img
-          
-          class="flag "
-          :src="roles_img_url['team']"
-          alt="flag"
-        />
-        </div>
-      </div>
-    </div> -->
-
-    <!-- Player Photo -->
-    <!-- <div class="image-layer-container mb-1">
-      <img
-        v-if="role && !teamTeam"
-        :src="img_url"
-        class="role-icon"
-        alt="role icon"
-      />
-      <img
-        v-if="teamTeam?.imageUrl"
-        :src="teamTeam.imageUrl"
-        class="player-image-overlay"
-        alt="player image"
-      />
-      <div
-          v-if="!teamTeam"
-          class="action-button add-button player-image-overlay"
-          @click="addPlayerToRole(role)"
-        >
-          <i class="fas fa-circle-plus fa-xl"></i>
-        </div>
-    </div> -->
-    <!-- Bottom Info: Price and Points -->
     <div class="tile-footer" v-if="teamTeam">
       <div class="price ps-2">{{ teamTeam?.price?.toFixed(1) }}$</div>
       <div class="points pe-2">{{ teamTeam?.points ? teamTeam?.points.toFixed(1) : teamPoints?.totalPoints?.toFixed(1) }} Pts</div>
     </div>
     <div class="tile-footer second" v-if="teamTeam">
       <div></div>
-      <!-- <div class="points pe-2">{{ (teamTeam?.points/teamTeam?.gamesPlayed).toFixed(0) }}pts/g</div> -->
+      
     </div>
    
   </div>
@@ -97,7 +42,7 @@
 <script>
 import TeamTileV2 from "@/components/TeamSelection-v2/TeamTile-v2.vue";
 export default {
-    name: "TeamTeamTileV2",
+    name: "TeamPoints",
     props:{
         teamPoints: Object,
         roles_img_url: Object,
@@ -115,9 +60,8 @@ export default {
         }
     },
     methods:{
-      getFlag(countryCode) {
-        return 'https://cdn-icons-png.flaticon.com/512/5373/5373301.png'
-        return `/flags/${countryCode.toLowerCase()}.png`; // or use CDN
+      showDetails (teamDetails) {
+        this.$emit('showDetails', teamDetails)
       },
         removePlayerFromRole(role) {
       // Emit an event to notify the parent component (App) about the selected player
@@ -145,6 +89,7 @@ export default {
 }
 .player-tile-container {
   /* height: 30vh; */
+  height: 8vh !important;
   background: var(--SECONDARY);
   border-radius: 1rem;
   padding: 0.5rem;
@@ -152,6 +97,7 @@ export default {
   text-align: center;
   position: relative;
   box-shadow: 0 8px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
 }
 .tile-header {
   font-weight: bold;

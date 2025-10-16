@@ -51,6 +51,7 @@
             <th></th> <!-- Role icon -->
             <th >Team</th>
             <!-- <th >Code</th> -->
+            <th >Vs</th>
             <th >League</th>
             <th class="text-center" :class="{'higlighted':this.selectedSorting=='priceAsc' || this.selectedSorting=='priceDesc'}">Price</th>
             <th class="text-center" :class="{'higlighted':this.selectedSorting=='points'}" >Points</th>
@@ -102,9 +103,9 @@
             <td>
               <strong class="team-name">{{ team.name }}</strong>
             </td>
-            <!-- <td>
-              <strong>{{ team.code }}</strong>
-            </td> -->
+            <td>
+              {{ team.opponent }}
+            </td>
             <td>
               <strong>{{ team.league }}</strong>
             </td>

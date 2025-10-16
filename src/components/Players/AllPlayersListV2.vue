@@ -57,6 +57,7 @@
             <th></th>
             <th></th> <!-- Role icon -->
             <th>Player</th>
+            <th class="text-center">Vs</th>
             <th class="text-center" :class="{'higlighted':this.selectedSorting=='priceAsc' || this.selectedSorting=='priceDesc'}">Price</th>
             <th class="text-center" :class="{'higlighted':this.selectedSorting=='points'}" >Points</th>
             <th class="text-center">Matches</th>
@@ -109,6 +110,7 @@
             </td>
 
             <!-- Price -->
+            <td class="text-start">{{ player.opponent }}</td>
             <td class="text-start">${{ player.price }}</td>
 
             <!-- Total Points -->

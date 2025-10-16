@@ -1,10 +1,6 @@
-<!-- TeamSelection.vue -->
 <template>
   <div>
     <h1>Dream teams</h1>
-    <!-- <div class="row justify-content-center">
-
-    </div> -->
     <div class="game-tabs ms-2 justify-content-md-center">
       <div
         v-for="(fixture, index) in tabs"
@@ -24,8 +20,7 @@
             <div class="player-role">{{ player.role }}</div>
             <div class="player-points">{{ player.points.toFixed(2) }}</div>
           </div>
-          <!-- <PlayerPointsGamesCard :isCaptain="teamPlayers.captain == 1" :key="teamPlayers" :gamesPointsDetails="teamPlayers.topPlayerPoints.gamesPointsDetails" :totalPointsA="teamPlayers.topPlayerPoints.totalPoints"/> -->
-        </div>
+          </div>
         <div class="player-card" :style="getTeamPosition()" v-if="dreamTeam.dreamTeamTeam != null">
           <img :src="dreamTeam.dreamTeamTeam.imageUrl" :alt="dreamTeam.dreamTeamTeam.name" class="player-image" />
           <div class="player-info">

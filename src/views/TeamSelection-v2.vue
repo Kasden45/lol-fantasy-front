@@ -211,7 +211,7 @@
         </div>
         
           <div class="" v-if="selectedTabIndex == 0">
-            <PlayersListV2 :currentFixture="this.lastPlayedFixture" :userTeam="pickedPlayersIds" :nextFixture="nextFixture" :teamsPlayingNextFixture="teamsPlayingInNextFixture" @rangeChange="rangeChanged" @playerSelect="playerSelected" :selectedRole="roleToAddPlayer" :players="allPlayers" v-if="allPlayers.length > 0"/>
+            <PlayersListV2 :currentFixture="this.lastPlayedFixture" :playersRivals="playersRivals" :userTeam="pickedPlayersIds" :nextFixture="nextFixture" :teamsPlayingNextFixture="teamsPlayingInNextFixture" @rangeChange="rangeChanged" @playerSelect="playerSelected" :selectedRole="roleToAddPlayer" :players="allPlayers" v-if="allPlayers.length > 0"/>
           </div>
           <div class="" v-if="selectedTabIndex == 2">
             <TeamsListV2 :currentFixture="this.lastPlayedFixture" :userTeam="selectedUserTeam.team.team != null ? selectedUserTeam.team.team.slug : ''" :nextFixture="nextFixture" :teamsPlayingNextFixture="teamsPlayingInNextFixture" @rangeChange="rangeChanged" @teamSelect="teamSelected" :selectedRole="roleToAddPlayer" :teams="allTeams" v-if="allTeams.length > 0"/>
@@ -314,6 +314,37 @@
       // this.getFixtures();
     },
     computed: {
+      playersRivals() {
+        if(this.allPlayers.length == null || this.allPlayers.length == 0 || this.nextFixture == null) return {};
+
+        let rivals = {};
+        this.allPlayers.forEach(player => {
+          let playerMatch = this.nextFixture.matches.find(m => 
+            (m.team1 != null && m.team1.code === player.team.code) || (m.team2 != null && m.team2.code === player.team.code)
+          );
+          if(playerMatch != null) {
+            rivals[player.esportsPlayerId] = playerMatch.team1.code === player.team.code ? playerMatch.team2.code : playerMatch.team1.code;
+          }
+          player.opponent = playerMatch != null ? (playerMatch.team1.code === player.team.code ? playerMatch.team2.code : playerMatch.team1.code) : null;
+        });
+        return rivals;
+      },
+      teamsRivals() {
+        if(this.allTeams.length == null || this.allTeams.length == 0 || this.nextFixture == null) return {};
+
+        let rivals = {};
+        this.allTeams.forEach(team => {
+          let teamMatch = this.nextFixture.matches.find(m => 
+            (m.team1 != null && m.team1.code === team.code) || (m.team2 != null && m.team2.code === team.code)
+          );
+          if(teamMatch != null) {
+            rivals[team.code] = teamMatch.team1.code === team.code ? teamMatch.team2.code : teamMatch.team1.code;
+            team.opponent = teamMatch.team1.code === team.code ? teamMatch.team2.code : teamMatch.team1.code;
+          
+          }
+        });
+        return rivals;
+      },
       pickedPlayers() {
         const playerKeys = Object.keys(this.selectedUserTeam).filter(key => key.endsWith('Player'));
 

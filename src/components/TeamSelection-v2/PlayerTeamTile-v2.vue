@@ -111,24 +111,6 @@
     </div>
     
   </div>
-    <!-- NEW -->
-    <!-- <div  class="row m-auto  team-player" :class="{'picked-position': currentlyPicked == role, 'captain-player': isCaptain}">
-      <div class="col-md-2">
-        <img :src="img_url" class="player-photo" alt="Player Photo" /> 
-      </div>
-      <div class="col-md-10 ">
-        <div  class="row ">
-          <div  class="col-md-10 team-tile d-flex align-items-center ">
-            <PlayerTileV2 :player="teamPlayer" v-if="teamPlayer != null"/>
-          </div>
-          <div class="col-md-2 d-flex justify-content-center align-items-center">
-            <button v-if="teamPlayer != null" class="btn btn-danger" @click="removePlayerFromRole(role)">-</button>
-            <button class="btn btn-success" v-else @click="addPlayerToRole(role)">+</button>
-          </div>
-        </div>
-        
-      </div>
-    </div> -->
 </template>
 
 <script>
@@ -191,20 +173,15 @@ export default {
 }
 
 .captain-player {
-  /* background-color: rgb(250, 212, 44) !important; */
   color: var(--GOLDEN-CAPTAIN) !important;
 }
 .captain-player-tile {
-  /* background-color: rgb(250, 212, 44) !important; */
-  /* border: 2px solid var(--GOLDEN-CAPTAIN) !important; */
   box-shadow:  -8px -8px 8px var(--GOLDEN-CAPTAIN) !important;
 }
 .picked-position {
-  /* background-color: rgb(52, 118, 194) !important; */
   box-shadow: 8px 8px 8px rgb(52, 118, 194) !important;
 }
 .picked-position.captain-player-tile {
-  /* background-color: rgb(52, 118, 194) !important; */
   box-shadow: 8px 8px 8px rgb(52, 118, 194), -8px -8px 8px var(--GOLDEN-CAPTAIN) !important;
 }
 .team-name {

@@ -1,25 +1,39 @@
 <template>
-  <div class="player-game-points">
-    <!-- Display points for the selected game using PlayerCard component -->
-    <div class="game-points" v-if="selectedGame != null">
+  <div class="player-game-points row">
+    <TeamPointsDetails
+      class="col-5"
+      v-if="gamesPointsDetails != null" 
+      :role="'top'" 
+      :teamTeam="gamesPointsDetails[0]"
+      :leagues_icons="this.$func_global.leagues_icons"
+      :points="totalPointsA"
+      :isCaptain="false"
+      :img_url="null" 
+      :details="true"
+      :roles_img_url="this.$func_global.role_images"
+    />
+
+    <div class="game-points col-6 offset-1" v-if="selectedGame != null">
       <div class="game-tabs ms-2">
-      <div
-        v-for="(game, index) in gamesPointsDetails.sort((a,b) => a.gameId > b.gameId ? 1 : -1)"
-        :key="index"
-        @click="selectGame(index)"
-        :class="{ active: selectedGameIndex === index }"
-      >
-        <!-- Game {{ index + 1 }} -->
-        {{this.getGameHeader(game.gameId)}}
-      </div>
+      <div class="mx-3" v-for="(game, index) in gamesPointsDetails.sort((a,b) => a.gameId > b.gameId ? 1 : -1)">
+
+      <TeamPointsCardV2 
+        :title="this.getGameHeader(game.gameId)"
+        :isSub="false"
+        :playerDetails="this.gamesPointsDetails[index]"
+        :isCaptain="false"
+        :totalPoints="totalPointsA"
+        v-if="selectedGame" 
+      />
     </div>
-      <TeamPointsCardV2 :teamDetails="selectedGame" :totalPoints="totalPointsA" v-if="selectedGame" />
+    </div>
     </div>
   </div>
 </template>
   
   <script>
   import TeamPointsCardV2 from '@/components/Points/TeamPointsCardV2.vue';
+  import TeamPointsDetails from '@/components/Points/TeamPointsDetails.vue';
   export default {
     name: "TeamPointsGamesCardV2",
     props:{
@@ -28,7 +42,8 @@
       totalPointsA: Number,
     },
     components: {
-      TeamPointsCardV2
+      TeamPointsCardV2,
+      TeamPointsDetails
     },
     computed: {
     selectedGame() {
@@ -62,7 +77,8 @@
   
   <style scoped>
 .player-game-points {
-  max-width: 500px;
+  /* max-width: 500px; */
+  flex-wrap: nowrap;
   margin: 0 auto;
 }
 
@@ -73,12 +89,9 @@
 }
 
 .game-tabs div {
-  cursor: pointer;
-  padding: 10px 20px;
-  border: 1px solid #ccc;
-  min-width: 150px;
-  border-radius: 4px;
-  margin-right: 10px;
+  display: flex;
+  width: max-content;
+  
 }
 
 .game-tabs .active {
@@ -91,6 +104,7 @@
   padding: 10px;
   border-radius: 4px;
 }
+
 
 ::-webkit-scrollbar {
     width: 10px;

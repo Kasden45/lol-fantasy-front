@@ -1,35 +1,30 @@
 <template>
-    <div class="player-card" v-if="teamDetails != null">
-      <div class="player-details row">
-        <div class="left-section col-md-3">
-          <div class="player-info">
-            <img :src="teamDetails.imageUrl" alt="Player Image" />
-            <p>{{ teamDetails.name }}</p>
-            <p class="role">{{ teamDetails.code }}</p>
-            <p>{{ teamDetails.league }}</p>
-            <p class="points" v-if="totalPoints != null">{{ totalPoints }} pts</p>
-          </div>
-        </div>
-        <div class="col-md-9">
-            <div class="right-section player-points-scrollable ">
+    <div class="player-card" :class="{'captain' : this.isCaptain, 'sub' : this.isSub} " v-if="playerDetails != null">
+      <div class=" row">
+        <h2 class="text-center">{{ title }}</h2>
+        
+        <div class="col-md-12">
+            <div class="">
                 <table class="points-table px-2">
                     <thead>
                     <tr>
                         <th>Event</th>
-                        <th>Value</th>
+                        <th></th>
                         <th>Points</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="(points, event) in teamDetails.pointsDetails" :key="event">
-                        <td class="points-event">{{ event }}</td>
-                        <td class="points-value">{{ points.value }}</td>
-                        <td class="points">{{ points.points }}</td>
+                    <tr v-for="(points, event) in playerDetails.pointsDetails" :key="event">
+                        <td class="points-event">{{ eventDisplay[event] }}</td>
+                        <td class="points-value">{{ points.value != null ? points.value : '-' }}</td>
+                        <td class="points" :class="{'negative-points': points.points<0}">{{ points.points }}</td>
                     </tr>
                     </tbody>
                 </table>
                 <div class="total-points pe-2">
-                    <p>Game points: {{ teamDetails.points }}</p>
+                    <span >Game points: </span>
+                    <span :class="{'crossed':this.isCaptain}">{{ playerDetails.points.toFixed(2) }} </span>
+                    <span v-if="this.isCaptain">  => {{ (playerDetails.points*2).toFixed(2) }}</span>
                 </div>
             </div>
         </div>
@@ -39,16 +34,32 @@
   </template>
   
   <script>
+
   export default {
     name: "TeamPointsCardV2",
     props:{
-        teamDetails: Object,
-        totalPoints: Number
+        playerDetails: Object,
+        totalPoints: Number,
+        isCaptain: Boolean,
+        isSub: Boolean,
+        title: String
     },
     
     data() {
         return {
-            
+            eventDisplay:{
+              kills: 'Kills',
+              assists: 'Assists',
+              deaths: 'Deaths',
+              firstBlood: 'FB',
+              drakes: 'Drakes',
+              nashors: 'Nashors',
+              towers: 'Towers',
+              over30Lose: 'Over 30 min lose',
+              under30Win: 'Under 30 min win',
+              voidgrubs: 'Voidgrubs',
+              win: 'Win',
+            }
         }
     },
     methods: {
@@ -57,11 +68,8 @@
     },
   },
   watch: {
-    // Watch for changes in the 'playerDetails' prop
-    teamDetails: {
+    playerDetails: {
       handler(newPlayerDetails, oldPlayerDetails) {
-        // React to prop changes here
-        // playerDetails = 
         console.log(newPlayerDetails, oldPlayerDetails);
       },
       immediate: true, // This will trigger the handler immediately when the component is created
@@ -74,16 +82,19 @@
   .role:first-letter {
     text-transform: capitalize;
   }
-.player-card {
-    width: auto;
-  display: flex;
-  border: 1px solid #ddd;
-  margin: 10px;
-  padding: 10px;
-  /* max-width: 400px; */
-  /* max-height: 250px; */
+table, tr, td {
+    border: none;
 }
 
+@media (max-width: 1000px) {
+  .player-card {
+    width: auto;
+    display: flex;
+    border: 1px solid #ddd;
+    margin: 3px;
+    padding: 3px;
+}
+}
 .player-details {
   display: flex;
   width: 100%;
@@ -93,13 +104,13 @@
 .left-section {
   padding: 10px;
   text-align: center;
-  height: 200px;
+  /* height: 800px; */
 }
 
 .right-section {
   flex: 2;
   overflow-y: scroll;
-  /* height: 200px; */
+  /* height: 800px; */
 }
 
 .player-info img {
@@ -113,11 +124,14 @@
 .points-table {
   width: 100%;
   border-collapse: collapse;
+  border: none;
 }
 
 .points-table th, .points-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
+  border-bottom: 1px solid #ddd;
+  padding: 2px;
+  padding-left: 5px;
+  padding-right: 5px;
   text-align: left;
 }
 
@@ -132,9 +146,11 @@
   overflow-y: visible;
   /* Adjust the height and other styles as needed */
 }
-
+.negative-points {
+  color: red;
+}
 .points-event {
-    font-weight: 400;
+    font-weight: 500;
 }
 .points-value {
     font-weight: 300;
@@ -145,7 +161,7 @@
 
 ::-webkit-scrollbar {
     width: 5px;
-    height: 15px;
+    height: 15px !important;
     background-color: var(--DARK-YELLOW);
 }
 
@@ -168,5 +184,15 @@
     border-radius: 3px;
     background-color: rgb(150, 79, 150);
     --webkit-box-shadow: inset 0 0 6px rgba(90, 90, 90, 0.7);
+}
+
+.captain {
+  background-color: rgba(224, 191, 3, 0.747);
+}
+.sub {
+  background-color: rgba(114, 106, 106, 0.432);
+}
+.crossed {
+  text-decoration: line-through;
 }
 </style>
