@@ -6,9 +6,22 @@
             </div>
         </div>
     </td> -->
-    <td  v-if="participantData != null">{{ participantData.userLogin }}
-
-        <div v-if="participantData != null && participantData.userTeam != null && showDetails" class="team-points" ref="pointsContainer">
+    <td  v-if="participantData != null"><p>{{ participantData.userLogin }}</p>
+        <p><span v-for="chip in participantData.userChips" :key="chip.id">
+            <i class="fa-solid"
+            :class="{
+                'fa-star': chip.id == 1,
+                'fa-dollar-sign': chip.id == 2,
+                'fa-infinity': chip.id == 3,
+                'fa-chair': chip.id == 4,
+                'chip-used': chip.userStatus == 3 ,
+                'chip-active': chip.userStatus == 2,
+                'chip-available': chip.userStatus == 0 || chip.userStatus == 1,
+            }"
+            ></i>
+            
+        </span></p>
+        <!-- <div v-if="participantData != null && participantData.userTeam != null && showDetails" class="team-points" ref="pointsContainer">
             <PlayerPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 1" :gamesPointsDetails="participantData.userTeam.topPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.topPlayerPoints.totalPoints"/>
             <PlayerPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 2" :gamesPointsDetails="participantData.userTeam.junglePlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.junglePlayerPoints.totalPoints"/>
             <PlayerPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 3" :gamesPointsDetails="participantData.userTeam.midPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.midPlayerPoints.totalPoints"/>
@@ -16,7 +29,7 @@
             <PlayerPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 5" :gamesPointsDetails="participantData.userTeam.supportPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.supportPlayerPoints.totalPoints"/>
             <PlayerPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :isSub="true" :gamesPointsDetails="participantData.userTeam.subPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.subPlayerPoints.totalPoints"/>
             <TeamPointsGamesCard  class="team-points-details" :gamesList="fixtureGames" :gamesPointsDetails="participantData.userTeam.teamPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.teamPoints.totalPoints"/>
-        </div>
+        </div> -->
 
     </td>
     <td :class="{'showing-details' : showDetails}" v-if="participantData != null">
@@ -180,7 +193,18 @@
     border-radius: 25px;
     border-color: grey;
 }
-
+.chip-used {
+    color: var(--RED-USED-CHIP);
+    margin-right: 5px;
+}
+.chip-active {
+    color: var(--GOLDEN-CAPTAIN);
+    margin-right: 5px;
+}
+.chip-available {
+    color: var(--BENCH-BOOST);
+    margin-right: 5px;
+}
 .account-btn {
     color: white;
     font-size: 2vw;

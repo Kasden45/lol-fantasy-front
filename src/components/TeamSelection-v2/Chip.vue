@@ -3,11 +3,13 @@
         :class="{
             'active-chip': isActive,
             'disabled-chip': isDisabled,
+            'was-used-chip': wasUsed,
         }"
-        :disabled="isDisabled"
+        :disabled="isDisabled || wasUsed"
         @click="activateChip()"
     >
             <div class="price">{{ name }}</div>
+            <div v-if="usedFixture" class="additional-info">{{ usedFixture }}</div>
             <!-- <div class="points pe-2">
                 <img
           
@@ -31,6 +33,8 @@ props:{
     name: String,
     iconUrl: String,
     isActive: Boolean,
+    wasUsed: Boolean,
+    usedFixture: String,
     isDisabled: Boolean,
     userStatus: Number,
     type: Number
@@ -114,6 +118,12 @@ button.disabled-chip {
     border: 2px solid var(--GREY);
     cursor: not-allowed;
 }
+button.was-used-chip {
+    /* background-color: var(--SECONDARY); */
+    /* color: var(--GREY); */
+    border: 2px solid var(--GREY-DARKER);
+    cursor: not-allowed;
+}
 .flag {
   width: 1.0rem;
   /* height: 12px; */
@@ -123,6 +133,10 @@ button.disabled-chip {
 .tooltips {
   position: relative;
   display: inline-block;
+}
+.additional-info {
+    font-size: 0.7rem;
+    color: var(--BENCH-BOOST);
 }
 
 /* Tooltip text */
