@@ -20,9 +20,6 @@
           alt="flag"
         />
       </div>
-      <!-- <div class="col-8 align-content-center">
-        <div class="team-name">{{ teamPlayer?.team.code || ' ' }}</div>
-      </div> -->
       <div class="col-8 align-content-center" >
         <span class="player-name" 
         :class="{
@@ -31,13 +28,6 @@
         >{{ teamPlayer?.team.code + ' ' +teamPlayer?.summonerName}}</span>
       </div>
       <div class="col-2 inline-text-flag role-sub">
-        <!-- <div
-          v-if="teamPlayer"
-          class="action-button remove-button"
-          @click="removePlayerFromRole(role)"
-        >
-          <i class="flag fas fa-info fa-xl"></i>
-        </div> -->
            <img
           
           class="flag "
@@ -50,20 +40,7 @@
       <div class="col-2 inline-text-flag">
         
       </div>
-      <!-- <div class="col-8 align-content-center">
-        <span class="player-name" 
-        :class="{
-          'captain-player': isCaptain
-        }"
-        >{{ teamPlayer?.team.code + ' ' +teamPlayer?.summonerName }}</span>
-      </div> -->
       <div v-if="teamPlayer" class="col-2 inline-text-flag role-sub" >
-           <!-- <img
-          
-          class="flag "
-          :src="roles_img_url[role]"
-          alt="flag"
-        /> -->
       </div>
     </div>
 
@@ -118,7 +95,7 @@
 <script>
 import PlayerTileV2 from "@/components/TeamSelection-v2/PlayerTile-v2.vue"
 export default {
-    name: "PlayerTeamTileV2",
+    name: "PlayerPoints",
     props:{
         img_url: String,
         roles_img_url: Object,
@@ -177,27 +154,28 @@ export default {
   justify-content: end !important;
 }
 
+.player-tile-container.sub {
+  background: var(--GREY-DARKER) !important;
+
+}
+.player-tile-container.bench-boost-tile {
+  background: var(--SECONDARY) !important;
+
+}
 .captain-player {
-  /* background-color: rgb(250, 212, 44) !important; */
   color: var(--GOLDEN-CAPTAIN) !important;
 }
 .captain-player-tile {
-  /* background-color: rgb(250, 212, 44) !important; */
-  /* border: 2px solid var(--GOLDEN-CAPTAIN) !important; */
   box-shadow:  8px 8px 8px var(--GOLDEN-CAPTAIN) !important;
 }
 .triple-captain-player-tile {
-  /* background-color: rgb(250, 212, 44) !important; */
-  /* border: 2px solid var(--GOLDEN-CAPTAIN) !important; */
   box-shadow:  8px 8px 8px var(--PRIMARY) !important;
 }
 .bench-boost-tile {
-  /* background-color: rgb(250, 212, 44) !important; */
-  /* border: 2px solid var(--GOLDEN-CAPTAIN) !important; */
   box-shadow:  8px 8px 8px var(--BENCH-BOOST) !important;
+  background: var(--SECONDARY) !important;
 }
 .picked-position {
-  /* background-color: rgb(52, 118, 194) !important; */
   box-shadow: 8px 8px 8px rgb(52, 118, 194) !important;
 }
 .team-name {
@@ -205,7 +183,6 @@ export default {
   align-content: center;
 }
 .player-tile-container {
-  /* height: 30vh; */
   height: 8vh !important;
   background: var(--SECONDARY);
   border-radius: 1rem;
@@ -236,14 +213,11 @@ export default {
 display: flex;
   align-items: center;
   justify-content: start;
-  /* gap: 0.5rem; */
-  /* font-weight: 600; */
   font-size: 0.7rem;
 }
 
 .flag {
   width: 1.0rem;
-  /* height: 12px; */
   object-fit: cover;
   border-radius: 2px;
 }
@@ -251,15 +225,10 @@ display: flex;
   position: relative;
   aspect-ratio: 1 / 1;
 }
-.player-tile-container.sub {
-  background: var(--GREY-DARKER) !important;
-
-}
 
 
 .role-icon {
   width: 100%;
-  /* height: 100%; */
   object-fit: cover;
   opacity: 0.50;
   z-index: 1;
@@ -282,8 +251,6 @@ display: flex;
   justify-content: space-between;
   font-size: 0.8rem;
   font-weight: 600;
-  /* border-top: 2px solid var(--GREY); */
-  /* margin-top: 0.4rem; */
   padding-top: 0.3rem;
 }
 
@@ -293,7 +260,6 @@ display: flex;
   font-size: 0.8rem;
   font-weight: 600;
   border-top: none;
-  /* margin-top: 0.4rem; */
   padding-top: 0rem;
 }
 
@@ -306,7 +272,6 @@ display: flex;
 .action-button {
   opacity: 0.8;
   height: 100%;
-  /* font-weight: bold; */
   
   cursor: pointer;
 }

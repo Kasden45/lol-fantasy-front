@@ -1,42 +1,4 @@
 <template>
-    <!-- <td v-if="participantData != null">
-        <div v-if="participantData != null && participantData.participantData.userTeam != null && showDetails" class="team-points vh-80 align-content-center py-auto fill-height d-flex align-items-center">
-            <div class="col-8 d-flex justify-self-start">
-                <button class="btn btn-info btn-purple" @click="scrollLeft">&lt;</button>
-            </div>
-        </div>
-    </td>
-    <td  v-if="participantData != null">{{ participantData.userLogin }}
-
-        <div v-if="participantData != null && participantData.participantData.userTeam != null && showDetails" class="team-points" ref="pointsContainer">
-            <PlayerPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 1" :gamesPointsDetails="participantData.userTeam.topPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.topPlayerPoints.totalPoints"/>
-            <PlayerPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 2" :gamesPointsDetails="participantData.userTeam.junglePlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.junglePlayerPoints.totalPoints"/>
-            <PlayerPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 3" :gamesPointsDetails="participantData.userTeam.midPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.midPlayerPoints.totalPoints"/>
-            <PlayerPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 4" :gamesPointsDetails="participantData.userTeam.bottomPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.bottomPlayerPoints.totalPoints"/>
-            <PlayerPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 5" :gamesPointsDetails="participantData.userTeam.supportPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.supportPlayerPoints.totalPoints"/>
-            <PlayerPointsGamesCard class="team-points-details" :gamesList="fixtureGames" :isSub="true" :gamesPointsDetails="participantData.userTeam.subPlayerPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.subPlayerPoints.totalPoints"/>
-            <TeamPointsGamesCard  class="team-points-details" :gamesList="fixtureGames" :gamesPointsDetails="participantData.userTeam.teamPoints.gamesPointsDetails" :totalPointsA="participantData.userTeam.teamPoints.totalPoints"/>
-        </div>
-
-    </td>
-    <td :class="{'showing-details' : showDetails}" v-if="participantData != null">
-        <div v-if="!showDetails">
-            {{ participantData.userTeam ? participantData.userTeam.totalPoints : (participantData.points != null ? participantData.points : 0) }} pts        
-        </div>
-        <div v-if="participantData != null && participantData.participantData.userTeam != null && showDetails" class="team-points position-center">
-            <div class="col-8 d-flex justify-content-end sticky-end">
-                <button class="btn btn-info btn-purple" @click="scrollRight">></button>
-            </div>
-        </div>
-    </td> -->
-    <!-- <td>{{ participant.joinedAt }}</td> -->
-    <!-- <td :class="{'showing-details' : showDetails}" v-if="participantData != null && participantData.participantData.userTeam != null" >
-        <button @click="toggleDetailsVisibility" data-toggle="modal" data-target="#sda" >
-            {{ showDetails ? 'Hide team' : 'Show team' }}
-        </button>
-    </td> -->
-          
-     <!-- <div class="container"> -->
       <div class="row team-row justify-content-start align-content-center">
         <div class="col-xl-3 col-lg-4  col-md-5  col-sm-6 col-8 align-content-center">
           <PlayerPoints 
@@ -79,8 +41,6 @@
           @captainPick="pickCaptain"
         />
         </div>
-      <!-- </div>
-      <div class="row justify-content-center mb-3"> -->
         <div class="col-xl-3 col-lg-4  col-md-5  col-sm-6 col-8 col-offset-2 align-content-center">
                 <PlayerPoints 
                 :is-triple="participantData.userTeam.chipUsed == 1"
@@ -109,15 +69,11 @@
                 @captainPick="pickCaptain"
                 />
         </div>
-      <!-- </div>
-      <div class="row justify-content-center mb-3"> -->
-        <!-- <div class="col-xl-3 col-lg-4  col-md-5  col-sm-6 col-8 align-content-center">
-          
-        </div> -->
         <div class="col-xl-3 col-lg-4  col-md-5  col-sm-6 col-8 align-content-center">
                 <TeamPoints 
                 v-if="participantData.userTeam != null" 
                 :role="'team'" 
+                @showDetails="showDetailsModal"
                 :teamTeam="participantData.userTeam.teamPoints.team" 
                 :teamPoints="participantData.userTeam.teamPoints"
                 :img_url="role_images['team']" 
@@ -140,11 +96,13 @@
       <div class="row justify-content-center">
         
       </div>
-    <!-- </div> -->
     <div>
         <MyModal :openModal="this.openModal" @closeModal="closeDetailsModal" :title="`${participant.userLogin}'s ${fixture.title} points details`">
-            <div v-if="participantData != null && participantData.userTeam != null" class="team-points " ref="pointsContainer">
+            <div v-if="participantData != null && participantData.userTeam != null && detailsData.team == null" class="team-points " ref="pointsContainer">
                 <PlayerPointsGamesCardV2 class="team-points-details align-content-center" :gamesList="fixtureGames" :isCaptain="participantData.userTeam.captain == 1" :gamesPointsDetails="detailsData.gamesPointsDetails" :totalPointsA="detailsData.totalPoints"/>
+            </div>
+            <div v-if="participantData != null && participantData.userTeam != null && detailsData.team != null" class="team-points " ref="pointsContainer">
+                <TeamPointsGamesCardV2 class="team-points-details align-content-center" :gamesList="fixtureGames" :isCaptain="false" :gamesPointsDetails="detailsData.gamesPointsDetails" :totalPointsA="detailsData.totalPoints"/>
             </div>
         </MyModal>
     </div>
@@ -167,7 +125,7 @@
       TeamPoints
   },
   props: {
-    participant: Object, // Pass the participant data as a prop
+    participant: Object,
     fixtureGames: Array,
     fixture: Object
   },
@@ -203,13 +161,11 @@
     // Watch for changes in the 'playerDetails' prop
     participant: {
       handler(newparticipant, oldparticipant) {
-        // React to prop changes here
-        // playerDetails = 
         console.log(newparticipant, oldparticipant);
         this.participantData = this.participant;
         this.correctEmptyPlayers();
       },
-      immediate: true, // This will trigger the handler immediately when the component is created
+      immediate: true,
     },
   },
     methods: {
@@ -221,9 +177,7 @@
     },
     closeDetailsModal(name) {
         console.log("details close")
-        // console.log(detailsData)
         this.openModal = false
-        // this.detailsData = detailsData
     },
     scrollRight() {
       const cardWidth = this.$refs.pointsContainer.children[0].offsetWidth; // get width of the first card
@@ -237,16 +191,7 @@
     },
     toggleDetailsVisibility() {
       this.showDetails = !this.showDetails;
-    //   if(this.showDetails) 
-    //     this.openModal();
     },
-    // openModal() {
-    //   this.showTeamDetailsModal = true;
-    // },
-    // closeModal() {
-    //   this.showTeamDetailsModal = false;
-    // },
-    // Other methods
     correctEmptyPlayers() {
             if(this.participantData.userTeam == null)
                 return;
@@ -304,8 +249,6 @@
   flex: 0 0 auto; /* Optional: Add some space between cards */
   height: 50%;
   max-width: 70vw;
-  margin-left: 10px;
-  /* min-width: 500px; */
 }
 
 ::-webkit-scrollbar {
@@ -358,7 +301,6 @@ input.has-error {
 
 p.has-error {
     color: pink;
-    /*font-weight: bold;*/
 }
 .register-btn {
     color: white;

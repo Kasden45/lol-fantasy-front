@@ -1,6 +1,5 @@
 <template>
   <div class="player-game-points row">
-    <!-- Create tabs for each game -->
     <PlayerPointsDetails
       class="col-5"
       v-if="gamesPointsDetails != null" 
@@ -13,17 +12,8 @@
       :roles_img_url="this.$func_global.role_images"
     />
 
-    <!-- Display points for the selected game using PlayerCard component -->
     <div class="game-points col-6 offset-1" v-if="selectedGame != null">
       <div class="game-tabs ms-2">
-      <!-- <div
-        v-for="(game, index) in gamesPointsDetails.sort((a,b) => a.gameId > b.gameId ? 1 : -1)"
-        :key="index"
-        @click="selectGame(index)"
-        :class="{ active: selectedGameIndex === index }"
-      >
-      {{this.getGameHeader(game.gameId)}}
-      </div> -->
       <div class="mx-3" v-for="(game, index) in gamesPointsDetails.sort((a,b) => a.gameId > b.gameId ? 1 : -1)">
 
       <PlayerPointsCardV2 
@@ -36,17 +26,6 @@
       />
     </div>
     </div>
-    <!-- <div v-for="(game, index) in gamesPointsDetails.sort((a,b) => a.gameId > b.gameId ? 1 : -1)">
-
-      <PlayerPointsCardV2 
-      
-      :isSub="isSub"
-      :playerDetails="this.gamesPointsDetails[index]"
-      :isCaptain="isCaptain"
-      :totalPoints="totalPointsA"
-      v-if="selectedGame" 
-      />
-    </div> -->
     </div>
   </div>
 </template>

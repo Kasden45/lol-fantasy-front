@@ -24,14 +24,6 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarClientContent">
           <ul class="navbar-nav ms-auto">
-            <!--          <li class="nav-item pe-3">-->
-            <!--            <router-link-->
-            <!--              class="nav-link"-->
-            <!--              :class="{ active: this.$route.name === 'Dashboard' }"-->
-            <!--              :to="{ name: 'Dashboard' }"-->
-            <!--              >HOME</router-link-->
-            <!--            >-->
-            <!--          </li>-->
             <li class="nav-item pe-3">
               <router-link
                 class="nav-link"
@@ -44,7 +36,7 @@
               <router-link
                 class="nav-link"
                 :class="{ active: this.$route.name === 'TeamSelection' || this.$route.name === 'TeamSelectionV2' }"
-                :to="{ name: 'TeamSelection' }"
+                :to="{ name: 'TeamSelectionV2' }"
                 >Team Selection</router-link
               >
             </li>
@@ -67,7 +59,7 @@
             <li class="nav-item pe-3" v-if="(this.$store.getters.getProfileId != null && this.$store.getters.getProfileId != '')">
               <router-link
                 class="nav-link"
-                :class="{ active: this.$route.name === 'LeaguesView' }"
+                :class="{ active: this.$route.name === 'LeaguesView'  || this.$route.name === 'SingleLeagueView' }"
                 :to="{ name: 'LeaguesView' }"
                 >Leagues</router-link
               >
@@ -80,14 +72,6 @@
                 >Matches</router-link
               >
             </li>
-            <!-- <li class="nav-item pe-3">
-              <router-link
-                class="nav-link"
-                :class="{ active: this.$route.name === 'StatsView' }"
-                :to="{ name: 'StatsView' }"
-                >Stats<span class="inform"> NEW</span></router-link
-              >
-            </li> -->
             <li class="nav-item pe-3">
               <div class="dropdown">
                 <button
@@ -186,7 +170,7 @@
                       <span class="inform"> NEW</span>
                   </a>
                   </li>
-                  <li>
+                  <!-- <li>
                     <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.worlds_2023 }" class="dropdown-item" href="#" @click="switchTournament(this.worlds_2023)">
                       WORLDS 2023
                     </a>
@@ -195,10 +179,10 @@
                     <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.msi_2024 }" class="dropdown-item" href="#" @click="switchTournament(this.msi_2024)">
                       MSI 2024
                     </a>
-                  </li>
+                  </li> -->
                   <li>
-                    <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.worlds_2024 }" class="dropdown-item" href="#" @click="switchTournament(this.worlds_2024)">
-                      WORLDS 2024
+                    <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.worlds_2025 }" class="dropdown-item" href="#" @click="switchTournament(this.worlds_2025)">
+                      WORLDS 2025
                     </a>
                   </li>
                   <li>
@@ -207,8 +191,8 @@
                     </a>
                   </li>
                   <li>
-                    <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.worlds_2025 }" class="dropdown-item" href="#" @click="switchTournament(this.worlds_2025)">
-                      WORLDS 2025
+                    <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.worlds_2024 }" class="dropdown-item" href="#" @click="switchTournament(this.worlds_2024)">
+                      WORLDS 2024
                     </a>
                   </li>
                   <li v-if="(this.$store.getters.getProfileId != null && this.$store.getters.getProfileId != '')">
@@ -220,19 +204,6 @@
                 </ul>
               </div>
             </li>
-            <!-- <li class="nav-item pe-3">
-              <router-link class="nav-link cart px-3" :to="{ name: 'Cart' }">
-                <font-awesome-icon :icon="['fa', 'cart-shopping']" />
-                <span class="cart-money ms-3 align-self-center"
-                  >{{
-                    this.$func_global.formatPrice(
-                      this.$store.getters.getTotalCost
-                    )
-                  }}
-                  zł</span
-                >
-              </router-link>
-            </li> -->
           </ul>
         </div>
       </div>

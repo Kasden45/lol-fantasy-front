@@ -1,86 +1,64 @@
 <template>
   <div
     class="player-tile-container"
-    :class="{
-      'picked-position': currentlyPicked === role,
-      'captain-player-tile': isCaptain,
-      'sub': role =='sub'
-    }"
   >
-    <div class="tile-header row mt-1" v-if="teamPlayer">
+    <div class="tile-header row mt-1" v-if="teamTeam">
       <div class="col-2 inline-text-flag">
         
       </div>
       <div class="col-8 align-content-center">
+        <p class="player-name" 
+        
+        >{{ teamTeam?.league }} </p>
         <span class="player-name" 
-        :class="{
-          'captain-player': isCaptain
-        }"
-        >{{ teamPlayer?.team.code || ' ' }} {{ teamPlayer?.summonerName }}</span>
-      </div>
-      <div v-if="teamPlayer" class="col-2 inline-text-flag role-sub" >
-           <img
-          
-          class="flag "
-          :src="roles_img_url[role]"
-          alt="flag"
-        />
+        
+        >{{ teamTeam?.name }}</span>
       </div>
     </div>
 
     <!-- Player Photo -->
     <div class="image-layer-container mb-1">
       <img
-        v-if="role && !teamPlayer"
+        v-if="!teamTeam"
         :src="img_url"
         class="role-icon"
         alt="role icon"
       />
       <img
-        v-if="role && teamPlayer"
-        :src="teamPlayer?.team?.imageUrl"
+        v-if="teamTeam"
+        :src="teamTeam?.imageUrl"
         class="role-icon"
         alt="role icon"
       />
-      <!-- Player Image Overlay -->
-      <img
-        v-if="teamPlayer?.imageUrl"
-        :src="teamPlayer.imageUrl"
-        class="player-image-overlay"
-        alt="player image"
-      />
       <div
-          v-if="teamPlayer && !details"
+          v-if="teamTeam && !details"
           class="captain-button player-image-overlay"
-          @click="showDetails(playerPoints)"
+          @click="showDetails(teamPoints)"
         >
         <i class="fa-sharp fa-solid fa-info fa-xl captain-letter"></i>
       </div>
     </div>
     
     <!-- Bottom Info: Price and Points -->
-    <div class="tile-footer" v-if="teamPlayer && !details">
-      <div class="price ps-2">{{ teamPlayer?.price?.toFixed(1) }}$</div>
-      <div class="points pe-2">{{ points ? points.toFixed(1) :playerPoints?.totalPoints?.toFixed(1) }}pts</div>
+    <div class="tile-footer" v-if="teamTeam && !details">
+      <div class="price ps-2">{{ teamTeam?.price?.toFixed(1) }}$</div>
+      <div class="points pe-2">{{ points ? points.toFixed(1) : teamPoints?.totalPoints?.toFixed(1) }}pts</div>
     </div>
-    <div class="tile-footer second justify-content-center" v-if="teamPlayer && details">
-        <div class="points details pe-2">{{ points ? points.toFixed(1) : playerPoints?.totalPoints?.toFixed(1) }}pts</div>
-        <div v-if="isCaptain" class="points details pe-2">{{ points ? points.toFixed(1) : playerPoints?.totalPoints?.toFixed(1) }}pts</div>
-    </div>    
+    <div class="tile-footer second justify-content-center" v-if="teamTeam && details">
+        <div class="points details pe-2">{{ points ? points.toFixed(1) : teamPoints?.totalPoints?.toFixed(1) }}pts</div>
+      </div>    
   </div>
 </template>
 
 <script>
 export default {
-    name: "PlayerPointsDetails",
+    name: "TeamPointsDetails",
     props:{
         img_url: String,
-        roles_img_url: Object,
-        teamPlayer: Object,
+        leagues_icons: Object,
+        teamTeam: Object,
         points: Number,
-        playerPoints: Object,
-        role: String,
-        isCaptain: Boolean,
+        teamPoints: Object,
         details: Boolean
     },
     data() {
@@ -91,10 +69,6 @@ export default {
     methods:{
       showDetails (playerDetails) {
         this.$emit('showDetails', playerDetails)
-      },
-      getFlag(countryCode) {
-        return 'https://cdn-icons-png.flaticon.com/512/323/323363.png'
-        return `/flags/${countryCode.toLowerCase()}.png`; // or use CDN
       }
     }
 }
@@ -183,7 +157,6 @@ display: flex;
   width: 100%;
   /* height: 100%; */
   object-fit: cover;
-  opacity: 0.50;
   z-index: 1;
   border-radius: 0.5rem;
 }
