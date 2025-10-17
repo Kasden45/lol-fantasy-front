@@ -2,6 +2,7 @@
   <div class="match-update">
     <h1>Update Match Details</h1>
     <div v-for="game in gameDetails" :key="game.gameId">
+      <button class="btn btn-info" @click="fetchMatchDetailsGOL">Fetch Match Details from gol.gg</button>
       <h2>Game ID: {{ game.gameId }} - Game no.{{ game.gameNumber }}</h2>
       <label>
         Duration:
@@ -105,6 +106,24 @@ export default {
           throw new Error('Failed to update match details');
         }
         alert('Match details updated successfully');
+      } catch (error) {
+        console.error('Error updating match details:', error);
+        alert('Failed to update match details');
+      }
+    },
+    async fetchMatchDetailsGOL() {
+      try {
+        const response = await fetch(`${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fetch_stats/${this.matchId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        if (!response.ok) {
+          throw new Error('Failed to update match details');
+        }
+        const data = await response.json();
+        alert(`Match details updated successfully ${data.gameDetails[0].duration}`);
       } catch (error) {
         console.error('Error updating match details:', error);
         alert('Failed to update match details');
