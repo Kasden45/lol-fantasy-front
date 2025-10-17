@@ -1,4 +1,6 @@
 <template>
+  
+  <button v-if="(this.$store.getters.getProfileId != null && this.$store.getters.getProfileId == 5)" class="btn btn-info" @click="fetchMatches()">Fetch matches</button>
   <div class="button-container m-auto row" v-if="this.oneFixtureId == null">
     <div class="col-6 d-flex justify-self-start">
       <button class="btn btn-info btn-purple" @click="scrollLeft">&lt;</button>
@@ -30,6 +32,7 @@ name: 'MatchesView',
   },  
   data() {
     return {
+      fixtureId: null,
       matchesByFixture: [
         // Your matches data here
       ],
@@ -124,6 +127,16 @@ name: 'MatchesView',
               }
               this.positionScroll();
                 // this.$router.push({name: 'LeaguesView'})
+            }).catch(error => {
+                console.log(error.response);
+            });
+        },
+        fetchMatches() {
+            const url = `${this.apiURL}Config/${this.$store.getters.getCurrentTournamentId}/fetchMatches`
+
+            this.axios.post(url).then((response) => {
+              
+               this.$router.push({name: 'MatchesView'})
             }).catch(error => {
                 console.log(error.response);
             });

@@ -1,6 +1,7 @@
 <template>
   <div class="fixture-card col-lg-4 col-md-8 col-sm-12 mx-2">
     <div class="card-header">
+  <button v-if="(this.$store.getters.getProfileId != null && this.$store.getters.getProfileId == 5)" class="me-2 btn btn-info" @click="calculatePoints(fixture.fixture.fixtureId)">Update points</button>
       <h4>{{ fixture.fixture.name }} - {{ this.$func_global.formatDate(fixture.fixture.deadlineDate) }}</h4>
     </div>
     <div class="match-list container">
@@ -101,6 +102,15 @@
     parseDate (datetime) {
        var jsDate = new Date(datetime);
        return `${jsDate.getDay()}-${jsDate.getUTCMonth()}-${jsDate.getUTCFullYear()} ${jsDate.getUTCHours()}:${jsDate.getUTCMinutes()}`
+    },
+    calculatePoints(fixtureId) {
+        const url = `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/update_points/fixture/${fixtureId}`
+
+        this.axios.get(url).then((response) => {
+            alert(`Points updated successfully: fixture ${fixtureId}`);
+        }).catch(error => {
+            console.log(error.response);
+        });
     }
   }
 };
