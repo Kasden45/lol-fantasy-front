@@ -11,37 +11,36 @@
             </div>
         </div>
         <div class="row justify-content-center">
-      <!-- <div class="col-md-4 ">
-        <h2>What is Fantasy LOL?</h2>
-        <div class="row pb-4 pt-3">
-          <span>Introducing the <b>"2KPI LoL Fantasy Game"</b> – where esports enthusiasts get to step into the shoes of a team manager and put their strategic prowess to the test. Just like traditional Fantasy Premier League (FPL) games in the realm of football, our Fantasy format takes the excitement of competitive gaming to a <b>whole new level</b>.
-          </span></div>
-        <div class="row pb-4">
-          <span>
-            In this virtual world, participants assemble their <b>dream teams</b> of professional League of Legends players, each with their unique skills and talents. Your mission? To draft the ultimate roster that will accumulate the most points based on <b>real-world performance during the League of Legends tournament</b>.
-          </span>
+      <div id="intro" class="home">
+        <div class="mask" id="bg">
+          <div class="container">
+            <div class="row">
+              <p id="photo-text">
+                Welcome to<br /> <span class="highlight">2KPI LoL Fantasy Game</span>
+              </p>
+            </div>
+              <div class="row step justify-content-center mw-100">
+                <div class="col-md-3 line">
+                  <img src="../assets/number1.png" alt="one" height="50px" width="auto" class="mx-auto d-block my-3">
+                  <p class="step-title">Assemble</p>
+                  <p><b>Create your dream team</b> from your favourite, top-performing League of Legends players</p>
+                </div>
+                <div class="col-md-3 line mx-2">
+                  <img src="../assets/number2.png" alt="two" height="50px" width="auto" class="mx-auto d-block my-3">
+                  <p class="step-title">Compete</p>
+                  <p><b>Create or join a league</b> to prove your skills and show your friends you’re the ultimate game expert</p>
+                </div>
+                <div class="col-md-3 mx-2">
+                  <img src="../assets/number3.png" alt="three" height="50px" width="auto" class="mx-auto d-block my-3">
+                  <p class="step-title">Manage</p>
+                  <p>Make smart moves with transfers and extra chips to <b>rack up maximum points</b> throughout the tournament</p>
+                </div>            
+                <button v-if="profile == null || profile == ''" class="cta-btn col-md-4" @click="openDetailsModal">Start Building Your Team</button>
+              </div>
+          </div>
         </div>
-        <div class="row pb-4">
-          <span>
-          You'll need to make <b>strategic decisions</b> on player selection, taking into account their past performance, roles, and game statistics. Points are awarded for various in-game achievements such as <b>kills, assists, and objectives taken</b> – much like in traditional fantasy sports.
-        </span>
-        </div>
-        <div class="row pb-4">
-          <span>
-          But it's not just about individual player performance. As a Fantasy manager, you'll also need to consider <b>team dynamics</b>. Choosing the right mix of players from the same team can yield additional team synergy points, making team composition a crucial part of your strategy.
-        </span>
-        </div>
-        <div class="row pb-4">
-          <span>
-          So, whether you're a League of Legends fanatic or simply a strategic mastermind, the <b>2KPI LoL Fantasy Game</b> provides an opportunity to immerse yourself in the world of professional esports, compete against friends, and experience the thrill of managing your very own championship-winning team. It's time to unleash your inner coach and <b>claim the title of Fantasy League of Legends champion</b>!
-        </span>
-        </div>
-
-
-
-
-      </div> -->
-      <div class="hero col-md-8">
+      </div>
+      <!-- <div class="hero col-md-8">
         <div class="overlay">
           <div class="content">
             <h1>
@@ -66,9 +65,9 @@
             <button v-if="profile == null || profile == ''" class="cta-btn" @click="openDetailsModal">Start Building Your Team</button>
           </div>
         </div>
-      </div>
+      </div> -->
       
-      <div class="col-md-8 " v-if="this.currentFixture != null">
+      <div class="col-md-10 " v-if="this.currentFixture != null">
         <div class="overlay">
           <div class="text-danger">
             <h3 v-if="new Date() < new Date('2023-11-02')"> NEW LIMITS FOR UPCOMING FIXTURES </h3>
@@ -108,20 +107,6 @@
               </tr>
               </tbody>
           </table>
-          <!-- <table >
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="rule in rules" :key="rule.name">
-                <td>{{ rule.name }}</td>
-                <td>{{ rule.value }}</td>
-              </tr>
-            </tbody>
-          </table> -->
         </div>
         <div class="row justify-content-center">
           <div class="info-section col-lg-6 col-md-12" v-if="this.currentFixture != null">
@@ -280,16 +265,30 @@ export default {
   color: white;
 }
 
-/* table {
-  width: 100%;
-  border-collapse: collapse;
+#intro {
+    color: #FFFFFF;
 }
 
-table th, table td {
-  border: 1px solid #ccc;
-  padding: 8px;
-  text-align: left;
-} */
+#intro {
+  height: 80vh;
+  width: 100%;
+  background: url("../assets/lolevent.jpg") no-repeat center center fixed;
+    background-color: rgba(143, 2, 2, 0.8);
+    background-blend-mode: lighten;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+#bg {
+  height: 80vh;
+  width: 100%;
+  background: linear-gradient(
+  150deg,
+      rgba(0, 0, 0, 0.0),
+      rgba(0, 0, 0, 0.5) 50%);
+}
 
 h2 {
   margin: 0;
@@ -347,7 +346,26 @@ h2 {
     font-style: italic;
     z-index: 2;
 }
+#photo-text {
+  position: absolute;
+  width: 80%;
+  bottom: 55%;
+  left: 10%;
+  padding: 10px;
+  font-weight: bold;
+  font-size: 400%;
+}
+.step {
+  position: absolute;
+  bottom: 20%;
+  left: 0;
+  text-align: center;
+}
 
+.step-title {
+  font-size: 24px;
+  font-weight: bold;
+}
 .game-tabs {
   display: flex;
   margin-bottom: 20px;
@@ -390,7 +408,7 @@ h1 {
 }
 
 .highlight {
-  color: #00d8ff;
+  color: var(--LIGHT-BLUE);
   font-weight: bold;
 }
 
@@ -402,8 +420,9 @@ p {
 
 .cta-btn {
   margin-top: 2rem;
+  /* width: 0.7vw; */
   padding: 0.75rem 2rem;
-  background: #00d8ff;
+  background: var(--LIGHT-BLUE);
   color: #000;
   border: none;
   border-radius: 25px;
