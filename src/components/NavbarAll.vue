@@ -1,8 +1,21 @@
 <template>
   <MyModal v-if="(this.$store.getters.getProfileId == null || this.$store.getters.getProfileId == '')" :openModal="this.openModal" @closeModal="closeDetailsModal" :title="''">
-                <login-panel/>
-            </MyModal>
-    <nav class="navbar navbar-expand-md  bg-white sticky-top">
+      <login-panel/>
+  </MyModal>
+    <div class="navbar-expand-md  bg-white  sticky-top">
+      
+    <nav class="navbar navbar-expand-md py-0 ">
+      <h4 
+      v-if="this.nextFixture != null && new Date(this.nextFixture.fixture.deadlineDate) > new Date()"
+      class=" w-100"
+      :class="{
+        'deadline-banner-danger' : ((new Date(this.nextFixture.fixture.deadlineDate) - new Date())/ 36e5) < 24, 
+        'deadline-banner-warning' : ((new Date(this.nextFixture.fixture.deadlineDate) - new Date())/ 36e5) > 24 && ((new Date(this.nextFixture.fixture.deadlineDate) - new Date())/ 36e5) < 26, 
+        'deadline-banner': ((new Date(this.nextFixture.fixture.deadlineDate) - new Date())/ 36e5) > 26 }"
+      >{{ this.nextFixture.fixture.name }} starts in {{ this.timeToDeadline }}</h4>
+    </nav>
+    <nav class="navbar navbar-expand-md pt-0 bg-white ">
+      
       <div class="container">
         <a class="navbar-brand">{{ this.tournaments[this.$store.getters.getCurrentTournamentId] }} Fantasy2KPI</a>
         <img
@@ -208,6 +221,7 @@
         </div>
       </div>
     </nav>
+    </div>
   </template>
   
   <script>
@@ -222,9 +236,36 @@
     data(){
       return {
         openModal: false,
+        timeToDeadline: '',
+        nextFixture: null
       }
     },
+    mounted: function () {
+      this.getFixtures();
+      this.timer = setInterval(() => {
+        this.deadlineCountdown()
+      }, 1000)
+    },
+    
     methods: {
+      deadlineCountdown(){
+        if(this.$store.getters.getNextFixture != null)
+      {          
+        const deadline = new Date(this.$store.getters.getNextFixture.fixture.deadlineDate);
+        const now = new Date();
+        const diff = deadline - now;
+        const days = Math.floor(diff / 864e5);
+        const hours = Math.floor((diff % 864e5) / 36e5);
+        const minutes = Math.floor((diff % 36e5) / 6e4);
+        const seconds = Math.floor((diff % 6e4) / 1000);
+        console.log(`${days}d ${hours}h ${minutes}m ${seconds}s`);
+        this.timeToDeadline = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+      }
+        else{
+          this.getFixtures();
+        }
+        
+      },
       logout() {
         this.$store.commit("setProfileId", "");
             this.$router.push({ name: "Home" });
@@ -240,6 +281,26 @@
       },
       openDetailsModal() {
         this.openModal = true;
+      },
+      async getFixtures() {
+        if(this.$store.getters.getNextFixture != null)
+        {
+          this.nextFixture = this.$store.getters.getNextFixture;
+          return;
+        }
+        const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixtures`
+
+        this.axios.get(url).then((response) => {
+            this.matchesByFixture = response.data.fixturesWithMatches;
+            this.nextFixture = this.matchesByFixture
+            .filter(m => new Date(m.fixture.deadlineDate) > new Date())
+                    .sort(function(a,b){
+                    return new Date(a.fixture.deadlineDate) - new Date(b.fixture.deadlineDate);
+                  })[0]
+        this.$store.commit("setNextFixture", this.nextFixture);
+        }).catch(error => {
+            console.log(error.response);
+        });
       },
     },
   };
@@ -320,4 +381,18 @@
   filter: invert(100%) opacity(0.8) drop-shadow(0 0 0 VAR(--PRIMARY)) ;
   /* filter: invert(100%); */
 }
-  </style>
+.deadline-banner {
+  color: white;
+  background-color: var(--PRIMARY);
+}
+
+.deadline-banner-danger {
+  color: white;
+  background-color: var(--ERROR);
+}
+
+.deadline-banner-warning {
+  color: white;
+  background-color: var(--WARNING);
+}
+</style>

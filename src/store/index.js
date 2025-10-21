@@ -12,7 +12,8 @@ export default createStore({
             email: "",
             token: "",
             roles: [],
-            selectedRequest: null
+            selectedRequest: null,
+            nextFixture: null
             // NUTRITION
 
             // TELEMEDICINE
@@ -45,6 +46,9 @@ export default createStore({
         },
         setCurrentTournamentId(state, value) {
             state.currentTournamentId = value;
+        },
+        setNextFixture(state, value) {
+            state.nextFixture = value;
         }
     },
     getters: {
@@ -71,6 +75,9 @@ export default createStore({
         },
         getCurrentTournamentId(state) {
             return state.currentTournamentId;
+        },
+        getNextFixture(state) {
+            return state.nextFixture;
         }
     },
     plugins: [createPersistedState()],
