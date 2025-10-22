@@ -6,6 +6,11 @@
       </div>
       <!-- List of Leagues the User Is In -->
       <h2>{{currentLeague.name}} - {{currentLeague.invitationCode}}</h2>
+      <!-- Chart -->
+       <button class="btn btn-primary" @click="openModal = !openModal"><i class="fa-solid fa-chart-line"></i> See league race Chart</button>
+       <MyModal v-if="openModal" :openModal="this.openModal" @closeModal="closeChartModal" :title="'League race chart'">
+         <LeagueTableChart v-if="fixturesData.fixtures.length > 0 && this.tabs.length > 0" :fixturesData="this.fixturesData.fixtures" :rules="this.tabs"/>
+       </MyModal>
 <!-- Start -->
         <div class="navbar navbar-expand-md navbar-light">
           <button
@@ -54,7 +59,12 @@
               </table>
             </div>
             <div class="col-md-9">
-              <div class="container participants-container">
+              <div ref="scrollContainer" class="container participants-container "
+                @wheel.prevent="onWheel"
+                @mousedown="startDrag"
+                @mouseup="stopDrag"
+                @mouseleave="stopDrag"
+                @mousemove="onDrag">
                 
                 <ParticipantDetailsV2 
                   v-for="(participant, index) in currentLeague.participants.sort(calculatePosition)" :key="participant.userId"
@@ -76,12 +86,16 @@
   import DraftView from '@/components/League/DraftView.vue';
 import ParticipantDetails from '@/components/League/ParticipantDetails.vue';
 import ParticipantDetailsV2 from '@/components/League/ParticipantDetailsV2.vue';
+import LeagueTableChart from '@/components/Charts/LeagueTableChart.vue';
+import MyModal from '@/components/MyModal.vue';
   export default {
     components: {
+      LeagueTableChart,
       // PlayerPointsCard,
       ParticipantDetailsV2,
       ParticipantDetails,
-      DraftView
+      DraftView,
+      MyModal
   },
     data() {
       return {
@@ -94,9 +108,20 @@ import ParticipantDetailsV2 from '@/components/League/ParticipantDetailsV2.vue';
         userLeagues: [],
         currentLeague: null,
         fixtureGames: [],
+        openModal: false
       };
     },
     methods: {
+      onWheel(event) {
+        const el = this.$refs.scrollContainer;
+        el.scrollLeft += event.deltaY;
+      },
+      closeChartModal(name) {
+        this.openModal = false
+      },
+      openChartModal() {
+        this.openModal = true;
+      },
       setActiveUserTeam(activeUserTeam) {
           this.activeUserTeam = activeUserTeam
       },
@@ -218,6 +243,7 @@ import ParticipantDetailsV2 from '@/components/League/ParticipantDetailsV2.vue';
 .participants-container {
   flex-wrap: nowrap;
   overflow-x: scroll;
+  scroll-behavior: smooth;
 }
 .game-tabs {
   display: flex;
@@ -235,5 +261,9 @@ import ParticipantDetailsV2 from '@/components/League/ParticipantDetailsV2.vue';
 .game-tabs .active {
   background-color: #007BFF;
   color: #fff;
+}
+.inform{
+  color: var(--ERROR);
+  font-size:  x-small;
 }
 </style>
