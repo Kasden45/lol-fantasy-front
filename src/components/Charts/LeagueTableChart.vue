@@ -1,5 +1,5 @@
 <template>
-    <div class="w-80">
+    <div class="w-80 mx-4">
         <Line v-if="chartData && chartData.datasets && chartData.datasets.length > 0"
             id="league-table-chart"
             :options="chartOptions"
@@ -86,6 +86,9 @@ export default {
         },
         chartOptions: {
           type: Object,
+          responsive: true,
+          maintainAspectRatio: true,
+          aspectRatio: 3,
           default: () => {}
         }
       }
