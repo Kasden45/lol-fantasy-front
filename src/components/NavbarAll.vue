@@ -248,7 +248,7 @@
     },
     
     methods: {
-      deadlineCountdown(){
+      async deadlineCountdown(){
         if(this.$store.getters.getNextFixture != null)
       {          
         const deadline = new Date(this.$store.getters.getNextFixture.fixture.deadlineDate);
@@ -261,9 +261,6 @@
         console.log(`${days}d ${hours}h ${minutes}m ${seconds}s`);
         this.timeToDeadline = `${days}d ${hours}h ${minutes}m ${seconds}s`;
       }
-        else{
-          this.getFixtures();
-        }
         
       },
       logout() {
@@ -283,11 +280,12 @@
         this.openModal = true;
       },
       async getFixtures() {
-        if(this.$store.getters.getNextFixture != null)
+        if(this.$store.getters.getNextFixture != null && Date(this.$store.getters.getNextFixture.fixture.deadlineDate) > new Date())
         {
           this.nextFixture = this.$store.getters.getNextFixture;
           return;
         }
+        this.$store.commit("setNextFixture", null);
         const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixtures`
 
         this.axios.get(url).then((response) => {
