@@ -20,6 +20,8 @@ app.config.globalProperties.msi_2024 = '112099354464733424'
 app.config.globalProperties.worlds_2024 = '112966669920590211'
 app.config.globalProperties.msi_2025 = '113470835034591734'
 app.config.globalProperties.worlds_2025 = '113475452383887518'
+app.config.globalProperties.lec_split_1_2026 = '115548424304940735'
+app.config.globalProperties.lck_split_2_2026 = '115548128960088078'
 
 app.config.globalProperties.tournaments = {
     '110852926142971547': 'Worlds 2023',
@@ -27,6 +29,8 @@ app.config.globalProperties.tournaments = {
     '112966669920590211': 'Worlds 2024',
     '113470835034591734': 'MSI 2025',
     '113475452383887518': 'Worlds 2025',
+    '115548424304940735': 'LEC Split 1 2026',
+    '115548128960088078': 'LCK Split 2 2026'
 
 }
 
@@ -36,6 +40,8 @@ app.config.globalProperties.tournaments_icons = {
     '112966669920590211': 'WORLDS',
     '113470835034591734': 'MSI',
     '113475452383887518': 'WORLDS',
+    '115548424304940735': 'LEC',
+    '115548128960088078': 'LCK',
 
 }
 

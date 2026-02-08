@@ -194,6 +194,16 @@
                     </a>
                   </li> -->
                   <li>
+                    <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.lck_split_2_2026 }" class="dropdown-item" href="#" @click="switchTournament(this.lck_split_2_2026)">
+                      LCK Split 2 2026
+                    </a>
+                  </li>
+                  <li>
+                    <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.lec_split_1_2026 }" class="dropdown-item" href="#" @click="switchTournament(this.lec_split_1_2026)">
+                      LEC Split 1 2026
+                    </a>
+                  </li>
+                  <li>
                     <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.worlds_2025 }" class="dropdown-item" href="#" @click="switchTournament(this.worlds_2025)">
                       WORLDS 2025
                     </a>
@@ -203,11 +213,11 @@
                       MSI 2025
                     </a>
                   </li>
-                  <li>
+                  <!-- <li>
                     <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.worlds_2024 }" class="dropdown-item" href="#" @click="switchTournament(this.worlds_2024)">
                       WORLDS 2024
                     </a>
-                  </li>
+                  </li> -->
                   <li v-if="(this.$store.getters.getProfileId != null && this.$store.getters.getProfileId != '')">
                     <a @click="logout" class="dropdown-item" href="#"
                       >Logout</a
