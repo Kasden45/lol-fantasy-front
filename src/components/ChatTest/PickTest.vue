@@ -1,7 +1,17 @@
   <template>
     <div class="container">
-      <button @click="joinDraft" v-if="!this.draftOrder.includes(this.$store.getters.getProfileId)">Join Draft</button>
-      <a v-if="this.draftOrder.includes(this.$store.getters.getProfileId)">Current players in draft: {{ this.draftOrder }}</a>
+      <button @click="joinDraft" v-if="!this.draftParticipants.map(p => p.id).includes(this.$store.getters.getProfileId)">Join Draft</button>
+      <button @click="startDraft" v-if="this.draftParticipants.map(p => p.id).includes(this.$store.getters.getProfileId)">Start Draft</button>
+      <a v-if="this.draftParticipants.map(p => p.id).includes(this.$store.getters.getProfileId)">Current players in draft: {{ this.draftParticipants.map(p => p.username) }}</a>
+      <DraftOrderBar 
+        :draftTitle="'Fantasy Draft'"
+        :totalRounds="7"
+        :currentPick="this.draftQueue.findIndex(pick => !pick.player)"
+        :participants="this.draftParticipants.length"
+        :draftQueue="this.draftQueue"
+        :timeRemaining="60"
+        :isYourTurn="this.isCurrentDrafter"
+        :isAutoDrafting="false"/>
       <div v-if="isCurrentDrafter">
         <h3>It's your turn to pick!</h3>
       </div>
@@ -46,6 +56,7 @@
   
   <script>
   import socket from '@/socket.js';
+  import DraftOrderBar from '@/components/ChatTest/DraftOrderBar.vue';
   import PlayersList from "@/components/Players/AllPlayersList.vue" 
   
   export default {
@@ -53,6 +64,7 @@
       leagueId: String
     },
     components: {
+      DraftOrderBar,
       PlayersList,
     },
     data() {
@@ -80,10 +92,11 @@
         team: { role: "team", team: null }
       },
         // selectedPlayers: [],
+        draftQueue: [],
         otherTeams: {},
         teamsPlayingInNextFixture: ['BLG','T1','DK','GEN', 'FNC', 'FLY', 'G2'],
         currentDrafter: null,
-        draftOrder: [],
+        draftParticipants: [],
       };
     },
     computed: {
@@ -113,7 +126,7 @@
     },
     mounted() {
       var leagueId = this.leagueId;
-      socket.emit('startDraft', leagueId)
+      // socket.emit('startDraft', leagueId)
       socket.emit('getCurrentState', ({message:'get players', invitationCode: this.leagueId}));
     },
     async created() {
@@ -123,13 +136,14 @@
         console.log('Connected to server');
       });
       var leagueId = this.leagueId;
-      socket.emit('startDraft', leagueId)
+      // socket.emit('startDraft', leagueId)
       socket.emit('getCurrentState', ({message:'get players', invitationCode: this.leagueId}));
 
-      socket.on('currentState', ({pickedPlayers, draftOrder, currentDrafter}) => {
+      socket.on('currentState', ({pickedPlayers, draftParticipants, currentDrafter, draftQueue}) => {
         this.otherTeams = {...pickedPlayers};
-        this.draftOrder = draftOrder;
-        console.log('got current state', pickedPlayers, draftOrder, currentDrafter);
+        this.draftParticipants = draftParticipants;
+        this.draftQueue = draftQueue;
+        console.log('got current state', pickedPlayers, draftParticipants, currentDrafter, draftQueue);
         console.log('profile id', this.$store.getters.getProfileId);
         this.selectedTeam = !this.otherTeams[this.$store.getters.getProfileId] ? 
         {
@@ -183,8 +197,8 @@
         this.currentDrafter = currentDrafter;
     });
 
-    socket.on('draftOrderUpdated', ({ draftOrder, currentDrafter }) => {
-      this.draftOrder = draftOrder;
+    socket.on('draftOrderUpdated', ({ draftParticipants, currentDrafter }) => {
+      this.draftParticipants = draftParticipants;
       this.currentDrafter = currentDrafter;
     });
 
@@ -192,7 +206,7 @@
         console.log('Disconnected from server');
       });
 
-      socket.on('finishedDraft', ({pickedPlayers, draftOrder, currentDrafter}) => {
+      socket.on('finishedDraft', ({pickedPlayers, draftParticipants, currentDrafter}) => {
         console.log('Finishing the draft');
         for (const [key, value] of Object.entries(pickedPlayers)) {
           console.log(key, value);
@@ -236,7 +250,11 @@
         },
       joinDraft() {
           var userId = this.$store.getters.getProfileId;
-          socket.emit('joinDraft', ({userId: userId, invitationCode: this.leagueId}));
+          var login = this.$store.getters.getLogin;
+          socket.emit('joinDraft', ({userId: userId, login: login, invitationCode: this.leagueId}));
+      },
+      startDraft() {
+          socket.emit('startDraft', this.leagueId);
       },
       selectPlayer(player) {
           if (!this.isCurrentDrafter) {

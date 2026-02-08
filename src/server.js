@@ -1,5 +1,5 @@
 const port = process.env.PORT || 8080
-
+const team_size = 7
 // wire up the module
 const express = require('express')
 const path = require('path');
@@ -35,32 +35,41 @@ io.on('connection', (socket) => {
       draft = allDrafts[invitationCode]
     } else {
       draft = {
+        started: true,
         pickedPlayers: {},
-        draftOrder: [],
-        currentDrafterIndex: 0
+        draftQueue: [],
+        draftParticipants: [],
+        currentPick: 0
       }
       allDrafts[invitationCode] = draft
     }
+
+    draft.started = true
+    draft.draftQueue = createDraftQueue(draft.draftParticipants, team_size * draft.draftParticipants.length)
+    io.emit('draftStarted', { draftParticipants: draft.draftParticipants, currentDrafter: draft.draftQueue[draft.currentPick]?.user?.id, draftQueue: draft.draftQueue });
   })
 
-  socket.on('joinDraft', ({userId, invitationCode}) => {
+  socket.on('joinDraft', ({userId, login, invitationCode}) => {
     let draft = {}
     if (invitationCode in allDrafts){
       draft = allDrafts[invitationCode]
     } else {
       draft = {
+        started: false,
         pickedPlayers: {},
-        draftOrder: [],
-        currentDrafterIndex: 0
+        draftQueue: [],
+        draftParticipants: [],
+        currentPick: 0
       }
       allDrafts[invitationCode] = draft
     }
-    if (!draft.draftOrder.includes(userId)) {
-      draft.draftOrder.push(userId);
+    if (!draft.draftParticipants.map(p => p.id).includes(userId)) {
+      draft.draftParticipants.push({id: userId, username: login});
+      console.log(`draft ${invitationCode}`, draft);
       console.log(`Client ${userId} joined the draft ${invitationCode}`);
-      io.emit('draftOrderUpdated', { draftOrder: draft.draftOrder, currentDrafter: draft.draftOrder[draft.currentDrafterIndex] });
+      io.emit('draftOrderUpdated', { draftParticipants: draft.draftParticipants, currentDrafter: userId });
   } else {
-    io.emit('draftOrderUpdated', { draftOrder: draft.draftOrder, currentDrafter: draft.draftOrder[draft.currentDrafterIndex] });
+    io.emit('draftOrderUpdated', { draftParticipants: draft.draftParticipants, currentDrafter: userId });
   }
   });
 
@@ -69,7 +78,7 @@ io.on('connection', (socket) => {
     if(invitationCode in allDrafts) {
       let draft = allDrafts[invitationCode]
       // Echo the message back to the client
-      socket.emit('currentState', { pickedPlayers: draft.pickedPlayers, draftOrder: draft.draftOrder, currentDrafter: draft.draftOrder[draft.currentDrafterIndex] });
+      socket.emit('currentState', { pickedPlayers: draft.pickedPlayers, draftParticipants: draft.draftParticipants, currentDrafter: draft.draftQueue[draft.currentPick]?.user?.id, draftQueue: draft.draftQueue });
     }
   });
 
@@ -78,8 +87,9 @@ io.on('connection', (socket) => {
       return;
     
     let draft = allDrafts[invitationCode]
-    
-    if (clientId !== draft.draftOrder[draft.currentDrafterIndex]) {
+    console.log('playerSelected draft:', draft)
+    console.log(draft.draftQueue[draft.currentPick]?.user)
+    if (clientId !== draft.draftQueue[draft.currentPick]?.user?.id) {
         console.log(`Client ${clientId} tried to pick out of turn`);
         return;
     }
@@ -99,13 +109,15 @@ io.on('connection', (socket) => {
     const roleKey = `${role}Player`;
     if (draft.pickedPlayers[clientId][roleKey]) {
       draft.pickedPlayers[clientId][roleKey].player = player;
+      draft.draftQueue[draft.currentPick].player = player;
     }
     
     // Move to the next drafter
-    draft.currentDrafterIndex = (draft.currentDrafterIndex + 1) % draft.draftOrder.length;
+    draft.currentPick++;
 
     io.emit('playerSelected', { clientId, player });
-    io.emit('currentDrafter', draft.draftOrder[draft.currentDrafterIndex]);
+    io.emit('currentState', { pickedPlayers: draft.pickedPlayers, draftParticipants: draft.draftParticipants, currentDrafter: draft.draftQueue[draft.currentPick]?.user?.id, draftQueue: draft.draftQueue });
+    io.emit('currentDrafter', draft.draftQueue[draft.currentPick]?.user?.id);
   });
 
   socket.on('disconnect', () => {
@@ -132,12 +144,29 @@ io.on('connection', (socket) => {
     console.log(`Found valid data for league: ${invitationCode}`);
 
     // Echo the message back to the client
-    socket.emit('finishedDraft', { pickedPlayers: draft.pickedPlayers, draftOrder: draft.draftOrder, currentDrafter: draft.draftOrder[draft.currentDrafterIndex] });
+    socket.emit('finishedDraft', { pickedPlayers: draft.pickedPlayers, draftParticipants: draft.draftParticipants, currentDrafter: draft.draftQueue[draft.currentPick]?.user?.id });
   });
 });
 // start the server
 server.listen(port, () => console.log(`Listening on port ${port} and ${path.join(__dirname, '../dist')}`))
 
-// function helloWorld() {
-//     console.log('Hello, World!');
-// }
+function createDraftQueue(participants, totalPicks) {
+    // create snake draft order
+    const draftQueue = [];
+    const rounds = Math.ceil(totalPicks / participants.length);
+    const participantIds = participants.sort(() => Math.random() - 0.5);
+    // const participantIds = participants.sort(() => Math.random() - 0.5);
+    console.log('participantIds', participantIds)
+    for (let round = 0; round < rounds; round++) {
+      if (round % 2 === 0) {
+        for (let i = 0; i < participantIds.length; i++) {
+          draftQueue.push({user: participantIds[i], player: null});
+        }
+      } else {
+        for (let i = participantIds.length - 1; i >= 0; i--) {
+          draftQueue.push({user: participantIds[i], player: null});
+        }
+      }
+    }
+    return draftQueue;
+}
