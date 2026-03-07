@@ -25,4 +25,15 @@
 
     --WARNING: #ff9800;
     --ERROR: #f44336;
+
+    --GREEN-DARK: #388e3c;
+    --GREEN-LIGHT: #4caf50;
+    
+    --ROLE-TOP: rgba(59, 130, 246, 0.4);
+    --ROLE-JUNGLE: rgba(34, 197, 94, 0.4);
+    --ROLE-MID: rgba(249, 115, 22, 0.4);
+    --ROLE-BOTTOM: rgba(239, 68, 68, 0.4);
+    --ROLE-SUPPORT: rgba(168, 85, 247, 0.4);
+    --ROLE-SUB: rgba(100, 116, 139, 0.4);
+    --ROLE-TEAM: rgb(0, 30, 73);
   }

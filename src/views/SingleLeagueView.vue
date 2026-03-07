@@ -2,7 +2,7 @@
     <div v-if="currentLeague != null">
       <h2>{{ fixturesData.mode }} mode</h2>
       <div class="row w-80 m-auto">
-        <DraftView v-if="fixturesData && fixturesData.mode == 'Draft'" :leagueId='this.currentLeague.invitationCode'/>
+        <DraftView v-if="fixturesData && fixturesData.mode == 'Draft'" :leagueId='this.currentLeague.invitationCode' :realLeagueId='this.realLeagueId'/>
       </div>
       <!-- List of Leagues the User Is In -->
       <h2>{{currentLeague.name}} - {{currentLeague.invitationCode}}</h2>
@@ -107,6 +107,7 @@ import MyModal from '@/components/MyModal.vue';
         invitationCode: "",
         userLeagues: [],
         currentLeague: null,
+        realLeagueId: null,
         fixtureGames: [],
         openModal: false
       };
@@ -141,6 +142,7 @@ import MyModal from '@/components/MyModal.vue';
         try {
           const response = await this.axios.get(`${this.apiURL}User/league/${invitationCode}`);
           this.currentLeague = response.data;
+          this.realLeagueId = this.currentLeague.participants[0].fantasyLeagueId;
           console.log("get league details", this.currentLeague)
         } catch (error) {
           console.error("Error fetching league details:", error);

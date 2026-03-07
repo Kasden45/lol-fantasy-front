@@ -1,7 +1,7 @@
 <template>
     <div class="draft-order-section">
         <div class="header">
-            <div class="title">LEC Split 1 2026 Fantasy2KPI - Draft League</div>
+            <div class="title">{{ this.tournaments[this.$store.getters.getCurrentTournamentId] }} Fantasy2KPI - Draft League</div>
             <div class="draft-info">
                 <div class="info-item">
                     <div class="info-label">Round</div>
@@ -21,10 +21,11 @@
         <!-- Draft Order -->
         <div class="draft-order-section">
             <div class="draft-order">
-                <div class="drafter" v-for="(user, index) in totalPicks" :key="index" :class="{ completed: index < currentPick, active: index === currentPick, 'drafter-separator': (index + 1) % participants === 0 && index !== totalPicks - 1 }">
-                    <div class="drafter-name">{{ draftQueue[index]?.user?.username }}</div>
-                    <div v-if="draftQueue[index]?.player?.summonerName == null" class="drafter-pick">Pick {{ index + 1 }}</div>
-                    <div v-else class="drafter-pick ">{{ draftQueue[index]?.player?.team?.code }} {{ draftQueue[index]?.player?.summonerName }}</div>
+                <div class="drafter" v-for="(user, index) in totalPicks" :key="index" :class="{ completed: index < currentPick, 'your-turn': isYourTurn && index === currentPick, active: index === currentPick, 'drafter-separator': (index + 1) % participants === 0 && index !== totalPicks - 1 }">
+                    <div class="drafter-name">{{ draftQueue[index]?.user?.username }} {{ this.isYourTurn && index === currentPick ? '(Your Turn)' : '' }}</div>
+                    <div v-if="draftQueue[index]?.player?.summonerName == null && draftQueue[index]?.player?.name == null" class="drafter-pick">Pick {{ index + 1 }}</div>
+                    <div v-if="draftQueue[index]?.player?.summonerName !== null" class="drafter-pick ">{{ draftQueue[index]?.player?.team?.code }} {{ draftQueue[index]?.player?.summonerName }}</div>
+                    <div v-if="draftQueue[index]?.player?.name !== null" class="drafter-pick ">{{ draftQueue[index]?.player?.code }}</div>
                 </div>
             </div>
         </div>
@@ -122,6 +123,18 @@ export default {
             const mins = Math.floor(seconds / 60);
             const secs = seconds % 60;
             return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+    },
+    watch: {
+        currentPick() {
+            this.$nextTick(() => {
+                const draftOrder = document.querySelector('.draft-order');
+                const activeDrafter = document.querySelector('.drafter.active');
+                if (draftOrder && activeDrafter) {
+                    const scrollLeft = activeDrafter.offsetLeft - draftOrder.offsetWidth / 2 + activeDrafter.offsetWidth / 2;
+                    draftOrder.scrollLeft = scrollLeft;
+                }
+            });
         }
     }
 };
@@ -232,7 +245,11 @@ export default {
             transform: scale(1.05);
             box-shadow: 0 0 20px var(--PRIMARY);;
         }
-
+        
+        .drafter.your-turn {
+            background: linear-gradient(135deg, var(--GREEN-DARK) 100%, var(--GREEN-LIGHT) 10%);
+        }
+        
         .drafter.completed {
             opacity: 0.5;
         }

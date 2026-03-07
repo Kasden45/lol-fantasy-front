@@ -1,6 +1,6 @@
 <!-- TeamSelection.vue -->
 <template>
-  <PickTest :leagueId="this.leagueId"/>
+  <PickTest :leagueId="this.leagueId" :realLeagueId="this.realLeagueId"/>
   <Chat/>
     
   </template>
@@ -10,7 +10,8 @@
   import Chat from '@/components/ChatTest/Chat.vue';
   export default {
     props:{
-      leagueId: String
+      leagueId: String,
+      realLeagueId: Number
     },
     components: {
       PickTest,
