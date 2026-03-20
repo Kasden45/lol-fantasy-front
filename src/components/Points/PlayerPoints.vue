@@ -5,43 +5,32 @@
       'picked-position': currentlyPicked === role,
       'captain-player-tile': isCaptain,
       'bench-boost-tile': isbenchboost,
-      'sub': role =='sub',
+      sub: role == 'sub',
       'triple-captain-player-tile': isTriple && isCaptain,
     }"
     @click="showDetails(playerPoints)"
   >
     <!-- Team and Player Name -->
-    <div class="tile-header row " v-if="teamPlayer">
+    <div class="tile-header row" v-if="teamPlayer">
       <div class="col-2 inline-text-flag">
-        <img
-          
-          class="flag"
-          :src="teamPlayer?.team?.imageUrl"
-          alt="flag"
-        />
+        <img class="flag" :src="teamPlayer?.team?.imageUrl" alt="flag" />
       </div>
-      <div class="col-8 align-content-center" >
-        <span class="player-name" 
-        :class="{
-          'captain-player': isCaptain
-        }"
-        >{{ teamPlayer?.team.code + ' ' +teamPlayer?.summonerName}}</span>
+      <div class="col-8 align-content-center">
+        <span
+          class="player-name"
+          :class="{
+            'captain-player': isCaptain,
+          }"
+          >{{ teamPlayer?.team.code + " " + teamPlayer?.summonerName }}</span
+        >
       </div>
       <div class="col-2 inline-text-flag role-sub">
-           <img
-          
-          class="flag "
-          :src="roles_img_url[role]"
-          alt="flag"
-        />
+        <img class="flag" :src="roles_img_url[role]" alt="flag" />
       </div>
     </div>
     <div class="tile-header row mt-1" v-if="teamPlayer">
-      <div class="col-2 inline-text-flag">
-        
-      </div>
-      <div v-if="teamPlayer" class="col-2 inline-text-flag role-sub" >
-      </div>
+      <div class="col-2 inline-text-flag"></div>
+      <div v-if="teamPlayer" class="col-2 inline-text-flag role-sub"></div>
     </div>
 
     <!-- Player Photo -->
@@ -66,83 +55,97 @@
         alt="player image"
       />
       <div
-          v-if="teamPlayer && !details"
-          class="captain-button player-image-overlay"
-          @click="showDetails(playerPoints)"
-        >
+        v-if="teamPlayer && !details"
+        class="captain-button player-image-overlay"
+        @click="showDetails(playerPoints)"
+      >
         <i class="fa-sharp fa-solid fa-info fa-xl captain-letter"></i>
       </div>
     </div>
-    
+
     <!-- Bottom Info: Price and Points -->
     <div class="tile-footer" v-if="teamPlayer && !details">
       <div class="price ps-2">{{ teamPlayer?.price?.toFixed(1) }}$</div>
-      <div class="points pe-2" :class="{
-        'captain-points': isCaptain,
-        'triple-points': isTriple && isCaptain,
-        'bench-points': isbenchboost,
-        }">
+      <div
+        class="points pe-2"
+        :class="{
+          'captain-points': isCaptain,
+          'triple-points': isTriple && isCaptain,
+          'bench-points': isbenchboost,
+        }"
+      >
         {{ displayedPoints.toFixed(1) }}pts
       </div>
     </div>
-    <div class="tile-footer second justify-content-center" v-if="teamPlayer && details">
-        <div class="points details pe-2">{{ points ? points.toFixed(1) : playerPoints?.totalPoints?.toFixed(1) }}pts</div>
-        <div v-if="isCaptain" class="points details pe-2">{{ points ? points.toFixed(1) : playerPoints?.totalPoints?.toFixed(1) }}pts</div>
-    </div>    
+    <div
+      class="tile-footer second justify-content-center"
+      v-if="teamPlayer && details"
+    >
+      <div class="points details pe-2">
+        {{
+          points ? points.toFixed(1) : playerPoints?.totalPoints?.toFixed(1)
+        }}pts
+      </div>
+      <div v-if="isCaptain" class="points details pe-2">
+        {{
+          points ? points.toFixed(1) : playerPoints?.totalPoints?.toFixed(1)
+        }}pts
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import PlayerTileV2 from "@/components/TeamSelection-v2/PlayerTile-v2.vue"
+import PlayerTileV2 from "@/components/TeamSelection-v2/PlayerTile-v2.vue";
 export default {
-    name: "PlayerPoints",
-    props:{
-        img_url: String,
-        roles_img_url: Object,
-        teamPlayer: Object,
-        points: Number,
-        playerPoints: Object,
-        role: String,
-        isCaptain: Boolean,
-        details: Boolean,
-        isTriple: Boolean,
-        isbenchboost: {
-          type: Boolean,
-          default: false
-        },
+  name: "PlayerPoints",
+  props: {
+    img_url: String,
+    roles_img_url: Object,
+    teamPlayer: Object,
+    points: Number,
+    playerPoints: Object,
+    role: String,
+    isCaptain: Boolean,
+    details: Boolean,
+    isTriple: Boolean,
+    isbenchboost: {
+      type: Boolean,
+      default: false,
     },
-    components: {
-      PlayerTileV2
+  },
+  components: {
+    PlayerTileV2,
+  },
+  data() {
+    return {};
+  },
+  methods: {
+    showDetails(playerDetails) {
+      this.$emit("showDetails", playerDetails);
     },
-    data() {
-      return {
-
-        }
+    getFlag(countryCode) {
+      return "https://cdn-icons-png.flaticon.com/512/323/323363.png";
+      return `/flags/${countryCode.toLowerCase()}.png`; // or use CDN
     },
-    methods:{
-      showDetails (playerDetails) {
-        this.$emit('showDetails', playerDetails)
-      },
-      getFlag(countryCode) {
-        return 'https://cdn-icons-png.flaticon.com/512/323/323363.png'
-        return `/flags/${countryCode.toLowerCase()}.png`; // or use CDN
+  },
+  computed: {
+    displayedPoints() {
+      if (this.isTriple && this.isCaptain) {
+        return this.points
+          ? this.points * 3
+          : this.playerPoints?.totalPoints * 3;
+      }
+      if (this.isCaptain) {
+        return this.points
+          ? this.points * 2
+          : this.playerPoints?.totalPoints * 2;
+      } else {
+        return this.points ? this.points : this.playerPoints?.totalPoints;
       }
     },
-    computed:{
-      displayedPoints() {
-        if (this.isTriple && this.isCaptain) {
-          return this.points ? this.points * 3 : this.playerPoints?.totalPoints * 3;
-        }
-        if (this.isCaptain) {
-          return this.points ? this.points * 2 : this.playerPoints?.totalPoints * 2;
-        }
-        else {
-          return this.points ? this.points : this.playerPoints?.totalPoints;
-        }
-      },
-    }
-}
-
+  },
+};
 </script>
 
 <style scoped>
@@ -156,23 +159,21 @@ export default {
 
 .player-tile-container.sub {
   background: var(--GREY-DARKER) !important;
-
 }
 .player-tile-container.bench-boost-tile {
   background: var(--SECONDARY) !important;
-
 }
 .captain-player {
   color: var(--GOLDEN-CAPTAIN) !important;
 }
 .captain-player-tile {
-  box-shadow:  8px 8px 8px var(--GOLDEN-CAPTAIN) !important;
+  box-shadow: 8px 8px 8px var(--GOLDEN-CAPTAIN) !important;
 }
 .triple-captain-player-tile {
-  box-shadow:  8px 8px 8px var(--PRIMARY) !important;
+  box-shadow: 8px 8px 8px var(--PRIMARY) !important;
 }
 .bench-boost-tile {
-  box-shadow:  8px 8px 8px var(--BENCH-BOOST) !important;
+  box-shadow: 8px 8px 8px var(--BENCH-BOOST) !important;
   background: var(--SECONDARY) !important;
 }
 .picked-position {
@@ -210,14 +211,14 @@ export default {
 }
 
 .inline-text-flag {
-display: flex;
+  display: flex;
   align-items: center;
   justify-content: start;
   font-size: 0.7rem;
 }
 
 .flag {
-  width: 1.0rem;
+  width: 1rem;
   object-fit: cover;
   border-radius: 2px;
 }
@@ -226,11 +227,10 @@ display: flex;
   aspect-ratio: 1 / 1;
 }
 
-
 .role-icon {
   width: 100%;
   object-fit: cover;
-  opacity: 0.50;
+  opacity: 0.5;
   z-index: 1;
   border-radius: 0.5rem;
 }
@@ -272,7 +272,7 @@ display: flex;
 .action-button {
   opacity: 0.8;
   height: 100%;
-  
+
   cursor: pointer;
 }
 .add-button {
@@ -280,10 +280,10 @@ display: flex;
   height: 40%;
   font-size: xx-large;
 }
-.captain-button{
+.captain-button {
   opacity: 0%;
 }
-.image-layer-container:hover .captain-button{
+.image-layer-container:hover .captain-button {
   opacity: 90%;
   color: var(--BLUE);
   height: 40%;

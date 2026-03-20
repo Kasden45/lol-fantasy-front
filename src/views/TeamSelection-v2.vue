@@ -403,7 +403,7 @@ export default {
         let playerMatch = this.nextFixture.matches.find(
           (m) =>
             (m.team1 != null && m.team1.code === player.team.code) ||
-            (m.team2 != null && m.team2.code === player.team.code),
+            (m.team2 != null && m.team2.code === player.team.code)
         );
         if (playerMatch != null) {
           rivals[player.esportsPlayerId] =
@@ -433,7 +433,7 @@ export default {
         let teamMatch = this.nextFixture.matches.find(
           (m) =>
             (m.team1 != null && m.team1.code === team.code) ||
-            (m.team2 != null && m.team2.code === team.code),
+            (m.team2 != null && m.team2.code === team.code)
         );
         if (teamMatch != null) {
           rivals[team.code] =
@@ -450,7 +450,7 @@ export default {
     },
     pickedPlayers() {
       const playerKeys = Object.keys(this.selectedUserTeam).filter((key) =>
-        key.endsWith("Player"),
+        key.endsWith("Player")
       );
 
       const activeCount = playerKeys.reduce((count, key) => {
@@ -461,7 +461,7 @@ export default {
     },
     pickedTeams() {
       const playerKeys = Object.keys(this.selectedUserTeam).filter((key) =>
-        key.endsWith("team"),
+        key.endsWith("team")
       );
 
       const activeCount = playerKeys.reduce((count, key) => {
@@ -486,7 +486,7 @@ export default {
       } else {
         percent = Math.min(
           this.teamValue / this.nextFixture.fixture.teamValueLimit,
-          1,
+          1
         );
       }
       return this.circumference - percent * this.circumference;
@@ -600,14 +600,14 @@ export default {
         if (this.selectedUserTeam[key].player != null) {
           console.log(
             "taki jest",
-            this.selectedUserTeam[key].player.esportsPlayerId,
+            this.selectedUserTeam[key].player.esportsPlayerId
           );
           currentLineup.push(this.selectedUserTeam[key].player.esportsPlayerId);
         }
         if (this.selectedUserTeam[key].team != null) {
           console.log(
             "taki jest team",
-            this.selectedUserTeam[key].team.esportsTeamId,
+            this.selectedUserTeam[key].team.esportsTeamId
           );
           currentLineup.push(this.selectedUserTeam[key].team.esportsTeamId);
         }
@@ -696,7 +696,7 @@ export default {
               .concat(
                 this.nextFixture.matches
                   .filter((m) => m.team1 != null && m.team2 != null)
-                  .map((m) => m.team2),
+                  .map((m) => m.team2)
               )
               .map((m) => m.code);
           }
@@ -717,35 +717,35 @@ export default {
     async fetchUserTeam() {
       try {
         const response = await this.axios.get(
-          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/user_team/${this.$store.getters.getProfileId}`,
+          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/user_team/${this.$store.getters.getProfileId}`
         );
         var userTeam = response.data;
         this.selectedUserTeam.topPlayer.player = this.allPlayers.find(
           (element) =>
-            element.esportsPlayerId == userTeam.topPlayer.esportsPlayerId,
+            element.esportsPlayerId == userTeam.topPlayer.esportsPlayerId
         );
         this.selectedUserTeam.junglePlayer.player = this.allPlayers.find(
           (element) =>
-            element.esportsPlayerId == userTeam.junglePlayer.esportsPlayerId,
+            element.esportsPlayerId == userTeam.junglePlayer.esportsPlayerId
         );
         this.selectedUserTeam.midPlayer.player = this.allPlayers.find(
           (element) =>
-            element.esportsPlayerId == userTeam.midPlayer.esportsPlayerId,
+            element.esportsPlayerId == userTeam.midPlayer.esportsPlayerId
         );
         this.selectedUserTeam.botPlayer.player = this.allPlayers.find(
           (element) =>
-            element.esportsPlayerId == userTeam.bottomPlayer.esportsPlayerId,
+            element.esportsPlayerId == userTeam.bottomPlayer.esportsPlayerId
         );
         this.selectedUserTeam.supportPlayer.player = this.allPlayers.find(
           (element) =>
-            element.esportsPlayerId == userTeam.supportPlayer.esportsPlayerId,
+            element.esportsPlayerId == userTeam.supportPlayer.esportsPlayerId
         );
         this.selectedUserTeam.subPlayer.player = this.allPlayers.find(
           (element) =>
-            element.esportsPlayerId == userTeam.subPlayer.esportsPlayerId,
+            element.esportsPlayerId == userTeam.subPlayer.esportsPlayerId
         );
         this.selectedUserTeam.team.team = this.allTeams.find(
-          (element) => element.esportsTeamId == userTeam.team.esportsTeamId,
+          (element) => element.esportsTeamId == userTeam.team.esportsTeamId
         );
         this.selectedUserTeam.captain = userTeam.captain;
         this.selectedUserTeam.transfersMade = userTeam.transfersMade;
@@ -777,7 +777,7 @@ export default {
             this.$store.getters.getCurrentTournamentId
           }/players${
             this.numberOfGames > 0 ? `/form/${this.numberOfGames}` : ""
-          }`,
+          }`
         );
         this.allPlayers = response.data;
         // this.sortedPlayers = this.players;
@@ -790,9 +790,7 @@ export default {
         const response = await this.axios.get(
           `${this.apiURL}FantasyPoints/${
             this.$store.getters.getCurrentTournamentId
-          }/teams${
-            this.numberOfGames > 0 ? `/form/${this.numberOfGames}` : ""
-          }`,
+          }/teams${this.numberOfGames > 0 ? `/form/${this.numberOfGames}` : ""}`
         );
         this.allTeams = response.data;
         this.fetchUserTeam();

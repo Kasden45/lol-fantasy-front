@@ -1,27 +1,59 @@
 <template>
-  <MyModal v-if="(this.$store.getters.getProfileId == null || this.$store.getters.getProfileId == '')" :openModal="this.openModal" @closeModal="closeDetailsModal" :title="''">
-      <login-panel/>
+  <MyModal
+    v-if="
+      this.$store.getters.getProfileId == null ||
+      this.$store.getters.getProfileId == ''
+    "
+    :openModal="this.openModal"
+    @closeModal="closeDetailsModal"
+    :title="''"
+  >
+    <login-panel />
   </MyModal>
-    <div class="navbar-expand-md  bg-white  sticky-top">
-      
-    <nav class="navbar navbar-expand-md py-0 ">
-      <h4 
-      v-if="this.nextFixture != null && new Date(this.nextFixture.fixture.deadlineDate) > new Date()"
-      class=" w-100"
-      :class="{
-        'deadline-banner-danger' : ((new Date(this.nextFixture.fixture.deadlineDate) - new Date())/ 36e5) < 24, 
-        'deadline-banner-warning' : ((new Date(this.nextFixture.fixture.deadlineDate) - new Date())/ 36e5) > 24 && ((new Date(this.nextFixture.fixture.deadlineDate) - new Date())/ 36e5) < 26, 
-        'deadline-banner': ((new Date(this.nextFixture.fixture.deadlineDate) - new Date())/ 36e5) > 26 }"
-      >{{ this.nextFixture.fixture.name }} starts in {{ this.timeToDeadline }}</h4>
+  <div class="navbar-expand-md bg-white sticky-top">
+    <nav class="navbar navbar-expand-md py-0">
+      <h4
+        v-if="
+          this.nextFixture != null &&
+          new Date(this.nextFixture.fixture.deadlineDate) > new Date()
+        "
+        class="w-100"
+        :class="{
+          'deadline-banner-danger':
+            (new Date(this.nextFixture.fixture.deadlineDate) - new Date()) /
+              36e5 <
+            24,
+          'deadline-banner-warning':
+            (new Date(this.nextFixture.fixture.deadlineDate) - new Date()) /
+              36e5 >
+              24 &&
+            (new Date(this.nextFixture.fixture.deadlineDate) - new Date()) /
+              36e5 <
+              26,
+          'deadline-banner':
+            (new Date(this.nextFixture.fixture.deadlineDate) - new Date()) /
+              36e5 >
+            26,
+        }"
+      >
+        {{ this.nextFixture.fixture.name }} starts in {{ this.timeToDeadline }}
+      </h4>
     </nav>
-    <nav class="navbar navbar-expand-md pt-0 bg-white ">
-      
+    <nav class="navbar navbar-expand-md pt-0 bg-white">
       <div class="container">
-        <a class="navbar-brand">{{ this.tournaments[this.$store.getters.getCurrentTournamentId] }} Fantasy2KPI</a>
+        <a class="navbar-brand"
+          >{{
+            this.tournaments[this.$store.getters.getCurrentTournamentId]
+          }}
+          Fantasy2KPI</a
+        >
         <img
-          
           class="flag"
-          :src="this.$func_global.leagues_icons[this.tournaments_icons[this.$store.getters.getCurrentTournamentId]]"
+          :src="
+            this.$func_global.leagues_icons[
+              this.tournaments_icons[this.$store.getters.getCurrentTournamentId]
+            ]
+          "
           alt="flag"
         />
         <button
@@ -45,19 +77,44 @@
                 >Home</router-link
               >
             </li>
-            <li class="nav-item pe-3" v-if="(this.$store.getters.getProfileId != null && this.$store.getters.getProfileId != '')">
+            <li
+              class="nav-item pe-3"
+              v-if="
+                this.$store.getters.getProfileId != null &&
+                this.$store.getters.getProfileId != ''
+              "
+            >
               <router-link
                 class="nav-link"
-                :class="{ active: this.$route.name === 'TeamSelection' || this.$route.name === 'TeamSelectionV2' }"
+                :class="{
+                  active:
+                    this.$route.name === 'TeamSelection' ||
+                    this.$route.name === 'TeamSelectionV2',
+                }"
                 :to="{ name: 'TeamSelectionV2' }"
                 >Team Selection</router-link
               >
             </li>
-            <li class="nav-item pe-3" v-if="(this.$store.getters.getProfileId != null && this.$store.getters.getProfileId != '')">
+            <li
+              class="nav-item pe-3"
+              v-if="
+                this.$store.getters.getProfileId != null &&
+                this.$store.getters.getProfileId != ''
+              "
+            >
               <router-link
                 class="nav-link"
                 :class="{ active: this.$route.name === 'CurrentPointsView' }"
-                :to="{ name: 'CurrentPointsView', params: {userId: (this.$store.getters.getProfileId != null && this.$store.getters.getProfileId != '') ? this.$store.getters.getProfileId : 0} }"
+                :to="{
+                  name: 'CurrentPointsView',
+                  params: {
+                    userId:
+                      this.$store.getters.getProfileId != null &&
+                      this.$store.getters.getProfileId != ''
+                        ? this.$store.getters.getProfileId
+                        : 0,
+                  },
+                }"
                 >Current points</router-link
               >
             </li>
@@ -69,10 +126,20 @@
                 >Players</router-link
               >
             </li>
-            <li class="nav-item pe-3" v-if="(this.$store.getters.getProfileId != null && this.$store.getters.getProfileId != '')">
+            <li
+              class="nav-item pe-3"
+              v-if="
+                this.$store.getters.getProfileId != null &&
+                this.$store.getters.getProfileId != ''
+              "
+            >
               <router-link
                 class="nav-link"
-                :class="{ active: this.$route.name === 'LeaguesView'  || this.$route.name === 'SingleLeagueView' }"
+                :class="{
+                  active:
+                    this.$route.name === 'LeaguesView' ||
+                    this.$route.name === 'SingleLeagueView',
+                }"
                 :to="{ name: 'LeaguesView' }"
                 >Leagues</router-link
               >
@@ -90,7 +157,11 @@
                 <button
                   class="nav-link"
                   id="dropdownMenuStats"
-                  :class="{ active: this.$route.name === 'StatsView' || this.$route.name === 'DreamTeamView' }"
+                  :class="{
+                    active:
+                      this.$route.name === 'StatsView' ||
+                      this.$route.name === 'DreamTeamView',
+                  }"
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
@@ -101,20 +172,24 @@
                   aria-labelledby="dropdownMenuStats"
                 >
                   <li>
-                    <a @click="this.$router.push({ name: 'DreamTeamView' })"
-                    class="dropdown-item"
-                    href="#">
+                    <a
+                      @click="this.$router.push({ name: 'DreamTeamView' })"
+                      class="dropdown-item"
+                      href="#"
+                    >
                       <span>Dream teams</span>
                       <span class="inform"> NEW</span>
-                  </a>
+                    </a>
                   </li>
                   <li>
-                    <a @click="this.$router.push({ name: 'StatsView' })"
-                    class="dropdown-item"
-                    href="#">
+                    <a
+                      @click="this.$router.push({ name: 'StatsView' })"
+                      class="dropdown-item"
+                      href="#"
+                    >
                       <span>Player stats</span>
                       <span class="inform"> NEW</span>
-                  </a>
+                    </a>
                   </li>
                 </ul>
               </div>
@@ -161,27 +236,36 @@
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  <span v-if="this.$store.getters.getLogin.length > 0" class="">{{ this.$store.getters.getLogin[0] }}</span>
+                  <span
+                    v-if="this.$store.getters.getLogin.length > 0"
+                    class=""
+                    >{{ this.$store.getters.getLogin[0] }}</span
+                  >
                 </button>
                 <ul
                   class="dropdown-menu dropdown-menu-end"
                   aria-labelledby="dropdownMenuAccount"
                 >
-                  <li v-if="(this.$store.getters.getProfileId == null || this.$store.getters.getProfileId == '')">
-                    <a @click="openDetailsModal"
-                    class="dropdown-item"
-                    href="#">
+                  <li
+                    v-if="
+                      this.$store.getters.getProfileId == null ||
+                      this.$store.getters.getProfileId == ''
+                    "
+                  >
+                    <a @click="openDetailsModal" class="dropdown-item" href="#">
                       <span>Login</span>
                       <span class="inform"> NEW</span>
-                  </a>
+                    </a>
                   </li>
                   <li>
-                    <a @click="this.$router.push({ name: 'SettingsView' })"
-                    class="dropdown-item"
-                    href="#">
+                    <a
+                      @click="this.$router.push({ name: 'SettingsView' })"
+                      class="dropdown-item"
+                      href="#"
+                    >
                       <span>Settings</span>
                       <span class="inform"> NEW</span>
-                  </a>
+                    </a>
                   </li>
                   <!-- <li>
                     <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.worlds_2023 }" class="dropdown-item" href="#" @click="switchTournament(this.worlds_2023)">
@@ -194,22 +278,58 @@
                     </a>
                   </li> -->
                   <li>
-                    <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.lck_split_2_2026 }" class="dropdown-item" href="#" @click="switchTournament(this.lck_split_2_2026)">
+                    <a
+                      :class="{
+                        'active-tournament':
+                          this.$store.getters.getCurrentTournamentId ===
+                          this.lck_split_2_2026,
+                      }"
+                      class="dropdown-item"
+                      href="#"
+                      @click="switchTournament(this.lck_split_2_2026)"
+                    >
                       LCK Split 2 2026
                     </a>
                   </li>
                   <li>
-                    <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.lec_split_1_2026 }" class="dropdown-item" href="#" @click="switchTournament(this.lec_split_1_2026)">
+                    <a
+                      :class="{
+                        'active-tournament':
+                          this.$store.getters.getCurrentTournamentId ===
+                          this.lec_split_1_2026,
+                      }"
+                      class="dropdown-item"
+                      href="#"
+                      @click="switchTournament(this.lec_split_1_2026)"
+                    >
                       LEC Split 1 2026
                     </a>
                   </li>
                   <li>
-                    <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.worlds_2025 }" class="dropdown-item" href="#" @click="switchTournament(this.worlds_2025)">
+                    <a
+                      :class="{
+                        'active-tournament':
+                          this.$store.getters.getCurrentTournamentId ===
+                          this.worlds_2025,
+                      }"
+                      class="dropdown-item"
+                      href="#"
+                      @click="switchTournament(this.worlds_2025)"
+                    >
                       WORLDS 2025
                     </a>
                   </li>
                   <li>
-                    <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.msi_2025 }" class="dropdown-item" href="#" @click="switchTournament(this.msi_2025)">
+                    <a
+                      :class="{
+                        'active-tournament':
+                          this.$store.getters.getCurrentTournamentId ===
+                          this.msi_2025,
+                      }"
+                      class="dropdown-item"
+                      href="#"
+                      @click="switchTournament(this.msi_2025)"
+                    >
                       MSI 2025
                     </a>
                   </li>
@@ -218,12 +338,14 @@
                       WORLDS 2024
                     </a>
                   </li> -->
-                  <li v-if="(this.$store.getters.getProfileId != null && this.$store.getters.getProfileId != '')">
-                    <a @click="logout" class="dropdown-item" href="#"
-                      >Logout</a
-                    >
-                  </li> 
-                  
+                  <li
+                    v-if="
+                      this.$store.getters.getProfileId != null &&
+                      this.$store.getters.getProfileId != ''
+                    "
+                  >
+                    <a @click="logout" class="dropdown-item" href="#">Logout</a>
+                  </li>
                 </ul>
               </div>
             </li>
@@ -231,37 +353,38 @@
         </div>
       </div>
     </nav>
-    </div>
-  </template>
-  
-  <script>
-  import MyModal from "@/components/MyModal.vue";
-  import LoginPanel from "@/views/LoginView.vue";
-  export default {
-    name: "NavbarAll",
-    components: {
-      MyModal,
-      LoginPanel
-    },
-    data(){
-      return {
-        openModal: false,
-        timeToDeadline: '',
-        nextFixture: null
-      }
-    },
-    mounted: function () {
-      this.getFixtures();
-      this.timer = setInterval(() => {
-        this.deadlineCountdown()
-      }, 1000)
-    },
-    
-    methods: {
-      async deadlineCountdown(){
-        if(this.$store.getters.getNextFixture != null)
-      {          
-        const deadline = new Date(this.$store.getters.getNextFixture.fixture.deadlineDate);
+  </div>
+</template>
+
+<script>
+import MyModal from "@/components/MyModal.vue";
+import LoginPanel from "@/views/LoginView.vue";
+export default {
+  name: "NavbarAll",
+  components: {
+    MyModal,
+    LoginPanel,
+  },
+  data() {
+    return {
+      openModal: false,
+      timeToDeadline: "",
+      nextFixture: null,
+    };
+  },
+  mounted: function () {
+    this.getFixtures();
+    this.timer = setInterval(() => {
+      this.deadlineCountdown();
+    }, 1000);
+  },
+
+  methods: {
+    async deadlineCountdown() {
+      if (this.$store.getters.getNextFixture != null) {
+        const deadline = new Date(
+          this.$store.getters.getNextFixture.fixture.deadlineDate
+        );
         const now = new Date();
         const diff = deadline - now;
         const days = Math.floor(diff / 864e5);
@@ -271,72 +394,80 @@
         console.log(`${days}d ${hours}h ${minutes}m ${seconds}s`);
         this.timeToDeadline = `${days}d ${hours}h ${minutes}m ${seconds}s`;
       }
-        
-      },
-      logout() {
-        this.$store.commit("setProfileId", "");
-            this.$router.push({ name: "Home" });
-      },
-      switchTournament(tournamentId){
-        this.$store.commit("setCurrentTournamentId", tournamentId);
-        this.$router.go();
-      },
-      closeDetailsModal(name) {
-        // console.log(detailsData)
-        this.openModal = false
-        // this.detailsData = detailsData
-      },
-      openDetailsModal() {
-        this.openModal = true;
-      },
-      async getFixtures() {
-        if(this.$store.getters.getNextFixture != null && Date(this.$store.getters.getNextFixture.fixture.deadlineDate) > new Date())
-        {
-          this.nextFixture = this.$store.getters.getNextFixture;
-          return;
-        }
-        this.$store.commit("setNextFixture", null);
-        const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixtures`
-
-        this.axios.get(url).then((response) => {
-            this.matchesByFixture = response.data.fixturesWithMatches;
-            this.nextFixture = this.matchesByFixture
-            .filter(m => new Date(m.fixture.deadlineDate) > new Date())
-                    .sort(function(a,b){
-                    return new Date(a.fixture.deadlineDate) - new Date(b.fixture.deadlineDate);
-                  })[0]
-        this.$store.commit("setNextFixture", this.nextFixture);
-        }).catch(error => {
-            console.log(error.response);
-        });
-      },
     },
-  };
-  </script>
-  
-  <style scoped>
-  .nav-link {
-    padding-right: 0.5rem;
-    padding-left: 0.5rem;
-  }
-  
-  .navbar-nav .cart {
-    background-color: var(--PRIMARY) !important;
-    color: white;
-    border-radius: 10px;
-  }
-  
-  .navbar-nav .cart:hover,
-  .navbar-nav .cart:focus {
-    background-color: var(--PRIMARY-DARKER) !important;
-    color: white;
-  }
-  
-  .cart-money {
-    font-size: smaller;
-  }
+    logout() {
+      this.$store.commit("setProfileId", "");
+      this.$router.push({ name: "Home" });
+    },
+    switchTournament(tournamentId) {
+      this.$store.commit("setCurrentTournamentId", tournamentId);
+      this.$router.go();
+    },
+    closeDetailsModal(name) {
+      // console.log(detailsData)
+      this.openModal = false;
+      // this.detailsData = detailsData
+    },
+    openDetailsModal() {
+      this.openModal = true;
+    },
+    async getFixtures() {
+      if (
+        this.$store.getters.getNextFixture != null &&
+        Date(this.$store.getters.getNextFixture.fixture.deadlineDate) >
+          new Date()
+      ) {
+        this.nextFixture = this.$store.getters.getNextFixture;
+        return;
+      }
+      this.$store.commit("setNextFixture", null);
+      const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixtures`;
 
-  .first-letter {
+      this.axios
+        .get(url)
+        .then((response) => {
+          this.matchesByFixture = response.data.fixturesWithMatches;
+          this.nextFixture = this.matchesByFixture
+            .filter((m) => new Date(m.fixture.deadlineDate) > new Date())
+            .sort(function (a, b) {
+              return (
+                new Date(a.fixture.deadlineDate) -
+                new Date(b.fixture.deadlineDate)
+              );
+            })[0];
+          this.$store.commit("setNextFixture", this.nextFixture);
+        })
+        .catch((error) => {
+          console.log(error.response);
+        });
+    },
+  },
+};
+</script>
+
+<style scoped>
+.nav-link {
+  padding-right: 0.5rem;
+  padding-left: 0.5rem;
+}
+
+.navbar-nav .cart {
+  background-color: var(--PRIMARY) !important;
+  color: white;
+  border-radius: 10px;
+}
+
+.navbar-nav .cart:hover,
+.navbar-nav .cart:focus {
+  background-color: var(--PRIMARY-DARKER) !important;
+  color: white;
+}
+
+.cart-money {
+  font-size: smaller;
+}
+
+.first-letter {
   border: 2px solid var(--PRIMARY);
   border-radius: 50%;
   /*color: var(--PRIMARY);*/
@@ -375,9 +506,9 @@
   color: var(--PRIMARY);
 }
 
-.inform{
+.inform {
   color: var(--PRIMARY);
-  font-size:  x-small;
+  font-size: x-small;
 }
 
 .flag {
@@ -386,7 +517,7 @@
   object-fit: cover;
   border-radius: 2px;
   color: VAR(--PRIMARY);
-  filter: invert(100%) opacity(0.8) drop-shadow(0 0 0 VAR(--PRIMARY)) ;
+  filter: invert(100%) opacity(0.8) drop-shadow(0 0 0 VAR(--PRIMARY));
   /* filter: invert(100%); */
 }
 .deadline-banner {

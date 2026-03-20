@@ -452,7 +452,7 @@ export default {
           pickedPlayers,
           draftParticipants,
           currentDrafter,
-          draftQueue,
+          draftQueue
         );
         console.log("profile id", this.$store.getters.getProfileId);
         this.selectedTeam = !this.otherTeams[this.$store.getters.getProfileId]
@@ -484,7 +484,7 @@ export default {
             }
           });
         delete this.otherTeams[this.$store.getters.getProfileId];
-      },
+      }
     );
 
     var userId = this.$store.getters.getProfileId;
@@ -568,13 +568,13 @@ export default {
               TeamSlug: pickedPlayers[key]["team"].team.slug,
               LeagueId: this.realLeagueId,
               Captain: 3,
-            },
+            }
           );
         }
 
         console.log("Finishing the draft - end");
         // Create all teams
-      },
+      }
     );
   },
   methods: {
@@ -727,12 +727,12 @@ export default {
               .concat(
                 this.nextFixture.matches
                   .filter((m) => m.team1 != null && m.team2 != null)
-                  .map((m) => m.team2),
+                  .map((m) => m.team2)
               )
               .map((m) => m.code);
             console.log(
               "teams playing in next fixture",
-              this.teamsPlayingInNextFixture,
+              this.teamsPlayingInNextFixture
             );
           }
 
@@ -752,7 +752,7 @@ export default {
     async fetchPlayers() {
       try {
         const response = await this.axios.get(
-          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/players`,
+          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/players`
         );
         this.availablePlayers = response.data;
         // this.sortedPlayers = this.players;
@@ -763,7 +763,7 @@ export default {
     async fetchTeams() {
       try {
         const response = await this.axios.get(
-          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/teams`,
+          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/teams`
         );
         this.availableTeams = response.data;
       } catch (error) {
@@ -817,7 +817,7 @@ export default {
         "trying to add ",
         player.summonerName,
         " to ",
-        this.roleToAddPlayer,
+        this.roleToAddPlayer
       );
 
       if (
@@ -834,7 +834,7 @@ export default {
         "trying to add team ",
         team.name,
         " to ",
-        this.roleToAddPlayer,
+        this.roleToAddPlayer
       );
 
       if (this.roleToAddPlayer == "team") {

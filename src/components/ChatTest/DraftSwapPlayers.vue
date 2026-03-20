@@ -299,7 +299,7 @@ export default {
     },
     getTeamName(team) {
       const participant = this.draftParticipants.find(
-        (p) => p.id === this.selectedTeamId,
+        (p) => p.id === this.selectedTeamId
       );
       return participant ? participant.username : "Unknown Team";
     },

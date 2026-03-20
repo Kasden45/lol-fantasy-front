@@ -1,81 +1,73 @@
 <template>
-    <div
-    class="player-tile-container  align-content-center"
+  <div
+    class="player-tile-container align-content-center"
     :class="{
-      'picked-position': currentlyPicked === role
+      'picked-position': currentlyPicked === role,
     }"
     @click="showDetails(teamPoints)"
   >
     <div class="tile-header row" v-if="teamTeam">
       <div class="col-2 inline-text-flag">
-        <img
-          
-          class="flag"
-          :src="teamTeam.imageUrl"
-          alt="flag"
-        />
+        <img class="flag" :src="teamTeam.imageUrl" alt="flag" />
       </div>
       <div class="col-8 align-content-center">
         <span class="player-name">{{ teamTeam?.code }}</span>
       </div>
       <div class="col-2 inline-text-flag role-sub">
-        <img
-          
-          class="flag "
-          :src="roles_img_url['team']"
-          alt="flag"
-        />
+        <img class="flag" :src="roles_img_url['team']" alt="flag" />
       </div>
     </div>
     <div class="tile-footer" v-if="teamTeam">
       <div class="price ps-2">{{ teamTeam?.price?.toFixed(1) }}$</div>
-      <div class="points pe-2">{{ teamTeam?.points ? teamTeam?.points.toFixed(1) : teamPoints?.totalPoints?.toFixed(1) }} Pts</div>
+      <div class="points pe-2">
+        {{
+          teamTeam?.points
+            ? teamTeam?.points.toFixed(1)
+            : teamPoints?.totalPoints?.toFixed(1)
+        }}
+        Pts
+      </div>
     </div>
     <div class="tile-footer second" v-if="teamTeam">
       <div></div>
-      
     </div>
-   
   </div>
 </template>
 
 <script>
 import TeamTileV2 from "@/components/TeamSelection-v2/TeamTile-v2.vue";
 export default {
-    name: "TeamPoints",
-    props:{
-        teamPoints: Object,
-        roles_img_url: Object,
-        img_url: String,
-        teamTeam: Object,
-        role: String,
-        currentlyPicked: String 
+  name: "TeamPoints",
+  props: {
+    teamPoints: Object,
+    roles_img_url: Object,
+    img_url: String,
+    teamTeam: Object,
+    role: String,
+    currentlyPicked: String,
+  },
+  components: {
+    TeamTileV2,
+  },
+  data() {
+    return {};
+  },
+  methods: {
+    showDetails(teamDetails) {
+      this.$emit("showDetails", teamDetails);
     },
-    components: {
-      TeamTileV2
-    },
-    data() {
-      return {
-        
-        }
-    },
-    methods:{
-      showDetails (teamDetails) {
-        this.$emit('showDetails', teamDetails)
-      },
-        removePlayerFromRole(role) {
+    removePlayerFromRole(role) {
       // Emit an event to notify the parent component (App) about the selected player
-        console.log("usuwam z ", role)
-        this.$emit("playerRemove", role);
-      },
-      addPlayerToRole(role) {
+      console.log("usuwam z ", role);
+      this.$emit("playerRemove", role);
+    },
+    addPlayerToRole(role) {
       // Emit an event to notify the parent component (App) about the selected player
-        console.log("chce dodac do ", role)
-        this.$emit("rolePick", role);
-      },
-    }
-}
-
+      console.log("chce dodac do ", role);
+      this.$emit("rolePick", role);
+    },
+  },
+};
 </script>
 <style scoped>
 .role-sub {
@@ -131,7 +123,6 @@ export default {
   position: relative;
   aspect-ratio: 1 / 1;
 }
-
 
 .role-icon {
   width: 100%;

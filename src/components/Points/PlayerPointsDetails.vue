@@ -4,27 +4,23 @@
     :class="{
       'picked-position': currentlyPicked === role,
       'captain-player-tile': isCaptain,
-      'sub': role =='sub'
+      sub: role == 'sub',
     }"
   >
     <div class="tile-header row mt-1" v-if="teamPlayer">
-      <div class="col-2 inline-text-flag">
-        
-      </div>
+      <div class="col-2 inline-text-flag"></div>
       <div class="col-8 align-content-center">
-        <span class="player-name" 
-        :class="{
-          'captain-player': isCaptain
-        }"
-        >{{ teamPlayer?.team.code || ' ' }} {{ teamPlayer?.summonerName }}</span>
+        <span
+          class="player-name"
+          :class="{
+            'captain-player': isCaptain,
+          }"
+          >{{ teamPlayer?.team.code || " " }}
+          {{ teamPlayer?.summonerName }}</span
+        >
       </div>
-      <div v-if="teamPlayer" class="col-2 inline-text-flag role-sub" >
-           <img
-          
-          class="flag "
-          :src="roles_img_url[role]"
-          alt="flag"
-        />
+      <div v-if="teamPlayer" class="col-2 inline-text-flag role-sub">
+        <img class="flag" :src="roles_img_url[role]" alt="flag" />
       </div>
     </div>
 
@@ -50,59 +46,70 @@
         alt="player image"
       />
       <div
-          v-if="teamPlayer && !details"
-          class="captain-button player-image-overlay"
-          @click="showDetails(playerPoints)"
-        >
+        v-if="teamPlayer && !details"
+        class="captain-button player-image-overlay"
+        @click="showDetails(playerPoints)"
+      >
         <i class="fa-sharp fa-solid fa-info fa-xl captain-letter"></i>
       </div>
     </div>
-    
+
     <!-- Bottom Info: Price and Points -->
     <div class="tile-footer" v-if="teamPlayer && !details">
       <div class="price ps-2">{{ teamPlayer?.price?.toFixed(1) }}$</div>
-      <div class="points pe-2">{{ points ? points.toFixed(1) :playerPoints?.totalPoints?.toFixed(1) }}pts</div>
+      <div class="points pe-2">
+        {{
+          points ? points.toFixed(1) : playerPoints?.totalPoints?.toFixed(1)
+        }}pts
+      </div>
     </div>
-    <div class="tile-footer second justify-content-center" v-if="teamPlayer && details">
-        <div class="points details pe-2">{{ points ? points.toFixed(1) : playerPoints?.totalPoints?.toFixed(1) }}pts</div>
-        <div v-if="isCaptain" class="points details pe-2">{{ points ? points.toFixed(1) : playerPoints?.totalPoints?.toFixed(1) }}pts</div>
-    </div>    
+    <div
+      class="tile-footer second justify-content-center"
+      v-if="teamPlayer && details"
+    >
+      <div class="points details pe-2">
+        {{
+          points ? points.toFixed(1) : playerPoints?.totalPoints?.toFixed(1)
+        }}pts
+      </div>
+      <div v-if="isCaptain" class="points details pe-2">
+        {{
+          points ? points.toFixed(1) : playerPoints?.totalPoints?.toFixed(1)
+        }}pts
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
-    name: "PlayerPointsDetails",
-    props:{
-        img_url: String,
-        roles_img_url: Object,
-        teamPlayer: Object,
-        points: Number,
-        playerPoints: Object,
-        role: String,
-        isCaptain: Boolean,
-        details: Boolean
+  name: "PlayerPointsDetails",
+  props: {
+    img_url: String,
+    roles_img_url: Object,
+    teamPlayer: Object,
+    points: Number,
+    playerPoints: Object,
+    role: String,
+    isCaptain: Boolean,
+    details: Boolean,
+  },
+  data() {
+    return {};
+  },
+  methods: {
+    showDetails(playerDetails) {
+      this.$emit("showDetails", playerDetails);
     },
-    data() {
-      return {
-
-        }
+    getFlag(countryCode) {
+      return "https://cdn-icons-png.flaticon.com/512/323/323363.png";
+      return `/flags/${countryCode.toLowerCase()}.png`; // or use CDN
     },
-    methods:{
-      showDetails (playerDetails) {
-        this.$emit('showDetails', playerDetails)
-      },
-      getFlag(countryCode) {
-        return 'https://cdn-icons-png.flaticon.com/512/323/323363.png'
-        return `/flags/${countryCode.toLowerCase()}.png`; // or use CDN
-      }
-    }
-}
-
+  },
+};
 </script>
 
 <style scoped>
-
 .details {
   font-size: x-large;
   justify-content: center;
@@ -118,7 +125,7 @@ export default {
 .captain-player-tile {
   /* background-color: rgb(250, 212, 44) !important; */
   /* border: 2px solid var(--GOLDEN-CAPTAIN) !important; */
-  box-shadow:  8px 8px 8px var(--GOLDEN-CAPTAIN) !important;
+  box-shadow: 8px 8px 8px var(--GOLDEN-CAPTAIN) !important;
 }
 .picked-position {
   /* background-color: rgb(52, 118, 194) !important; */
@@ -155,7 +162,7 @@ export default {
 }
 
 .inline-text-flag {
-display: flex;
+  display: flex;
   align-items: center;
   justify-content: start;
   /* gap: 0.5rem; */
@@ -175,15 +182,13 @@ display: flex;
 }
 .player-tile-container.sub {
   background: var(--GREY-DARKER) !important;
-
 }
-
 
 .role-icon {
   width: 100%;
   /* height: 100%; */
   object-fit: cover;
-  opacity: 0.50;
+  opacity: 0.5;
   z-index: 1;
   border-radius: 0.5rem;
 }
@@ -229,7 +234,7 @@ display: flex;
   opacity: 0.8;
   height: 100%;
   /* font-weight: bold; */
-  
+
   cursor: pointer;
 }
 .add-button {
@@ -237,10 +242,10 @@ display: flex;
   height: 40%;
   font-size: xx-large;
 }
-.captain-button{
+.captain-button {
   opacity: 0%;
 }
-.image-layer-container:hover .captain-button{
+.image-layer-container:hover .captain-button {
   opacity: 90%;
   color: var(--BLUE);
   height: 40%;

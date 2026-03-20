@@ -1,6 +1,14 @@
 <template>
-  
-  <button v-if="(this.$store.getters.getProfileId != null && this.$store.getters.getProfileId == 5)" class="btn btn-info" @click="fetchMatches()">Fetch matches</button>
+  <button
+    v-if="
+      this.$store.getters.getProfileId != null &&
+      this.$store.getters.getProfileId == 5
+    "
+    class="btn btn-info"
+    @click="fetchMatches()"
+  >
+    Fetch matches
+  </button>
   <div class="button-container m-auto row" v-if="this.oneFixtureId == null">
     <div class="col-6 d-flex justify-self-start">
       <button class="btn btn-info btn-purple" @click="scrollLeft">&lt;</button>
@@ -8,28 +16,28 @@
     <div class="col-6 d-flex justify-content-end sticky-end">
       <button class="btn btn-info btn-purple" @click="scrollRight">></button>
     </div>
-    </div>
+  </div>
   <div class="fixtures-container m-auto">
-  <div class="fixtures" ref="fixturesContainer">
-        <FixtureCard
-          v-for="fixture in this.matchesByFixture"
-          :key="fixture.id"
-          :fixture="fixture"
-        />
+    <div class="fixtures" ref="fixturesContainer">
+      <FixtureCard
+        v-for="fixture in this.matchesByFixture"
+        :key="fixture.id"
+        :fixture="fixture"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import FixtureCard from '@/components/Matches/FixtureCard.vue';  
+import FixtureCard from "@/components/Matches/FixtureCard.vue";
 export default {
-  props:{
-    oneFixtureId: Number
+  props: {
+    oneFixtureId: Number,
   },
-name: 'MatchesView',
+  name: "MatchesView",
   components: {
-    FixtureCard
-  },  
+    FixtureCard,
+  },
   data() {
     return {
       fixtureId: null,
@@ -43,8 +51,8 @@ name: 'MatchesView',
     // this.fetchRulesData();
     this.getCurrentFixture();
     this.getFixtures();
-    // this.profile = 
-    console.log(this.profile)
+    // this.profile =
+    console.log(this.profile);
   },
   updated() {
     // this.getFixtures();
@@ -63,9 +71,12 @@ name: 'MatchesView',
     },
     positionScroll() {
       var continueCheck = true;
-      this.matchesByFixture.forEach(element => {
+      this.matchesByFixture.forEach((element) => {
         console.log(new Date(element.fixture.deadlineDate), "vs", Date.now());
-        if(continueCheck && element.fixture.fixtureId != this.$store.getters.getFixtureId) {
+        if (
+          continueCheck &&
+          element.fixture.fixtureId != this.$store.getters.getFixtureId
+        ) {
           console.log("scrolling right");
           console.log(element.fixture.fixtureId);
           console.log(this.$store.getters.getFixtureId);
@@ -74,78 +85,89 @@ name: 'MatchesView',
           console.log("not scrolling right");
           continueCheck = false;
         }
-      }); 
+      });
     },
     formatDate(inputDate) {
-    // Create a Date object from the input string
-        const date = new Date(inputDate);
-        
-        // Get the individual date and time components
-        const day = date.getUTCDate();
-        const month = date.getUTCMonth() + 1; // Months are zero-based
-        const year = date.getUTCFullYear() % 100; // Get the last two digits of the year
-        const hours = date.getHours();
-        const minutes = date.getUTCMinutes();
+      // Create a Date object from the input string
+      const date = new Date(inputDate);
 
-        // Ensure single digits have leading zeros
-        const formattedDay = day < 10 ? `0${day}` : day;
-        const formattedMonth = month < 10 ? `0${month}` : month;
-        const formattedYear = year < 10 ? `0${year}` : year;
-        const formattedHours = hours < 10 ? `0${hours}` : hours;
-        const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+      // Get the individual date and time components
+      const day = date.getUTCDate();
+      const month = date.getUTCMonth() + 1; // Months are zero-based
+      const year = date.getUTCFullYear() % 100; // Get the last two digits of the year
+      const hours = date.getHours();
+      const minutes = date.getUTCMinutes();
 
-        // Construct the formatted date and time string
-        const formattedDate = `${formattedDay}.${formattedMonth}.${formattedYear} ${formattedHours}:${formattedMinutes}`;
+      // Ensure single digits have leading zeros
+      const formattedDay = day < 10 ? `0${day}` : day;
+      const formattedMonth = month < 10 ? `0${month}` : month;
+      const formattedYear = year < 10 ? `0${year}` : year;
+      const formattedHours = hours < 10 ? `0${hours}` : hours;
+      const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
 
-        return formattedDate;
+      // Construct the formatted date and time string
+      const formattedDate = `${formattedDay}.${formattedMonth}.${formattedYear} ${formattedHours}:${formattedMinutes}`;
+
+      return formattedDate;
     },
-    parseDate (datetime) {
-       var jsDate = new Date(datetime);
-       return `${jsDate.getDay()}-${jsDate.getUTCMonth()}-${jsDate.getUTCFullYear()} ${jsDate.getUTCHours()}:${jsDate.getUTCMinutes()}`
+    parseDate(datetime) {
+      var jsDate = new Date(datetime);
+      return `${jsDate.getDay()}-${jsDate.getUTCMonth()}-${jsDate.getUTCFullYear()} ${jsDate.getUTCHours()}:${jsDate.getUTCMinutes()}`;
     },
     getCurrentFixture() {
-            const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixture`
+      const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixture`;
 
-            this.axios.get(url).then((response) => {
-                this.$store.commit('setFixtureId', response.data);
-                console.log("Current fixture: ", this.$store.getters.getFixtureId)
-                
-                // this.$router.push({name: 'LeaguesView'})
-            }).catch(error => {
-                console.log(error.response);
-            });
-        },
-      getFixtures() {
-            const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixtures`
+      this.axios
+        .get(url)
+        .then((response) => {
+          this.$store.commit("setFixtureId", response.data);
+          console.log("Current fixture: ", this.$store.getters.getFixtureId);
 
-            this.axios.get(url).then((response) => {
-              if(this.oneFixtureId == null) {
-                this.matchesByFixture = response.data.fixturesWithMatches.sort((a, b) => a.fixture.order - b.fixture.order);
-              }
-              else{
-                this.matchesByFixture = response.data.fixturesWithMatches.filter((f) => f.fixture.fixtureId == this.oneFixtureId)
-              }
-              this.positionScroll();
-                // this.$router.push({name: 'LeaguesView'})
-            }).catch(error => {
-                console.log(error.response);
-            });
-        },
-        fetchMatches() {
-            const url = `${this.apiURL}Config/${this.$store.getters.getCurrentTournamentId}/fetchMatches`
+          // this.$router.push({name: 'LeaguesView'})
+        })
+        .catch((error) => {
+          console.log(error.response);
+        });
+    },
+    getFixtures() {
+      const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixtures`;
 
-            this.axios.post(url).then((response) => {
-              
-               this.$router.push({name: 'MatchesView'})
-            }).catch(error => {
-                console.log(error.response);
-            });
-        },
+      this.axios
+        .get(url)
+        .then((response) => {
+          if (this.oneFixtureId == null) {
+            this.matchesByFixture = response.data.fixturesWithMatches.sort(
+              (a, b) => a.fixture.order - b.fixture.order
+            );
+          } else {
+            this.matchesByFixture = response.data.fixturesWithMatches.filter(
+              (f) => f.fixture.fixtureId == this.oneFixtureId
+            );
+          }
+          this.positionScroll();
+          // this.$router.push({name: 'LeaguesView'})
+        })
+        .catch((error) => {
+          console.log(error.response);
+        });
+    },
+    fetchMatches() {
+      const url = `${this.apiURL}Config/${this.$store.getters.getCurrentTournamentId}/fetchMatches`;
+
+      this.axios
+        .post(url)
+        .then((response) => {
+          this.$router.push({ name: "MatchesView" });
+        })
+        .catch((error) => {
+          console.log(error.response);
+        });
+    },
   },
   computed: {
     profile() {
-    return this.$store.getters.getProfileId;
-    }
+      return this.$store.getters.getProfileId;
+    },
   },
 };
 </script>
@@ -160,7 +182,7 @@ name: 'MatchesView',
 }
 
 .matches-back {
-    background-color: var(--PRIMARY-LIGHTER);
+  background-color: var(--PRIMARY-LIGHTER);
 }
 .fixtures-container {
   width: 80vw;
@@ -185,9 +207,9 @@ name: 'MatchesView',
 }
 
 ::-webkit-scrollbar {
-    width: 5px;
-    height: 10px;
-    background-color: var(--DARK-YELLOW);
+  width: 5px;
+  height: 10px;
+  background-color: var(--DARK-YELLOW);
 }
 
 .btn-purple {

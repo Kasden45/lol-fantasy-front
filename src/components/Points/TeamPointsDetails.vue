@@ -1,29 +1,16 @@
 <template>
-  <div
-    class="player-tile-container"
-  >
+  <div class="player-tile-container">
     <div class="tile-header row mt-1" v-if="teamTeam">
-      <div class="col-2 inline-text-flag">
-        
-      </div>
+      <div class="col-2 inline-text-flag"></div>
       <div class="col-8 align-content-center">
-        <p class="player-name" 
-        
-        >{{ teamTeam?.league }} </p>
-        <span class="player-name" 
-        
-        >{{ teamTeam?.name }}</span>
+        <p class="player-name">{{ teamTeam?.league }}</p>
+        <span class="player-name">{{ teamTeam?.name }}</span>
       </div>
     </div>
 
     <!-- Player Photo -->
     <div class="image-layer-container mb-1">
-      <img
-        v-if="!teamTeam"
-        :src="img_url"
-        class="role-icon"
-        alt="role icon"
-      />
+      <img v-if="!teamTeam" :src="img_url" class="role-icon" alt="role icon" />
       <img
         v-if="teamTeam"
         :src="teamTeam?.imageUrl"
@@ -31,52 +18,59 @@
         alt="role icon"
       />
       <div
-          v-if="teamTeam && !details"
-          class="captain-button player-image-overlay"
-          @click="showDetails(teamPoints)"
-        >
+        v-if="teamTeam && !details"
+        class="captain-button player-image-overlay"
+        @click="showDetails(teamPoints)"
+      >
         <i class="fa-sharp fa-solid fa-info fa-xl captain-letter"></i>
       </div>
     </div>
-    
+
     <!-- Bottom Info: Price and Points -->
     <div class="tile-footer" v-if="teamTeam && !details">
       <div class="price ps-2">{{ teamTeam?.price?.toFixed(1) }}$</div>
-      <div class="points pe-2">{{ points ? points.toFixed(1) : teamPoints?.totalPoints?.toFixed(1) }}pts</div>
+      <div class="points pe-2">
+        {{
+          points ? points.toFixed(1) : teamPoints?.totalPoints?.toFixed(1)
+        }}pts
+      </div>
     </div>
-    <div class="tile-footer second justify-content-center" v-if="teamTeam && details">
-        <div class="points details pe-2">{{ points ? points.toFixed(1) : teamPoints?.totalPoints?.toFixed(1) }}pts</div>
-      </div>    
+    <div
+      class="tile-footer second justify-content-center"
+      v-if="teamTeam && details"
+    >
+      <div class="points details pe-2">
+        {{
+          points ? points.toFixed(1) : teamPoints?.totalPoints?.toFixed(1)
+        }}pts
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
-    name: "TeamPointsDetails",
-    props:{
-        img_url: String,
-        leagues_icons: Object,
-        teamTeam: Object,
-        points: Number,
-        teamPoints: Object,
-        details: Boolean
+  name: "TeamPointsDetails",
+  props: {
+    img_url: String,
+    leagues_icons: Object,
+    teamTeam: Object,
+    points: Number,
+    teamPoints: Object,
+    details: Boolean,
+  },
+  data() {
+    return {};
+  },
+  methods: {
+    showDetails(playerDetails) {
+      this.$emit("showDetails", playerDetails);
     },
-    data() {
-      return {
-
-        }
-    },
-    methods:{
-      showDetails (playerDetails) {
-        this.$emit('showDetails', playerDetails)
-      }
-    }
-}
-
+  },
+};
 </script>
 
 <style scoped>
-
 .details {
   font-size: x-large;
   justify-content: center;
@@ -92,7 +86,7 @@ export default {
 .captain-player-tile {
   /* background-color: rgb(250, 212, 44) !important; */
   /* border: 2px solid var(--GOLDEN-CAPTAIN) !important; */
-  box-shadow:  8px 8px 8px var(--GOLDEN-CAPTAIN) !important;
+  box-shadow: 8px 8px 8px var(--GOLDEN-CAPTAIN) !important;
 }
 .picked-position {
   /* background-color: rgb(52, 118, 194) !important; */
@@ -129,7 +123,7 @@ export default {
 }
 
 .inline-text-flag {
-display: flex;
+  display: flex;
   align-items: center;
   justify-content: start;
   /* gap: 0.5rem; */
@@ -149,9 +143,7 @@ display: flex;
 }
 .player-tile-container.sub {
   background: var(--GREY-DARKER) !important;
-
 }
-
 
 .role-icon {
   width: 100%;
@@ -202,7 +194,7 @@ display: flex;
   opacity: 0.8;
   height: 100%;
   /* font-weight: bold; */
-  
+
   cursor: pointer;
 }
 .add-button {
@@ -210,10 +202,10 @@ display: flex;
   height: 40%;
   font-size: xx-large;
 }
-.captain-button{
+.captain-button {
   opacity: 0%;
 }
-.image-layer-container:hover .captain-button{
+.image-layer-container:hover .captain-button {
   opacity: 90%;
   color: var(--BLUE);
   height: 40%;

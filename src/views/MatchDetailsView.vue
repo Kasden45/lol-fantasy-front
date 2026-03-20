@@ -2,7 +2,9 @@
   <div class="match-update">
     <h1>Update Match Details</h1>
     <div v-for="game in gameDetails" :key="game.gameId">
-      <button class="btn btn-info" @click="fetchMatchDetailsGOL">Fetch Match Details from gol.gg</button>
+      <button class="btn btn-info" @click="fetchMatchDetailsGOL">
+        Fetch Match Details from gol.gg
+      </button>
       <h2>Game ID: {{ game.gameId }} - Game no.{{ game.gameNumber }}</h2>
       <label>
         Duration:
@@ -28,7 +30,10 @@
       </div>
       <!-- Players -->
       <div v-for="player in game.lolGamePlayersDetails" :key="player.id">
-        <h3>Player: {{ player.teamSlug }} {{ player.summonerName }} - {{ player.role }}</h3>
+        <h3>
+          Player: {{ player.teamSlug }} {{ player.summonerName }} -
+          {{ player.role }}
+        </h3>
         <div class="player-details row">
           <label>
             Triple Kills:
@@ -56,7 +61,6 @@
           </label>
         </div>
       </div>
-      
     </div>
     <button @click="updateMatchDetails">Update Match Details</button>
   </div>
@@ -64,11 +68,11 @@
 
 <script>
 export default {
-  name: 'MatchDetailsView',
+  name: "MatchDetailsView",
   data() {
     return {
       matchId: null,
-      gameDetails: []
+      gameDetails: [],
     };
   },
   mounted() {
@@ -82,54 +86,64 @@ export default {
   methods: {
     async fetchMatchDetails(matchId) {
       try {
-        const response = await fetch(`${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/${matchId}`);
+        const response = await fetch(
+          `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/${matchId}`
+        );
         const data = await response.json();
         this.matchId = data.matchId;
         this.gameDetails = data.gameDetails;
       } catch (error) {
-        console.error('Error fetching match details:', error);
+        console.error("Error fetching match details:", error);
       }
     },
     async updateMatchDetails() {
       try {
-        const response = await fetch(`${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/${this.matchId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            matchId: this.matchId,
-            gameDetails: this.gameDetails
-          })
-        });
+        const response = await fetch(
+          `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/${this.matchId}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              matchId: this.matchId,
+              gameDetails: this.gameDetails,
+            }),
+          }
+        );
         if (!response.ok) {
-          throw new Error('Failed to update match details');
+          throw new Error("Failed to update match details");
         }
-        alert('Match details updated successfully');
+        alert("Match details updated successfully");
       } catch (error) {
-        console.error('Error updating match details:', error);
-        alert('Failed to update match details');
+        console.error("Error updating match details:", error);
+        alert("Failed to update match details");
       }
     },
     async fetchMatchDetailsGOL() {
       try {
-        const response = await fetch(`${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fetch_stats/${this.matchId}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
+        const response = await fetch(
+          `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fetch_stats/${this.matchId}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
           }
-        });
+        );
         if (!response.ok) {
-          throw new Error('Failed to update match details');
+          throw new Error("Failed to update match details");
         }
         const data = await response.json();
-        alert(`Match details updated successfully ${data.gameDetails[0].duration}`);
+        alert(
+          `Match details updated successfully ${data.gameDetails[0].duration}`
+        );
       } catch (error) {
-        console.error('Error updating match details:', error);
-        alert('Failed to update match details');
+        console.error("Error updating match details:", error);
+        alert("Failed to update match details");
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

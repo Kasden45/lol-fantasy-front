@@ -1,25 +1,23 @@
 <template>
-
   <div
     class="player-tile-container"
     :class="{
       'picked-position': currentlyPicked === role && !teamPlayer,
       'captain-player-tile': isCaptain,
-      'sub': role =='sub'
+      sub: role == 'sub',
     }"
   >
     <!-- Team and Player Name -->
     <div class="tile-header row" v-if="teamPlayer">
       <div class="col-2 inline-text-flag">
         <img
-          
           class="flag"
           :src="getLeagueFlag(teamPlayer?.team?.league)"
           alt="flag"
         />
       </div>
       <div class="col-8 align-content-center">
-        <div class="team-name">{{ teamPlayer?.team.code || ' ' }}</div>
+        <div class="team-name">{{ teamPlayer?.team.code || " " }}</div>
       </div>
       <div class="col-2 inline-text-flag role-sub">
         <div
@@ -29,32 +27,23 @@
         >
           <i class="flag fas fa-circle-minus fa-xl"></i>
         </div>
-        
       </div>
     </div>
     <div class="tile-header row mt-1" v-if="teamPlayer">
       <div class="col-2 inline-text-flag">
-        <img
-          
-          class="flag"
-          :src="getFlag(teamPlayer?.nationality)"
-          alt="flag"
-        />
+        <img class="flag" :src="getFlag(teamPlayer?.nationality)" alt="flag" />
       </div>
       <div class="col-8 align-content-center">
-        <span class="player-name" 
-        :class="{
-          'captain-player': isCaptain
-        }"
-        >{{ teamPlayer?.summonerName }}</span>
+        <span
+          class="player-name"
+          :class="{
+            'captain-player': isCaptain,
+          }"
+          >{{ teamPlayer?.summonerName }}</span
+        >
       </div>
-      <div v-if="teamPlayer" class="col-2 inline-text-flag role-sub" >
-           <img
-          
-          class="flag "
-          :src="roles_img_url[teamPlayer?.role]"
-          alt="flag"
-        />
+      <div v-if="teamPlayer" class="col-2 inline-text-flag role-sub">
+        <img class="flag" :src="roles_img_url[teamPlayer?.role]" alt="flag" />
       </div>
     </div>
 
@@ -80,21 +69,21 @@
         alt="player image"
       />
       <div
-          v-if="!teamPlayer"
-          class="action-button add-button player-image-overlay"
-          @click="addPlayerToRole(role)"
-        >
+        v-if="!teamPlayer"
+        class="action-button add-button player-image-overlay"
+        @click="addPlayerToRole(role)"
+      >
         <i class="fas fa-circle-plus fa-xl"></i>
       </div>
       <div
-          v-if="teamPlayer && role != 'sub'"
-          class="captain-button player-image-overlay"
-          @click="setCaptain(role)"
-        >
+        v-if="teamPlayer && role != 'sub'"
+        class="captain-button player-image-overlay"
+        @click="setCaptain(role)"
+      >
         <i class="fa-sharp fa-solid fa-star fa-xl captain-letter"></i>
       </div>
     </div>
-    
+
     <!-- Bottom Info: Price and Points -->
     <div class="tile-footer" v-if="teamPlayer">
       <div class="price ps-2">${{ teamPlayer?.price?.toFixed(1) }}</div>
@@ -106,65 +95,57 @@
     </div>
 
     <!-- Add/Remove Button -->
-    <div class="tile-actions" >
-      
-    </div>
-    
+    <div class="tile-actions"></div>
   </div>
 </template>
 
 <script>
-import PlayerTileV2 from "@/components/TeamSelection-v2/PlayerTile-v2.vue"
+import PlayerTileV2 from "@/components/TeamSelection-v2/PlayerTile-v2.vue";
 export default {
-    name: "PlayerTeamTileV2",
-    props:{
-        img_url: String,
-        roles_img_url: Object,
-        teamPlayer: Object,
-        role: String,
-        currentlyPicked: String,
-        isCaptain: Boolean
+  name: "PlayerTeamTileV2",
+  props: {
+    img_url: String,
+    roles_img_url: Object,
+    teamPlayer: Object,
+    role: String,
+    currentlyPicked: String,
+    isCaptain: Boolean,
+  },
+  components: {
+    PlayerTileV2,
+  },
+  data() {
+    return {};
+  },
+  methods: {
+    setCaptain(role) {
+      this.$emit("captainPick", role);
     },
-    components: {
-      PlayerTileV2
+    getLeagueFlag(league) {
+      // Placeholder for region flag logic
+      return this.$func_global.leagues_icons[league];
     },
-    data() {
-      return {
-
-        }
+    getFlag(countryCode) {
+      if (countryCode == null) return this.$func_global.nation_flag["Default"];
+      else {
+        if (countryCode in this.$func_global.nation_flag)
+          return this.$func_global.nation_flag[countryCode];
+        else return this.$func_global.nation_flag["Default"];
+      }
+      return `/flags/${countryCode.toLowerCase()}.png`; // or use CDN
     },
-    methods:{
-      setCaptain(role) {
-        this.$emit("captainPick", role);
-      },
-      getLeagueFlag(league) {
-        // Placeholder for region flag logic
-        return this.$func_global.leagues_icons[league];
-      },
-      getFlag(countryCode) {
-        if (countryCode == null)
-          return this.$func_global.nation_flag['Default']
-        else {
-          if (countryCode in this.$func_global.nation_flag)
-            return this.$func_global.nation_flag[countryCode]
-          else
-            return this.$func_global.nation_flag['Default']
-        }
-        return `/flags/${countryCode.toLowerCase()}.png`; // or use CDN
-      },
-        removePlayerFromRole(role) {
+    removePlayerFromRole(role) {
       // Emit an event to notify the parent component (App) about the selected player
-        console.log("usuwam z ", role)
-        this.$emit("playerRemove", role);
-      },
-      addPlayerToRole(role) {
+      console.log("usuwam z ", role);
+      this.$emit("playerRemove", role);
+    },
+    addPlayerToRole(role) {
       // Emit an event to notify the parent component (App) about the selected player
-        console.log("chce dodac do ", role)
-        this.$emit("rolePick", role);
-      },
-    }
-}
-
+      console.log("chce dodac do ", role);
+      this.$emit("rolePick", role);
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -176,7 +157,7 @@ export default {
   color: var(--GOLDEN-CAPTAIN) !important;
 }
 .captain-player-tile {
-  box-shadow:  -8px -8px 8px var(--GOLDEN-CAPTAIN) !important;
+  box-shadow: -8px -8px 8px var(--GOLDEN-CAPTAIN) !important;
 }
 .picked-position {
   box-shadow: 8px 8px 8px rgb(52, 118, 194) !important;
@@ -224,7 +205,7 @@ export default {
 }
 
 .flag {
-  width: 1.0rem;
+  width: 1rem;
   /* height: 12px; */
   object-fit: cover;
   border-radius: 2px;
@@ -235,15 +216,13 @@ export default {
 }
 .player-tile-container.sub {
   background: var(--GREY-DARKER) !important;
-
 }
-
 
 .role-icon {
   width: 100%;
   /* height: 100%; */
   object-fit: cover;
-  opacity: 0.50;
+  opacity: 0.5;
   z-index: 1;
   border-radius: 0.5rem;
 }
@@ -289,7 +268,7 @@ export default {
   opacity: 0.8;
   height: 100%;
   /* font-weight: bold; */
-  
+
   cursor: pointer;
 }
 .add-button {
@@ -297,10 +276,10 @@ export default {
   height: 40%;
   font-size: xx-large;
 }
-.captain-button{
+.captain-button {
   opacity: 0%;
 }
-.image-layer-container:hover .captain-button{
+.image-layer-container:hover .captain-button {
   opacity: 90%;
   color: var(--GOLDEN-CAPTAIN);
   height: 40%;
