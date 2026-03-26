@@ -118,222 +118,56 @@
 
     <!-- Players Grid -->
     <div class="players-grid">
-      <div
+      <PlayerDraftCard
         v-if="selectedFilter !== 'team'"
         v-for="player in filteredAndSortedPlayers"
         :key="player.esportsPlayerId"
-        class="player-card"
-        :class="{
-          'player-inactive': !teamsPlayingNextFixture.includes(
-            player.team.code
-          ),
-          'already-owned': Object.keys(userTeamsPicked).includes(
-            player.esportsPlayerId
-          ),
-          disabled:
-            !teamsPlayingNextFixture.includes(player.team.code) ||
-            (selectedRole !== player.role && selectedRole !== 'sub') ||
-            Object.keys(userTeamsPicked).includes(player.esportsPlayerId),
-        }"
-        @click="handlePlayerClick(player)"
-      >
-        <!-- Team and Role Badge {{ player.team.code }} -->
-        <div class="player-header">
-          <span class="team-badge">vs {{ matchups[player.team.code] }}</span>
-          <span class="role-badge" :class="`role-${player.role.toLowerCase()}`">
-            {{ player.role.toUpperCase() }}
-          </span>
-        </div>
-
-        <!-- Player Image -->
-        <div class="player-image-container">
-          <img
-            :src="player.imageUrl"
-            :alt="player.summonerName"
-            class="player-image"
-            @error="handleImageError"
-          />
-          <div
-            v-if="userTeam.includes(player.esportsPlayerId)"
-            class="owned-overlay"
-          >
-            YOURS
-          </div>
-          <div
-            v-else-if="
-              Object.keys(userTeamsPicked).includes(player.esportsPlayerId)
-            "
-            class="owned-rival-overlay"
-          >
-            {{ userTeamsPicked[player.esportsPlayerId].username }}
-          </div>
-          <div
-            v-else-if="!teamsPlayingNextFixture.includes(player.team.code)"
-            class="inactive-overlay"
-          >
-            INACTIVE
-          </div>
-        </div>
-
-        <!-- Player Name -->
-        <div class="player-name">
-          {{ player.team.code }} {{ player.summonerName }}
-        </div>
-
-        <!-- Player Stats -->
-        <div class="player-stats">
-          <div class="stat">
-            <div class="stat-value">{{ player.price }}</div>
-            <div class="stat-label">Price</div>
-          </div>
-          <div class="stat">
-            <div class="stat-value">{{ player.points.toFixed(0) }}</div>
-            <div class="stat-label">Pts</div>
-          </div>
-          <div class="stat">
-            <div class="stat-value">
-              {{
-                player.gamesPlayed === 0
-                  ? "-"
-                  : (player.points / player.gamesPlayed).toFixed(1)
-              }}
-            </div>
-            <div class="stat-label">Pts/G</div>
-          </div>
-        </div>
-
-        <!-- Action Button -->
-        <button
-          class="add-player-btn"
-          :class="{
-            'btn-available':
-              teamsPlayingNextFixture.includes(player.team.code) &&
-              (selectedRole === player.role || selectedRole === 'sub'),
-            'btn-unavailable':
-              !teamsPlayingNextFixture.includes(player.team.code) ||
-              (selectedRole !== player.role && selectedRole !== 'sub'),
-          }"
-          :disabled="
-            !teamsPlayingNextFixture.includes(player.team.code) ||
-            (selectedRole !== player.role && selectedRole !== 'sub') ||
-            Object.keys(userTeamsPicked).includes(player.esportsPlayerId)
-          "
-          @click.stop="selectPlayer(player)"
-        >
-          <span v-if="userTeam.includes(player.esportsPlayerId)">✓</span>
-          <span v-else>+</span>
-        </button>
-      </div>
+        :player="player"
+        :selectedRole="selectedRole"
+        :teamsPlayingNextFixture="teamsPlayingNextFixture"
+        :userTeam="userTeam"
+        :userTeamsPicked="userTeamsPicked"
+        :matchups="matchups"
+        :swapMode="swapMode"
+        :selectedForSwap="
+          selectedForSwap?.esportsPlayerId === player.esportsPlayerId
+            ? true
+            : false
+        "
+        @select="selectPlayer"
+      />
       <!-- Teams -->
-      <div
+      <TeamDraftCard
         v-if="selectedFilter === 'team'"
         v-for="team in filteredAndSortedTeams"
         :key="team.code"
-        class="player-card"
-        :class="{
-          'player-inactive': !teamsPlayingNextFixture.includes(team.code),
-          'already-owned': Object.keys(userTeamsPicked).includes(
-            team.esportsTeamId
-          ),
-          disabled:
-            !teamsPlayingNextFixture.includes(team.code) ||
-            selectedRole !== 'team' ||
-            Object.keys(userTeamsPicked).includes(team.esportsTeamId),
-        }"
-        @click="handleTeamClick(team)"
-      >
-        <div class="player-header">
-          <span class="team-badge">vs {{ matchups[team.code] }}</span>
-          <span class="role-badge">TEAM</span>
-        </div>
-
-        <div class="player-image-container">
-          <img
-            :src="team.imageUrl"
-            :alt="team.name"
-            class="player-image"
-            @error="handleImageError"
-          />
-          <div
-            v-if="userTeam.includes(team.esportsTeamId)"
-            class="owned-overlay"
-          >
-            OWNED
-          </div>
-          <div
-            v-else-if="
-              Object.keys(userTeamsPicked).includes(team.esportsTeamId)
-            "
-            class="owned-rival-overlay"
-          >
-            {{ userTeamsPicked[team.esportsTeamId].username }}
-          </div>
-          <div
-            v-else-if="!teamsPlayingNextFixture.includes(team.code)"
-            class="inactive-overlay"
-          >
-            INACTIVE
-          </div>
-        </div>
-
-        <div class="player-name">{{ team.name }}</div>
-
-        <div class="player-stats">
-          <div class="stat">
-            <div class="stat-value">{{ team.price }}</div>
-            <div class="stat-label">Price</div>
-          </div>
-          <div class="stat">
-            <div class="stat-value">{{ team.points.toFixed(0) }}</div>
-            <div class="stat-label">Pts</div>
-          </div>
-          <div class="stat">
-            <div class="stat-value">
-              {{
-                team.gamesPlayed === 0
-                  ? "-"
-                  : (team.points / team.gamesPlayed).toFixed(1)
-              }}
-            </div>
-            <div class="stat-label">Pts/G</div>
-          </div>
-        </div>
-
-        <button
-          class="add-player-btn"
-          :class="{
-            'btn-available': teamsPlayingNextFixture.includes(team.code),
-            'btn-unavailable': !teamsPlayingNextFixture.includes(team.code),
-          }"
-          :disabled="
-            !teamsPlayingNextFixture.includes(team.code) ||
-            Object.keys(userTeamsPicked).includes(team.esportsTeamId)
-          "
-          @click.stop="selectTeam(team)"
-        >
-          <span v-if="userTeam.includes(team.esportsTeamId)">✓</span>
-          <span v-else>+</span>
-        </button>
-      </div>
-      <!-- Empty State -->
-      <div
-        v-if="
-          filteredAndSortedPlayers.length === 0 &&
-          filteredAndSortedTeams.length === 0
+        :team="team"
+        :selectedRole="selectedRole"
+        :teamsPlayingNextFixture="teamsPlayingNextFixture"
+        :userTeam="userTeam"
+        :userTeamsPicked="userTeamsPicked"
+        :matchups="matchups"
+        :swapMode="swapMode"
+        :selectedForSwap="
+          selectedForSwap?.esportsTeamId === team.esportsTeamId ? true : false
         "
-        class="empty-state"
-      >
-        <div class="empty-icon">🔍</div>
-        <div class="empty-text">No players found</div>
-        <div class="empty-subtext">Try adjusting your filters</div>
-      </div>
+        @select="selectTeam"
+      />
     </div>
   </div>
 </template>
 
 <script>
+import PlayerDraftCard from "@/components/Draft/PlayersListDraftPlayer.vue";
+import TeamDraftCard from "@/components/Draft/PlayersListDraftTeam.vue";
 export default {
+  components: {
+    PlayerDraftCard,
+    TeamDraftCard,
+  },
   props: {
+    swapMode: Boolean,
+    selectedForSwap: Object,
     nextFixture: Object,
     userTeam: Array,
     userTeamsPicked: Object,
@@ -366,7 +200,7 @@ export default {
     },
     uniqueTeamCodes() {
       return Array.from(
-        new Set(this.players.map((player) => player.team.code))
+        new Set(this.players.map((player) => player.team.code)),
       ).sort();
     },
     filteredAndSortedPlayers() {
@@ -374,14 +208,14 @@ export default {
         (p) =>
           p.price > 0 &&
           (!this.hideInactive ||
-            this.teamsPlayingNextFixture.includes(p.team.code))
+            this.teamsPlayingNextFixture.includes(p.team.code)),
       );
     },
     filteredAndSortedTeams() {
       return this.sortedTeams.filter(
         (t) =>
           t.price > 0 &&
-          (!this.hideInactive || this.teamsPlayingNextFixture.includes(t.code))
+          (!this.hideInactive || this.teamsPlayingNextFixture.includes(t.code)),
       );
     },
   },
@@ -436,7 +270,7 @@ export default {
         this.sortedPlayers.sort((a, b) =>
           a.summonerName
             .toLowerCase()
-            .localeCompare(b.summonerName.toLowerCase())
+            .localeCompare(b.summonerName.toLowerCase()),
         );
       }
       if (option === "priceAsc") {
@@ -447,7 +281,7 @@ export default {
       }
       if (option === "team") {
         this.sortedPlayers.sort((a, b) =>
-          a.team.name.toLowerCase().localeCompare(b.team.name.toLowerCase())
+          a.team.name.toLowerCase().localeCompare(b.team.name.toLowerCase()),
         );
       }
     },
@@ -476,7 +310,7 @@ export default {
       }
       if (option === "name") {
         this.sortedTeams.sort((a, b) =>
-          a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+          a.name.toLowerCase().localeCompare(b.name.toLowerCase()),
         );
       }
       if (option === "priceAsc") {
@@ -488,7 +322,7 @@ export default {
     },
     extractUniqueTeamCodes() {
       this.uniqueTeamCodes = Array.from(
-        new Set(this.players.map((player) => player.team.code))
+        new Set(this.players.map((player) => player.team.code)),
       ).sort();
     },
     filterPlayers(option) {
@@ -515,7 +349,7 @@ export default {
       // Apply role filter
       if (
         ["top", "jungle", "mid", "bottom", "support", "team"].includes(
-          this.selectedFilter
+          this.selectedFilter,
         )
       ) {
         filtered = filtered.filter((p) => p.role === this.selectedFilter);
@@ -527,7 +361,7 @@ export default {
         this.selectedTeamFilter !== "team"
       ) {
         filtered = filtered.filter(
-          (p) => p.team.code === this.selectedTeamFilter
+          (p) => p.team.code === this.selectedTeamFilter,
         );
       }
 
@@ -578,7 +412,7 @@ export default {
           "Selected role changed to:",
           this.selectedRole,
           " - applying filters with filter:",
-          this.selectedFilter
+          this.selectedFilter,
         );
         if (this.selectedRole === "team") {
           this.applyFiltersTeams();

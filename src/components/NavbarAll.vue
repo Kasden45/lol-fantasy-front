@@ -383,7 +383,7 @@ export default {
     async deadlineCountdown() {
       if (this.$store.getters.getNextFixture != null) {
         const deadline = new Date(
-          this.$store.getters.getNextFixture.fixture.deadlineDate
+          this.$store.getters.getNextFixture.fixture.deadlineDate,
         );
         const now = new Date();
         const diff = deadline - now;
@@ -391,7 +391,7 @@ export default {
         const hours = Math.floor((diff % 864e5) / 36e5);
         const minutes = Math.floor((diff % 36e5) / 6e4);
         const seconds = Math.floor((diff % 6e4) / 1000);
-        console.log(`${days}d ${hours}h ${minutes}m ${seconds}s`);
+        // console.log(`${days}d ${hours}h ${minutes}m ${seconds}s`);
         this.timeToDeadline = `${days}d ${hours}h ${minutes}m ${seconds}s`;
       }
     },

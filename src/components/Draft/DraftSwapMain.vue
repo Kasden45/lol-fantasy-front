@@ -6,17 +6,17 @@
       <div class="tab-navigation">
         <button
           class="tab-btn"
-          :class="{ active: activeTab === 'others' }"
-          @click="activeTab = 'others'"
-        >
-          Swap with Others
-        </button>
-        <button
-          class="tab-btn"
           :class="{ active: activeTab === 'unused' }"
           @click="activeTab = 'unused'"
         >
           Swap with player pool
+        </button>
+        <button
+          class="tab-btn"
+          :class="{ active: activeTab === 'others' }"
+          @click="activeTab = 'others'"
+        >
+          Swap with Others
         </button>
       </div>
       <!-- Left Panel: Your Team Selection -->
@@ -34,20 +34,10 @@
           :next-fixture="nextFixture"
           :your-turn="false"
           :selected-role="selectedYourRole"
+          :swap-mode="true"
           @choose-role="selectFromYourTeam"
+          @choose-player="selectPlayerFromYourTeam"
         />
-
-        <div v-if="selectedFromYourTeam" class="selected-badge">
-          <span class="badge-text"
-            >Selected:
-            {{
-              selectedFromYourTeam.summonerName || selectedFromYourTeam.name
-            }}</span
-          >
-          <button class="badge-clear" @click="selectedFromYourTeam = null">
-            ✕
-          </button>
-        </div>
       </div>
 
       <!-- Middle Panel: Swap Direction & Submit -->
@@ -58,15 +48,26 @@
 
         <div
           class="swap-target-info"
-          v-if="selectedFromYourTeam && selectedTargetTeam"
+          v-if="
+            selectedFromYourTeam &&
+            (selectedFromTargetTeam ||
+              (selectedFromUnusedPlayers && activeTab === 'unused'))
+          "
         >
           <div class="target-team-name">
-            {{ getTeamName(selectedTargetTeam) }}
+            {{ getTeamName(selectedTeamId) }}
           </div>
+          <SwapCard :swap="proposedSwapData"> </SwapCard>
           <button
+            :title="!canSwap ? errorMessage : 'Propose this swap'"
             class="propose-swap-btn"
             @click="proposeSwap"
-            :disabled="!selectedFromYourTeam || !selectedFromTargetTeam"
+            :disabled="
+              !selectedFromYourTeam ||
+              (!selectedFromTargetTeam &&
+                !(selectedFromUnusedPlayers && activeTab === 'unused')) ||
+              canSwap === false
+            "
           >
             Propose Swap
           </button>
@@ -92,19 +93,7 @@
               >
             </div>
 
-            <slot></slot>
-
-            <div v-if="selectedFromUnusedPlayers" class="selected-badge">
-              <span class="badge-text"
-                >Selected: {{ selectedFromUnusedPlayers.summonerName }}</span
-              >
-              <button
-                class="badge-clear"
-                @click="selectedFromUnusedPlayers = null"
-              >
-                ✕
-              </button>
-            </div>
+            <slot @playerSelect="selectPlayerFromYourTeam"></slot>
           </div>
 
           <!-- Right Panel: Other Teams Selection -->
@@ -118,7 +107,7 @@
 
           <div class="teams-selector">
             <div
-              v-for="(team, clientId) in otherTeams"
+              v-for="(userTeam, clientId) in otherTeams"
               :key="clientId"
               class="team-selector-btn"
               :class="{ active: selectedTeamId === clientId }"
@@ -127,14 +116,15 @@
               <span class="team-selector-name">
                 {{
                   draftParticipants.find((p) => p.id === clientId)?.username ||
-                  "Team " + clientId
+                  "Team " + userTeam.user.username
                 }}
               </span>
               <span class="team-selector-count">
                 {{
-                  Object.values(team).filter((pos) => pos.player || pos.team)
-                    .length
-                }}/{{ Object.keys(team).length }}
+                  Object.values(userTeam.team).filter(
+                    (pos) => pos != null && (pos.player || pos.team),
+                  ).length
+                }}/{{ Object.keys(userTeam.team).length }}
               </span>
             </div>
           </div>
@@ -147,29 +137,15 @@
               :own-team="false"
               :next-fixture="nextFixture"
               :your-turn="false"
+              :swap-mode="true"
               :rival-name="
-                draftParticipants.find((p) => p.id === selectedTeamId)
-                  ?.username || 'Unknown'
+                this.otherTeams[this.selectedTeamId]?.user?.username ||
+                'Unknown'
               "
               :selected-role="selectedTargetRole"
               @choose-role="selectFromTargetTeam"
+              @choose-player="selectPlayerFromYourTeam"
             />
-
-            <div v-if="selectedFromTargetTeam" class="selected-badge">
-              <span class="badge-text"
-                >Selected:
-                {{
-                  selectedFromTargetTeam.summonerName ||
-                  selectedFromTargetTeam.name
-                }}</span
-              >
-              <button
-                class="badge-clear"
-                @click="selectedFromTargetTeam = null"
-              >
-                ✕
-              </button>
-            </div>
           </div>
 
           <div v-else class="no-team-selected">
@@ -180,67 +156,31 @@
     </div>
 
     <!-- Swap History / Pending Swaps -->
-    <div class="swap-history-section">
-      <div class="history-header">
-        <h3>Pending Swap Requests</h3>
-        <span v-if="pendingSwaps.length" class="swap-count">{{
-          pendingSwaps.length
-        }}</span>
-      </div>
-
-      <div v-if="pendingSwaps.length > 0" class="swap-requests-list">
-        <div
-          v-for="(swap, index) in pendingSwaps"
-          :key="index"
-          class="swap-request-card"
-        >
-          <div class="swap-request-header">
-            <span class="swap-from">From: {{ swap.fromTeam }}</span>
-            <span class="swap-arrow-small">→</span>
-            <span class="swap-to">To: {{ swap.toTeam }}</span>
-          </div>
-
-          <div class="swap-request-body">
-            <div class="swap-player">
-              <img
-                :src="swap.fromPlayer.imageUrl"
-                :alt="swap.fromPlayer.summonerName"
-              />
-              <span>{{ swap.fromPlayer.summonerName }}</span>
-            </div>
-            <span class="for-text">for</span>
-            <div class="swap-player">
-              <img
-                :src="swap.toPlayer.imageUrl"
-                :alt="swap.toPlayer.summonerName"
-              />
-              <span>{{ swap.toPlayer.summonerName }}</span>
-            </div>
-          </div>
-
-          <div class="swap-request-actions">
-            <button class="action-btn cancel-btn" @click="cancelSwap(index)">
-              Cancel
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div v-else class="no-swaps">
-        <p>No pending swap requests</p>
-      </div>
-    </div>
+    <SwapsHistory
+      :fixtures="fixtures"
+      :pending-swaps="pendingSwaps"
+      @refresh-swaps="fetchSwaps"
+      @refresh-teams="refreshTeams"
+      @open-details="openDetailsModal"
+    />
   </div>
 </template>
 
 <script>
 import socket from "@/socket.js";
-import TeamRoster from "@/components/ChatTest/TeamDisplayDraft.vue";
-
+import TeamRoster from "@/components/Draft/TeamDisplayDraft.vue";
+import MyModal from "../MyModal.vue";
+import ComparePlayers from "./ComparePlayers.vue";
+import SwapsHistory from "./SwapsHistory.vue";
+import SwapCard from "./SwapCard.vue";
 export default {
-  name: "DraftSwapPlayers",
+  name: "DraftSwapMain",
   components: {
     TeamRoster,
+    MyModal,
+    ComparePlayers,
+    SwapsHistory,
+    SwapCard,
   },
   props: {
     selectedTeam: {
@@ -267,78 +207,282 @@ export default {
       type: String,
       required: true,
     },
+    realLeagueId: {
+      type: Number,
+      required: true,
+    },
+    selectedFromUnusedPlayers: {
+      type: Object,
+      default: null,
+    },
+    fixtures: {
+      type: Object,
+    },
   },
   data() {
     return {
-      activeTab: "others",
+      openModal: false,
+      activeTab: "unused",
       selectedFromYourTeam: null,
       selectedFromTargetTeam: null,
       selectedTeamId: null,
       selectedYourRole: null,
       selectedTargetRole: null,
+      rivalUserTeamId: null,
       pendingSwaps: [],
+      timeToDeadline: "",
+      currentSwap: null,
+      errorMessage: "",
     };
   },
   computed: {
+    proposedSwapData() {
+      if (!this.selectedFromYourTeam) return null;
+
+      return {
+        tradeInitiatorUserTeam: {
+          userId: this.profileId,
+          userLogin: "You",
+        },
+        tradeReceiverUserTeam: {
+          userId: this.rivalUserTeamId,
+          userLogin: this.getTeamName(),
+        },
+        playerInitiator: this.selectedFromYourTeam,
+        playerReceiver:
+          this.activeTab === "unused"
+            ? this.selectedFromUnusedPlayers
+            : this.selectedFromTargetTeam,
+        status: -1,
+      };
+    },
+    canSwap() {
+      if (this.activeTab === "unused") {
+        if (!(!!this.selectedFromYourTeam && !!this.selectedFromUnusedPlayers))
+          return false;
+
+        const fromPlayer = this.selectedFromYourTeam;
+        const toPlayer = this.selectedFromUnusedPlayers;
+
+        // Check if both are players or both are teams
+        const fromIsPlayer = !!fromPlayer.summonerName;
+        const toIsPlayer = !!toPlayer.summonerName;
+
+        if (fromIsPlayer !== toIsPlayer) {
+          this.errorMessage =
+            "You can only swap players with players and teams with teams.";
+          return false; // Can't swap a player for a team or vice versa
+        }
+        if (
+          this.selectedFromYourTeam.role !=
+            this.selectedFromUnusedPlayers.role &&
+          !(this.selectedYourRole == "sub")
+        ) {
+          this.errorMessage =
+            "You can only swap players of the same role, unless swapping with a substitute.";
+          return false;
+        }
+        return true;
+      } else {
+        if (
+          !this.selectedFromYourTeam ||
+          !this.selectedFromTargetTeam ||
+          (!(
+            this.selectedYourRole == "sub" && this.selectedTargetRole == "sub"
+          ) &&
+            this.selectedFromYourTeam.role != this.selectedFromTargetTeam.role)
+        ) {
+          this.errorMessage =
+            "You can only swap players of the same role, unless both are substitutes.";
+          return false;
+        }
+        const fromPlayer = this.selectedFromYourTeam;
+        const toPlayer = this.selectedFromTargetTeam;
+
+        // Check if both are players or both are teams
+        const fromIsPlayer = !!fromPlayer.summonerName;
+        const toIsPlayer = !!toPlayer.summonerName;
+
+        if (fromIsPlayer !== toIsPlayer) {
+          this.errorMessage =
+            "You can only swap players with players and teams with teams.";
+          return false; // Can't swap a player for a team or vice versa
+        }
+
+        return true; // Valid swap
+      }
+    },
     selectedTeamData() {
-      return this.selectedTeamId ? this.otherTeams[this.selectedTeamId] : null;
+      console.log(
+        "Selected Team ID:",
+        this.otherTeams[this.selectedTeamId].team,
+      );
+      return this.selectedTeamId
+        ? this.transformTeamData(this.otherTeams[this.selectedTeamId]).result
+        : null;
     },
   },
   methods: {
+    refreshTeams() {
+      console.log("forcing refetch");
+      this.$emit("refetch-teams");
+    },
+    openDetailsModal(swap) {
+      this.currentSwap = swap;
+      this.openModal = true;
+    },
+    closeDetailsModal(name) {
+      // console.log(detailsData)
+      this.openModal = false;
+      // this.detailsData = detailsData
+    },
+    async fetchSwaps() {
+      try {
+        const response = await this.axios.get(
+          `${this.apiURL}Draft/${this.$store.getters.getCurrentTournamentId}/trades/${this.realLeagueId}`,
+        );
+        this.pendingSwaps = response.data.draftTrades;
+        // this.sortedPlayers = this.players;
+      } catch (error) {
+        console.error("Error fetching swaps:", error);
+      }
+    },
+    transformTeamData(data) {
+      const team = data.team;
+      const user = data.user;
+
+      if (!team || !user) return null;
+
+      const roleMap = {
+        topPlayerPoints: "top",
+        junglePlayerPoints: "jungle",
+        midPlayerPoints: "mid",
+        bottomPlayerPoints: "bottom",
+        supportPlayerPoints: "support",
+        subPlayerPoints: "sub",
+      };
+
+      const result = {};
+
+      for (const [key, role] of Object.entries(roleMap)) {
+        const playerData = team?.[key]?.player || null;
+
+        result[key.replace("Points", "")] = {
+          role,
+          player: playerData,
+        };
+      }
+
+      result.team = {
+        role: "team",
+        team: team.teamPoints?.team || null,
+      };
+
+      return {
+        result,
+      };
+    },
     selectFromYourTeam(role) {
+      console.log("Selected from your team:", role);
       this.selectedYourRole = role;
+      this.$emit("choose-role", role);
       // In actual implementation, emit event to parent to select player from pool
+    },
+    selectPlayerFromYourTeam(player, ownTeam, profileId) {
+      console.log(
+        "Selected player from your team:",
+        player,
+        ownTeam,
+        profileId,
+      );
+      if (ownTeam && profileId === this.profileId) {
+        this.selectedFromYourTeam = player;
+      } else {
+        this.selectedFromTargetTeam = player;
+        console.warn("Attempted to select player from another team");
+      }
     },
     selectFromTargetTeam(role) {
       this.selectedTargetRole = role;
     },
     selectTeamToSwapWith(clientId) {
       this.selectedTeamId = this.selectedTeamId === clientId ? null : clientId;
+      this.rivalUserTeamId =
+        this.otherTeams[this.selectedTeamId]?.team?.userTeamId || null;
       this.selectedFromTargetTeam = null;
       this.selectedTargetRole = null;
     },
     getTeamName(team) {
-      const participant = this.draftParticipants.find(
-        (p) => p.id === this.selectedTeamId
-      );
-      return participant ? participant.username : "Unknown Team";
+      if (this.activeTab === "unused") return "Player Pool";
+
+      return this.otherTeams[this.selectedTeamId]?.user?.username || "Unknown";
     },
-    proposeSwap() {
-      if (
-        !this.selectedFromYourTeam ||
-        !this.selectedFromTargetTeam ||
-        !this.selectedTeamId
-      ) {
+    async proposeSwapFromPlayerPool() {
+      // Similar to proposeSwap but for players from the pool
+      const swapRequest = {
+        LeagueId: this.realLeagueId,
+        PlayerInitiatorId: this.selectedFromYourTeam.esportsPlayerId,
+        PlayerReceiverId: this.selectedFromUnusedPlayers.esportsPlayerId,
+        TeamInitiatorId: this.selectedFromYourTeam.slug,
+        TeamReceiverId: this.selectedFromUnusedPlayers.slug,
+        TradeInitiatorUserTeamId: this.selectedTeam.userTeamId,
+        TradeReceiverUserTeamId: 0,
+      };
+
+      console.log("Proposing from player pool swap with data:", swapRequest);
+      try {
+        const response = await this.axios.post(
+          `${this.apiURL}Draft/${this.$store.getters.getCurrentTournamentId}/trades/${this.$store.getters.getProfileId}`,
+          swapRequest,
+        );
+        console.log("Swap created", response.data);
+        await this.fetchSwaps();
+        console.log("to refetch");
+        this.$emit("refetch-teams");
+        console.log("refetched?");
+        this.selectedFromYourTeam = null;
+        // this.selectedFromUnusedPlayers = null;
+        this.selectedTeamId = null;
+      } catch (error) {
+        console.error("Error swapping", error);
+      }
+    },
+    async proposeSwap() {
+      if (!this.canSwap) {
         console.log("Missing swap data");
         return;
       }
 
+      if (this.activeTab === "unused" && this.selectedFromUnusedPlayers) {
+        console.log("Proposing swap with player pool");
+        this.proposeSwapFromPlayerPool();
+        return;
+      }
+
       const swapRequest = {
-        fromTeamId: this.profileId,
-        fromTeamName: "Your Team",
-        fromPlayer: this.selectedFromYourTeam,
-        toTeamId: this.selectedTeamId,
-        toTeamName: this.getTeamName(),
-        toPlayer: this.selectedFromTargetTeam,
-        leagueId: this.leagueId,
+        LeagueId: this.realLeagueId,
+        PlayerInitiatorId: this.selectedFromYourTeam.esportsPlayerId,
+        PlayerReceiverId: this.selectedFromTargetTeam.esportsPlayerId,
+        TeamInitiatorId: this.selectedFromYourTeam.slug,
+        TeamReceiverId: this.selectedFromTargetTeam.slug,
+        TradeInitiatorUserTeamId: this.selectedTeam.userTeamId,
+        TradeReceiverUserTeamId: this.rivalUserTeamId,
       };
 
-      // Emit swap proposal via socket
-      socket.emit("proposeSwap", swapRequest);
-
-      // Add to pending swaps locally
-      this.pendingSwaps.push({
-        ...swapRequest,
-        fromTeam: swapRequest.fromTeamName,
-        toTeam: swapRequest.toTeamName,
-        fromPlayer: swapRequest.fromPlayer,
-        toPlayer: swapRequest.toPlayer,
-      });
-
-      // Reset selections
-      this.selectedFromYourTeam = null;
-      this.selectedFromTargetTeam = null;
-      this.selectedTeamId = null;
+      console.log("Proposing swap with data:", swapRequest);
+      try {
+        const response = await this.axios.post(
+          `${this.apiURL}Draft/${this.$store.getters.getCurrentTournamentId}/trades/${this.$store.getters.getProfileId}`,
+          swapRequest,
+        );
+        console.log("Swap created", response.data);
+        this.fetchSwaps();
+        this.selectedFromYourTeam = null;
+        this.selectedFromTargetTeam = null;
+        this.selectedTeamId = null;
+      } catch (error) {
+        console.error("Error swapping", error);
+      }
     },
     cancelSwap(index) {
       const swap = this.pendingSwaps[index];
@@ -349,20 +493,10 @@ export default {
       this.pendingSwaps.splice(index, 1);
     },
   },
-  mounted() {
-    socket.on("swapProposed", (swap) => {
-      // Handle incoming swap proposals from other players
-      console.log("Swap proposal received:", swap);
-    });
-
-    socket.on("swapCancelled", (swapId) => {
-      this.pendingSwaps.splice(swapId, 1);
-    });
+  created() {
+    this.fetchSwaps();
   },
-  beforeDestroy() {
-    socket.off("swapProposed");
-    socket.off("swapCancelled");
-  },
+  beforeDestroy() {},
 };
 </script>
 
@@ -548,7 +682,11 @@ export default {
   font-size: 12px;
   text-align: center;
 }
-
+.error-text {
+  color: var(--ERROR);
+  font-size: 11px;
+  word-break: break-all;
+}
 /* Other Teams Panel */
 .teams-selector {
   display: flex;
@@ -606,143 +744,6 @@ export default {
   align-items: center;
   justify-content: center;
   height: 200px;
-  color: #64748b;
-  font-size: 12px;
-}
-
-/* Swap History */
-.swap-history-section {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 15px;
-}
-
-.history-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.history-header h3 {
-  margin: 0;
-  color: #fff;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.swap-count {
-  background: var(--PRIMARY, #00d9ff);
-  color: #000;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.swap-requests-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 12px;
-}
-
-.swap-request-card {
-  background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.swap-request-header {
-  display: flex;
-  gap: 8px;
-  font-size: 11px;
-  color: #94a3b8;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 8px;
-}
-
-.swap-from,
-.swap-to {
-  flex: 1;
-}
-
-.swap-arrow-small {
-  color: var(--PRIMARY, #00d9ff);
-  font-weight: 600;
-}
-
-.swap-request-body {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.swap-player {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  flex: 1;
-}
-
-.swap-player img {
-  width: 50px;
-  height: 50px;
-  border-radius: 4px;
-  object-fit: cover;
-}
-
-.swap-player span {
-  font-size: 11px;
-  color: #fff;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-}
-
-.for-text {
-  color: #64748b;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.swap-request-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.action-btn {
-  flex: 1;
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.cancel-btn {
-  background: rgba(239, 68, 68, 0.2);
-  color: #f85a67;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-}
-
-.cancel-btn:hover {
-  background: rgba(239, 68, 68, 0.3);
-  border-color: rgba(239, 68, 68, 0.5);
-}
-
-.no-swaps {
-  text-align: center;
-  padding: 20px;
   color: #64748b;
   font-size: 12px;
 }

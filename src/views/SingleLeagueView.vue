@@ -72,7 +72,7 @@
               <tr
                 class="table-row-participants"
                 v-for="(participant, index) in currentLeague.participants.sort(
-                  calculatePosition
+                  calculatePosition,
                 )"
                 :key="participant.userId"
               >
@@ -98,7 +98,7 @@
           >
             <ParticipantDetailsV2
               v-for="(participant, index) in currentLeague.participants.sort(
-                calculatePosition
+                calculatePosition,
               )"
               :key="participant.userId"
               v-if="tabs.length > 0"
@@ -180,7 +180,7 @@ export default {
       this.selectedTabIndex = index;
       console.log(this.selectedTabIndex);
       this.currentLeague = this.fixturesData.fixtures.find(
-        (element) => element.fixture == fixture
+        (element) => element.fixture == fixture,
       );
 
       // this.currentLeague = this.fixturesData.fixtures.find((element) => element.fixture == fixture);
@@ -188,7 +188,7 @@ export default {
     async getLeagueDetails(invitationCode) {
       try {
         const response = await this.axios.get(
-          `${this.apiURL}User/league/${invitationCode}`
+          `${this.apiURL}User/league/${invitationCode}`,
         );
         this.currentLeague = response.data;
         this.realLeagueId = this.currentLeague.participants[0].fantasyLeagueId;
@@ -200,10 +200,10 @@ export default {
     async getLeagueDetailsWithFixtures(invitationCode) {
       try {
         const response = await this.axios.get(
-          `${this.apiURL}User/league/${invitationCode}/fixtures`
+          `${this.apiURL}User/league/${invitationCode}/fixtures`,
         );
         this.currentLeague = response.data.fixtures.find(
-          (element) => element.fixture == null
+          (element) => element.fixture == null,
         );
         this.fixturesData = response.data;
         this.FetchRules();
@@ -226,7 +226,7 @@ export default {
     FetchFixtureGames() {
       this.axios
         .get(
-          `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/matches`
+          `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/matches`,
         )
         .then((response) => {
           this.fixtureGames = response.data;
@@ -238,13 +238,13 @@ export default {
     FetchRules() {
       this.axios
         .get(
-          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/rules`
+          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/rules`,
         )
         .then((response) => {
           var generalTab = [
             {
               id: this.fixturesData.fixtures.find(
-                (element) => element.fixture == null
+                (element) => element.fixture == null,
               ).fixture,
               title: "General",
               order: 0,
@@ -260,10 +260,10 @@ export default {
                   order: fix.fixture.order,
                 };
                 return newFix;
-              })
+              }),
             )
             .filter((tab) =>
-              this.fixturesData.fixtures.map((f) => f.fixture).includes(tab.id)
+              this.fixturesData.fixtures.map((f) => f.fixture).includes(tab.id),
             )
             .sort((a, b) => a.order - b.order);
         })

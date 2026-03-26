@@ -1,28 +1,61 @@
 <template>
-  <DraftSwapPlayers
-    v-if="showSwap"
-    :selected-team="selectedTeam"
-    :other-teams="otherTeams"
+  <div class="tab-navigation">
+    <button
+      class="tab-btn"
+      :class="{ active: activeTab === 'draft' }"
+      @click="activeTab = 'draft'"
+    >
+      Draft teams
+    </button>
+    <button
+      class="tab-btn"
+      :class="{ active: activeTab === 'swaps' }"
+      @click="activeTab = 'swaps'"
+    >
+      Swap players
+    </button>
+    <button
+      class="tab-btn"
+      :class="{ active: activeTab === 'results' }"
+      @click="activeTab = 'results'"
+    >
+      Standings
+    </button>
+  </div>
+  <DraftSwapMain
+    v-if="activeTab == 'swaps' && selectedUserTeam && realLeagueId"
+    :selected-team="selectedUserTeam"
+    :other-teams="otherFinishedTeams"
     :draft-participants="draftParticipants"
     :profile-id="$store.getters.getProfileId"
     :next-fixture="nextFixture"
     :league-id="leagueId"
+    :real-league-id="realLeagueId"
+    :selectedFromUnusedPlayers="selectedFromUnusedPlayers"
+    :fixtures="fixtures"
+    @refetch-teams="refetchTeams"
+    @choose-role="choseRole"
   >
     <PlayersListDraft
-      :userTeam="pickedPlayersIds"
-      :userTeamsPicked="pickedPlayersIdsAll"
+      :userTeam="pickedPlayersIdsSwaps"
+      :userTeamsPicked="pickedPlayersIdsAllSwaps"
       :nextFixture="nextFixture"
       :teamsPlayingNextFixture="teamsPlayingInNextFixture"
       @rangeChange="() => {}"
-      @playerSelect="playerSelected"
-      @teamSelect="teamSelected"
+      @playerSelect="playerSelectedDraft"
+      @playerSelectDraft="playerSelectedDraft"
+      @teamSelect="teamSelectedDraft"
+      :swapMode="true"
       :selectedRole="roleToAddPlayer"
+      @choose-role="choseRole"
       :players="availablePlayers"
       :teams="availableTeams"
+      :selectedForSwap="selectedFromUnusedPlayers"
       v-if="availablePlayers.length > 0 && availableTeams.length > 0"
     />
-  </DraftSwapPlayers>
-  <div v-if="!showSwap" class="container">
+  </DraftSwapMain>
+  <!-- Draft and league -->
+  <div v-if="activeTab == 'draft'" class="container">
     <button
       class="cta-btn"
       @click="joinDraft"
@@ -95,6 +128,7 @@
         @choose-role="choseRole"
         :selectedRole="roleToAddPlayer"
         @remove-player="handleRemovePlayer"
+        :swapMode="false"
       />
       <div class="players-list-container col-6">
         <PlayersListDraft
@@ -183,31 +217,45 @@
 
 <script>
 import socket from "@/socket.js";
-import DraftOrderBar from "@/components/ChatTest/DraftOrderBar.vue";
+import DraftOrderBar from "@/components/Draft/DraftOrderBar.vue";
 import PlayersList from "@/components/Players/AllPlayersList.vue";
-import PlayersListDraft from "@/components/ChatTest/PlayersListDraft.vue";
-import TeamRoster from "@/components/ChatTest/TeamDisplayDraft.vue";
-import DraftSwapPlayers from "@/components/ChatTest/DraftSwapPlayers.vue";
+import PlayersListDraft from "@/components/Draft/PlayersListDraft.vue";
+import TeamRoster from "@/components/Draft/TeamDisplayDraft.vue";
+import DraftSwapMain from "@/components/Draft/DraftSwapMain.vue";
 export default {
   props: {
     leagueId: String,
-    realLeagueId: Number,
+    // realLeagueId: Number,
   },
   components: {
     DraftOrderBar,
     PlayersList,
     PlayersListDraft,
     TeamRoster,
-    DraftSwapPlayers,
+    DraftSwapMain,
   },
   data() {
     return {
-      showSwap: true,
+      name: "DraftLeagueViewManager",
+      activeTab: "results",
+      realLeagueId: null,
+      showSwap: null,
       roleToAddPlayer: "",
       availablePlayers: [],
       availableTeams: [
         // Add more teams as needed
       ],
+      selectedUserTeam: {
+        topPlayer: { role: "top", player: null },
+        junglePlayer: { role: "jungle", player: null },
+        midPlayer: { role: "mid", player: null },
+        bottomPlayer: { role: "bottom", player: null },
+        supportPlayer: { role: "support", player: null },
+        subPlayer: { role: "sub", player: null },
+        team: { role: "team", team: null },
+        captain: null,
+        transfersMade: 0,
+      },
       selectedTeam: {
         topPlayer: { role: "top", player: null },
         junglePlayer: { role: "jungle", player: null },
@@ -251,121 +299,122 @@ export default {
       },
       // selectedPlayers: [],
       draftQueue: [],
+      otherFinishedTeams: {},
       otherTeams: {
-        "Sly Marb0": {
-          topPlayer: {
-            role: "top",
-            player: {
-              esportsPlayerId: "99871276342168416",
-              firstName: "Jihun",
-              lastName: "Jung",
-              summonerName: "Chovy",
-              role: "mid",
-              imageUrl:
-                "http://static.lolesports.com/players/1686474439543_GEN_Chovy.png",
-              nationality: "South Korea",
-              price: 100,
-              points: 0,
-              gamesPlayed: 0,
-              matchesPlayed: 0,
-              team: {
-                esportsTeamId: "100205573495116443",
-                slug: "geng",
-                name: "Gen.G Esports",
-                region: "KOREA",
-                league: "LCK",
-                code: "GEN",
-                imageUrl:
-                  "http://static.lolesports.com/teams/1655210113163_GenG_logo_200407-05.png",
-                backgroundImageUrl:
-                  "https://lolstatic-a.akamaihd.net/esports-assets/production/team/geng-bnm75bf5.png",
-                price: 15,
-                gamesPlayed: 0,
-                matchesPlayed: 0,
-                points: 0,
-              },
-            },
-          },
-          junglePlayer: { role: "jungle", player: null },
-          midPlayer: { role: "mid", player: null },
-          bottomPlayer: { role: "bottom", player: null },
-          supportPlayer: { role: "support", player: null },
-          subPlayer: { role: "sub", player: null },
-          team: { role: "team", team: null },
-        },
-        Hakkene: {
-          topPlayer: {
-            role: "top",
-            player: {
-              esportsPlayerId: "99871276342168416",
-              firstName: "Jihun",
-              lastName: "Jung",
-              summonerName: "Chovy",
-              role: "mid",
-              imageUrl:
-                "http://static.lolesports.com/players/1686474439543_GEN_Chovy.png",
-              nationality: "South Korea",
-              price: 100,
-              points: 0,
-              gamesPlayed: 0,
-              matchesPlayed: 0,
-              team: {
-                esportsTeamId: "100205573495116443",
-                slug: "geng",
-                name: "Gen.G Esports",
-                region: "KOREA",
-                league: "LCK",
-                code: "GEN",
-                imageUrl:
-                  "http://static.lolesports.com/teams/1655210113163_GenG_logo_200407-05.png",
-                backgroundImageUrl:
-                  "https://lolstatic-a.akamaihd.net/esports-assets/production/team/geng-bnm75bf5.png",
-                price: 15,
-                gamesPlayed: 0,
-                matchesPlayed: 0,
-                points: 0,
-              },
-            },
-          },
-          junglePlayer: { role: "jungle", player: null },
-          midPlayer: {
-            role: "mid",
-            player: {
-              esportsPlayerId: "99871276342168416",
-              firstName: "Jihun",
-              lastName: "Jung",
-              summonerName: "Faker",
-              role: "mid",
-              imageUrl:
-                "http://static.lolesports.com/players/1686475867148_T1_Faker.png",
-              nationality: "South Korea",
-              price: 100,
-              points: 0,
-              gamesPlayed: 0,
-              matchesPlayed: 0,
-              team: {
-                esportsTeamId: "100205573495116443",
-                slug: "t1",
-                name: "T1",
-                region: "KOREA",
-                league: "LCK",
-                code: "T1",
-                imageUrl:
-                  "http://static.lolesports.com/teams/1726801573959_539px-T1_2019_full_allmode.png",
-                backgroundImageUrl:
-                  "http://static.lolesports.com/teams/1596305556675_T1T1.png",
-                price: 15,
-                gamesPlayed: 0,
-                matchesPlayed: 0,
-                points: 0,
-              },
-            },
-          },
-          bottomPlayer: { role: "bottom", player: null },
-          supportPlayer: { role: "support", player: null },
-          subPlayer: { role: "sub", player: null },
-          team: { role: "team", team: null },
-        },
+        // "Sly Marb0": {
+        //   topPlayer: {
+        //     role: "top",
+        //     player: {
+        //       esportsPlayerId: "99871276342168416",
+        //       firstName: "Jihun",
+        //       lastName: "Jung",
+        //       summonerName: "Chovy",
+        //       role: "mid",
+        //       imageUrl:
+        //         "http://static.lolesports.com/players/1686474439543_GEN_Chovy.png",
+        //       nationality: "South Korea",
+        //       price: 100,
+        //       points: 0,
+        //       gamesPlayed: 0,
+        //       matchesPlayed: 0,
+        //       team: {
+        //         esportsTeamId: "100205573495116443",
+        //         slug: "geng",
+        //         name: "Gen.G Esports",
+        //         region: "KOREA",
+        //         league: "LCK",
+        //         code: "GEN",
+        //         imageUrl:
+        //           "http://static.lolesports.com/teams/1655210113163_GenG_logo_200407-05.png",
+        //         backgroundImageUrl:
+        //           "https://lolstatic-a.akamaihd.net/esports-assets/production/team/geng-bnm75bf5.png",
+        //         price: 15,
+        //         gamesPlayed: 0,
+        //         matchesPlayed: 0,
+        //         points: 0,
+        //       },
+        //     },
+        //   },
+        //   junglePlayer: { role: "jungle", player: null },
+        //   midPlayer: { role: "mid", player: null },
+        //   bottomPlayer: { role: "bottom", player: null },
+        //   supportPlayer: { role: "support", player: null },
+        //   subPlayer: { role: "sub", player: null },
+        //   team: { role: "team", team: null },
+        // },
+        // Hakkene: {
+        //   topPlayer: {
+        //     role: "top",
+        //     player: {
+        //       esportsPlayerId: "99871276342168416",
+        //       firstName: "Jihun",
+        //       lastName: "Jung",
+        //       summonerName: "Chovy",
+        //       role: "mid",
+        //       imageUrl:
+        //         "http://static.lolesports.com/players/1686474439543_GEN_Chovy.png",
+        //       nationality: "South Korea",
+        //       price: 100,
+        //       points: 0,
+        //       gamesPlayed: 0,
+        //       matchesPlayed: 0,
+        //       team: {
+        //         esportsTeamId: "100205573495116443",
+        //         slug: "geng",
+        //         name: "Gen.G Esports",
+        //         region: "KOREA",
+        //         league: "LCK",
+        //         code: "GEN",
+        //         imageUrl:
+        //           "http://static.lolesports.com/teams/1655210113163_GenG_logo_200407-05.png",
+        //         backgroundImageUrl:
+        //           "https://lolstatic-a.akamaihd.net/esports-assets/production/team/geng-bnm75bf5.png",
+        //         price: 15,
+        //         gamesPlayed: 0,
+        //         matchesPlayed: 0,
+        //         points: 0,
+        //       },
+        //     },
+        //   },
+        //   junglePlayer: { role: "jungle", player: null },
+        //   midPlayer: {
+        //     role: "mid",
+        //     player: {
+        //       esportsPlayerId: "99871276342168416",
+        //       firstName: "Jihun",
+        //       lastName: "Jung",
+        //       summonerName: "Faker",
+        //       role: "mid",
+        //       imageUrl:
+        //         "http://static.lolesports.com/players/1686475867148_T1_Faker.png",
+        //       nationality: "South Korea",
+        //       price: 100,
+        //       points: 0,
+        //       gamesPlayed: 0,
+        //       matchesPlayed: 0,
+        //       team: {
+        //         esportsTeamId: "100205573495116443",
+        //         slug: "t1",
+        //         name: "T1",
+        //         region: "KOREA",
+        //         league: "LCK",
+        //         code: "T1",
+        //         imageUrl:
+        //           "http://static.lolesports.com/teams/1726801573959_539px-T1_2019_full_allmode.png",
+        //         backgroundImageUrl:
+        //           "http://static.lolesports.com/teams/1596305556675_T1T1.png",
+        //         price: 15,
+        //         gamesPlayed: 0,
+        //         matchesPlayed: 0,
+        //         points: 0,
+        //       },
+        //     },
+        //   },
+        //   bottomPlayer: { role: "bottom", player: null },
+        //   supportPlayer: { role: "support", player: null },
+        //   subPlayer: { role: "sub", player: null },
+        //   team: { role: "team", team: null },
+        // },
       },
       teamsPlayingInNextFixture: [],
       matchesByFixture: null,
@@ -373,9 +422,16 @@ export default {
       currentDrafter: null,
       draftStarted: false,
       draftParticipants: [],
+      selectedFromUnusedPlayers: null,
     };
   },
   computed: {
+    fixtures() {
+      if (this.matchesByFixture == null) return [];
+      console.log("matches by fixture to computed", this.matchesByFixture);
+
+      return this.matchesByFixture.map((f) => f.fixture);
+    },
     isCurrentDrafter() {
       var userId = this.$store.getters.getProfileId;
       return userId === this.currentDrafter;
@@ -396,6 +452,42 @@ export default {
         }
       }
       // eslint-disable-next-line
+      return pickedPlayers;
+    },
+    pickedPlayersIdsSwaps() {
+      let pickedPlayers = [];
+      if (this.selectedUserTeam) {
+        Object.values(this.selectedUserTeam)
+          .filter((u) => u != null && (u.player != null || u.team != null))
+          .forEach((u) => {
+            if (u.player) {
+              pickedPlayers.push(u.player.esportsPlayerId);
+            }
+            if (u.team) {
+              pickedPlayers.push(u.team.esportsTeamId);
+            }
+          });
+      }
+      // eslint-disable-next-line
+      return pickedPlayers;
+    },
+    pickedPlayersIdsAllSwaps() {
+      let pickedPlayers = {}; // Object dictionary playerId : ownedBy {id, name}
+      Object.values(this.otherFinishedTeams).forEach((userTeam) => {
+        if (userTeam.team) {
+          Object.values(userTeam.team)
+            .filter((u) => u != null && (u.player != null || u.team != null))
+            .forEach((u) => {
+              if (u.player) {
+                pickedPlayers[u.player.esportsPlayerId] = userTeam.user;
+              }
+              if (u.team) {
+                pickedPlayers[u.team.esportsTeamId] = userTeam.user;
+              }
+            });
+        }
+      });
+
       return pickedPlayers;
     },
     pickedPlayersIdsAll() {
@@ -423,7 +515,8 @@ export default {
     await this.fetchPlayers();
     await this.fetchTeams();
     await this.getFixtures();
-
+    await this.getLeagueDetails(this.leagueId);
+    await this.fetchUserTeam();
     socket.on("connect", () => {
       console.log("Connected to server");
     });
@@ -452,7 +545,7 @@ export default {
           pickedPlayers,
           draftParticipants,
           currentDrafter,
-          draftQueue
+          draftQueue,
         );
         console.log("profile id", this.$store.getters.getProfileId);
         this.selectedTeam = !this.otherTeams[this.$store.getters.getProfileId]
@@ -484,7 +577,7 @@ export default {
             }
           });
         delete this.otherTeams[this.$store.getters.getProfileId];
-      }
+      },
     );
 
     var userId = this.$store.getters.getProfileId;
@@ -568,16 +661,79 @@ export default {
               TeamSlug: pickedPlayers[key]["team"].team.slug,
               LeagueId: this.realLeagueId,
               Captain: 3,
-            }
+            },
           );
         }
 
         console.log("Finishing the draft - end");
         // Create all teams
-      }
+      },
     );
   },
   methods: {
+    async refetchTeams() {
+      await this.getLeagueDetails(this.leagueId);
+      await this.fetchUserTeam();
+    },
+    async fetchUserTeam() {
+      try {
+        const response = await this.axios.get(
+          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/user_team/${this.$store.getters.getProfileId}/${this.realLeagueId}`,
+        );
+        var userTeam = response.data;
+        this.selectedUserTeam.topPlayer.player = this.availablePlayers.find(
+          (element) =>
+            element.esportsPlayerId == userTeam.topPlayer.esportsPlayerId,
+        );
+        this.selectedUserTeam.junglePlayer.player = this.availablePlayers.find(
+          (element) =>
+            element.esportsPlayerId == userTeam.junglePlayer.esportsPlayerId,
+        );
+        this.selectedUserTeam.midPlayer.player = this.availablePlayers.find(
+          (element) =>
+            element.esportsPlayerId == userTeam.midPlayer.esportsPlayerId,
+        );
+        this.selectedUserTeam.bottomPlayer.player = this.availablePlayers.find(
+          (element) =>
+            element.esportsPlayerId == userTeam.bottomPlayer.esportsPlayerId,
+        );
+        this.selectedUserTeam.supportPlayer.player = this.availablePlayers.find(
+          (element) =>
+            element.esportsPlayerId == userTeam.supportPlayer.esportsPlayerId,
+        );
+        this.selectedUserTeam.subPlayer.player = this.availablePlayers.find(
+          (element) =>
+            element.esportsPlayerId == userTeam.subPlayer.esportsPlayerId,
+        );
+        this.selectedUserTeam.team.team = this.availableTeams.find(
+          (element) => element.esportsTeamId == userTeam.team.esportsTeamId,
+        );
+        this.selectedUserTeam.captain = userTeam.captain;
+        this.selectedUserTeam.transfersMade = userTeam.transfersMade;
+        this.selectedUserTeam.transfersAvailable = userTeam.transfersAvailable;
+        this.selectedUserTeam.chipActivated = userTeam.chipUsed ?? 0;
+        this.selectedUserTeam.userTeamId = userTeam.userTeamId ?? null;
+        // this.selectedUserTeam.chipUsed = userTeam.chipUsed
+        this.selectedUserTeam.chips = userTeam.extraChips;
+
+        this.loadedPlayers = [
+          userTeam.topPlayer.esportsPlayerId,
+          userTeam.junglePlayer.esportsPlayerId,
+          userTeam.midPlayer.esportsPlayerId,
+          userTeam.bottomPlayer.esportsPlayerId,
+          userTeam.supportPlayer.esportsPlayerId,
+          userTeam.subPlayer.esportsPlayerId,
+          userTeam.team.esportsTeamId,
+        ];
+
+        console.log("loaded players", this.loadedPlayers);
+        this.showSwap = true;
+        // this.sortedPlayers = this.players;
+      } catch (error) {
+        this.showSwap = false;
+        console.error("Error fetching player team:", error);
+      }
+    },
     finishDraft() {
       console.log(this.leagueId);
       socket.emit("finishDraft", this.leagueId);
@@ -587,129 +743,130 @@ export default {
       this.roleToAddPlayer = role;
     },
     async getFixtures() {
-      // const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixtures`
-      const url = `${this.apiURL}Matches/${113475452383887518}/fixtures`; // hardcoded tournament id for testing
+      const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixtures`;
+      // const url = `${this.apiURL}Matches/${113475452383887518}/fixtures`; // hardcoded tournament id for testing
 
       this.axios
         .get(url)
         .then((response) => {
-          this.matchesByFixture = [
-            {
-              fixture: {
-                fixtureId: 26,
-                order: 1,
-                name: "Round 1",
-                isFinished: false,
-                opensAtDate: "2026-03-05T15:00:00Z",
-                deadlineDate: "2026-03-10T04:40:00Z",
-                transfersLimit: 100,
-                teamValueLimit: 72,
-              },
-              matches: [
-                {
-                  id: "113475798006599034",
-                  state: null,
-                  startTime: "2026-03-10T05:00:00Z",
-                  maxGames: 1,
-                  team1: {
-                    wins: 0,
-                    imageUrl:
-                      "http://static.lolesports.com/teams/1767340467921_DN_SOOPerslogo_profile.webp",
-                    name: "DN FREECS",
-                    code: "DNS",
-                  },
-                  team2: {
-                    wins: 0,
-                    imageUrl:
-                      "http://static.lolesports.com/teams/1726801573959_539px-T1_2019_full_allmode.png",
-                    name: "T1",
-                    code: "T1",
-                  },
-                },
-                {
-                  id: "113475798006664572",
-                  state: null,
-                  startTime: "2026-03-10T06:00:00Z",
-                  maxGames: 1,
-                  team1: {
-                    wins: 0,
-                    imageUrl:
-                      "http://static.lolesports.com/teams/1655210113163_GenG_logo_200407-05.png",
-                    name: "Gen.G Esports",
-                    code: "GEN",
-                  },
-                  team2: {
-                    wins: 0,
-                    imageUrl:
-                      "http://static.lolesports.com/teams/1631819564399_hle-2021-worlds.png",
-                    name: "Hanwha Life Esports",
-                    code: "HLE",
-                  },
-                },
-                {
-                  id: "113475798006730110",
-                  state: null,
-                  startTime: "2026-03-10T07:00:00Z",
-                  maxGames: 1,
-                  team1: {
-                    wins: 0,
-                    imageUrl:
-                      "http://static.lolesports.com/teams/1672910733664_01.Basic_W.png",
-                    name: "DRX",
-                    code: "DRX",
-                  },
-                  team2: {
-                    wins: 0,
-                    imageUrl:
-                      "http://static.lolesports.com/teams/NSFullonDark.png",
-                    name: "NONGSHIM RED FORCE",
-                    code: "NS",
-                  },
-                },
-                {
-                  id: "113475798006795648",
-                  state: null,
-                  startTime: "2026-03-10T08:00:00Z",
-                  maxGames: 1,
-                  team1: {
-                    wins: 0,
-                    imageUrl:
-                      "http://static.lolesports.com/teams/kt_darkbackground.png",
-                    name: "kt Rolster",
-                    code: "KT",
-                  },
-                  team2: {
-                    wins: 0,
-                    imageUrl:
-                      "http://static.lolesports.com/teams/1673260049703_DPlusKIALOGO11.png",
-                    name: "Dplus KIA",
-                    code: "DK",
-                  },
-                },
-                {
-                  id: "113475798006861186",
-                  state: null,
-                  startTime: "2026-03-10T09:00:00Z",
-                  maxGames: 1,
-                  team1: {
-                    wins: 0,
-                    imageUrl:
-                      "http://static.lolesports.com/teams/1716454325887_Nowyprojekt.png",
-                    name: "OKSavingsBank BRION",
-                    code: "BRO",
-                  },
-                  team2: {
-                    wins: 0,
-                    imageUrl:
-                      "http://static.lolesports.com/teams/1734691810721_BFXfullcolorfordarkbg.png",
-                    name: "BNK FEARX",
-                    code: "BFX",
-                  },
-                },
-              ],
-            },
-          ];
-          //response.data.fixturesWithMatches;
+          this.matchesByFixture =
+            // [
+            //   {
+            //     fixture: {
+            //       fixtureId: 26,
+            //       order: 1,
+            //       name: "Round 1",
+            //       isFinished: false,
+            //       opensAtDate: "2026-03-05T15:00:00Z",
+            //       deadlineDate: "2026-03-10T04:40:00Z",
+            //       transfersLimit: 100,
+            //       teamValueLimit: 72,
+            //     },
+            //     matches: [
+            //       {
+            //         id: "113475798006599034",
+            //         state: null,
+            //         startTime: "2026-03-10T05:00:00Z",
+            //         maxGames: 1,
+            //         team1: {
+            //           wins: 0,
+            //           imageUrl:
+            //             "http://static.lolesports.com/teams/1767340467921_DN_SOOPerslogo_profile.webp",
+            //           name: "DN FREECS",
+            //           code: "DNS",
+            //         },
+            //         team2: {
+            //           wins: 0,
+            //           imageUrl:
+            //             "http://static.lolesports.com/teams/1726801573959_539px-T1_2019_full_allmode.png",
+            //           name: "T1",
+            //           code: "T1",
+            //         },
+            //       },
+            //       {
+            //         id: "113475798006664572",
+            //         state: null,
+            //         startTime: "2026-03-10T06:00:00Z",
+            //         maxGames: 1,
+            //         team1: {
+            //           wins: 0,
+            //           imageUrl:
+            //             "http://static.lolesports.com/teams/1655210113163_GenG_logo_200407-05.png",
+            //           name: "Gen.G Esports",
+            //           code: "GEN",
+            //         },
+            //         team2: {
+            //           wins: 0,
+            //           imageUrl:
+            //             "http://static.lolesports.com/teams/1631819564399_hle-2021-worlds.png",
+            //           name: "Hanwha Life Esports",
+            //           code: "HLE",
+            //         },
+            //       },
+            //       {
+            //         id: "113475798006730110",
+            //         state: null,
+            //         startTime: "2026-03-10T07:00:00Z",
+            //         maxGames: 1,
+            //         team1: {
+            //           wins: 0,
+            //           imageUrl:
+            //             "http://static.lolesports.com/teams/1672910733664_01.Basic_W.png",
+            //           name: "DRX",
+            //           code: "DRX",
+            //         },
+            //         team2: {
+            //           wins: 0,
+            //           imageUrl:
+            //             "http://static.lolesports.com/teams/NSFullonDark.png",
+            //           name: "NONGSHIM RED FORCE",
+            //           code: "NS",
+            //         },
+            //       },
+            //       {
+            //         id: "113475798006795648",
+            //         state: null,
+            //         startTime: "2026-03-10T08:00:00Z",
+            //         maxGames: 1,
+            //         team1: {
+            //           wins: 0,
+            //           imageUrl:
+            //             "http://static.lolesports.com/teams/kt_darkbackground.png",
+            //           name: "kt Rolster",
+            //           code: "KT",
+            //         },
+            //         team2: {
+            //           wins: 0,
+            //           imageUrl:
+            //             "http://static.lolesports.com/teams/1673260049703_DPlusKIALOGO11.png",
+            //           name: "Dplus KIA",
+            //           code: "DK",
+            //         },
+            //       },
+            //       {
+            //         id: "113475798006861186",
+            //         state: null,
+            //         startTime: "2026-03-10T09:00:00Z",
+            //         maxGames: 1,
+            //         team1: {
+            //           wins: 0,
+            //           imageUrl:
+            //             "http://static.lolesports.com/teams/1716454325887_Nowyprojekt.png",
+            //           name: "OKSavingsBank BRION",
+            //           code: "BRO",
+            //         },
+            //         team2: {
+            //           wins: 0,
+            //           imageUrl:
+            //             "http://static.lolesports.com/teams/1734691810721_BFXfullcolorfordarkbg.png",
+            //           name: "BNK FEARX",
+            //           code: "BFX",
+            //         },
+            //       },
+            //     ],
+            //   },
+            // ];
+            response.data.fixturesWithMatches;
           this.nextFixture = this.matchesByFixture
             .filter((m) => new Date(m.fixture.deadlineDate) > new Date())
             .sort(function (a, b) {
@@ -727,12 +884,12 @@ export default {
               .concat(
                 this.nextFixture.matches
                   .filter((m) => m.team1 != null && m.team2 != null)
-                  .map((m) => m.team2)
+                  .map((m) => m.team2),
               )
               .map((m) => m.code);
             console.log(
               "teams playing in next fixture",
-              this.teamsPlayingInNextFixture
+              this.teamsPlayingInNextFixture,
             );
           }
 
@@ -752,7 +909,7 @@ export default {
     async fetchPlayers() {
       try {
         const response = await this.axios.get(
-          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/players`
+          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/players`,
         );
         this.availablePlayers = response.data;
         // this.sortedPlayers = this.players;
@@ -763,7 +920,7 @@ export default {
     async fetchTeams() {
       try {
         const response = await this.axios.get(
-          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/teams`
+          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/teams`,
         );
         this.availableTeams = response.data;
       } catch (error) {
@@ -817,7 +974,7 @@ export default {
         "trying to add ",
         player.summonerName,
         " to ",
-        this.roleToAddPlayer
+        this.roleToAddPlayer,
       );
 
       if (
@@ -829,18 +986,48 @@ export default {
         this.roleToAddPlayer = ""; // Reset the selected role after adding the player
       } else console.log("WRONG ROLE");
     },
+    playerSelectedDraft(player) {
+      console.log(
+        "trying to add ",
+        player.summonerName,
+        " to ",
+        this.roleToAddPlayer,
+      );
+
+      if (
+        player.role == this.roleToAddPlayer ||
+        this.roleToAddPlayer == "sub"
+      ) {
+        // this.addToRole(player, this.roleToAddPlayer);
+        this.selectedFromUnusedPlayers = player;
+        // this.roleToAddPlayer = "";
+      } else console.log("WRONG ROLE");
+    },
     teamSelected(team) {
       console.log(
         "trying to add team ",
         team.name,
         " to ",
-        this.roleToAddPlayer
+        this.roleToAddPlayer,
       );
 
       if (this.roleToAddPlayer == "team") {
         // this.addToRole(player, this.roleToAddPlayer);
         this.selectTeam(team);
         this.roleToAddPlayer = ""; // Reset the selected role after adding the player
+      } else console.log("WRONG ROLE");
+    },
+    teamSelectedDraft(team) {
+      console.log(
+        "trying to add team ",
+        team.name,
+        " to ",
+        this.roleToAddPlayer,
+      );
+
+      if (this.roleToAddPlayer == "team") {
+        // this.addToRole(player, this.roleToAddPlayer);
+        this.selectedFromUnusedPlayers = team;
       } else console.log("WRONG ROLE");
     },
     addToRole(player, role) {
@@ -864,6 +1051,33 @@ export default {
       }
       console.log("nope");
       return null; // Return null if no player with the specified role is found
+    },
+    async getLeagueDetails(invitationCode) {
+      try {
+        const response = await this.axios.get(
+          `${this.apiURL}Draft/${this.$store.getters.getCurrentTournamentId}/league/${invitationCode}`,
+        );
+        this.currentLeague = response.data;
+        this.realLeagueId = this.currentLeague.participants[0].fantasyLeagueId;
+        console.log("Real League Id", this.realLeagueId);
+        console.log("get league details", this.currentLeague);
+        this.otherFinishedTeams = this.currentLeague.participants
+          .filter((p) => p.userId != this.$store.getters.getProfileId)
+          .reduce((acc, participant) => {
+            if (participant.userTeam) {
+              acc[participant.userId] = {};
+              acc[participant.userId].team = participant.userTeam;
+              acc[participant.userId].user = {
+                id: participant.userId,
+                username: participant.userLogin,
+              };
+            }
+            return acc;
+          }, {});
+        console.log("other finished teams", this.otherFinishedTeams);
+      } catch (error) {
+        console.error("Error fetching league details:", error);
+      }
     },
   },
   beforeDestroy() {
@@ -943,5 +1157,36 @@ li:hover {
 
 .cta-btn:hover {
   background: #00aacc;
+}
+
+/* Tab Navigation */
+.tab-navigation {
+  display: flex;
+  gap: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 15px;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  padding: 10px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+  position: relative;
+  bottom: -1px;
+}
+
+.tab-btn:hover {
+  color: var(--PRIMARY);
+}
+
+.tab-btn.active {
+  color: var(--PRIMARY-DARKER, #00d9ff);
+  border-bottom-color: var(--PRIMARY-DARKER, #00d9ff);
 }
 </style>

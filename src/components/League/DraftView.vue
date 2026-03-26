@@ -1,19 +1,19 @@
 <!-- TeamSelection.vue -->
 <template>
-  <PickTest :leagueId="this.leagueId" :realLeagueId="this.realLeagueId" />
-  <Chat />
+  <DraftLeagueViewManager :leagueId="this.leagueId" />
+  <!-- <Chat /> -->
 </template>
 
 <script>
-import PickTest from "@/components/ChatTest/PickTest.vue";
-import Chat from "@/components/ChatTest/Chat.vue";
+import DraftLeagueViewManager from "@/components/Draft/DraftLeagueViewManager.vue";
+import Chat from "@/components/Draft/Chat.vue";
 export default {
   props: {
     leagueId: String,
     realLeagueId: Number,
   },
   components: {
-    PickTest,
+    DraftLeagueViewManager,
     Chat,
   },
   data() {},

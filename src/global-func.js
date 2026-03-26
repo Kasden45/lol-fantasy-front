@@ -59,7 +59,7 @@ export const func_global = {
     const today = new Date(
       2000 + dateFormat[2],
       dateFormat[1] - 1,
-      dateFormat[0]
+      dateFormat[0],
     );
 
     const dayOfWeekNumber = today.getDay();
@@ -315,6 +315,33 @@ export const func_global = {
       });
     }
     return weekDays;
+  },
+  draftTradeStatus: {
+    0: {
+      label: "ONGOING",
+      text: "Ongoing",
+      color: "orange",
+    },
+    1: {
+      label: "COMPLETED",
+      text: "Done",
+      color: "green",
+    },
+    2: {
+      label: "DECLINED",
+      text: "Declined",
+      color: "red",
+    },
+    3: {
+      label: "EXPIRED",
+      text: "Expired",
+      color: "#f44336",
+    },
+    4: {
+      label: "WITHDRAWN",
+      text: "Withdrawn",
+      color: "red",
+    },
   },
   mapSex(sex) {
     if (sex == "WOMAN") return "Kobieta";
