@@ -1,189 +1,176 @@
 <template>
-  <div class="team-roster-container">
-    <!-- Header -->
-    <div class="roster-header">
-      <div class="roster-title">
-        <span v-if="ownTeam" class="team-id">My team</span>
-        <span v-if="!ownTeam" class="team-id">Team {{ rivalName }}</span>
+  <div
+    class="position-card"
+    :class="{
+      filled: position.player || position.team,
+      empty: !position.player && !position.team,
+      rival: !ownTeam,
+      swap: swapMode,
+      clickable:
+        (!position.player && !position.team && ownTeam && yourTurn) ||
+        ((position.player || position.team) && swapMode),
+      'currently-picked':
+        (yourTurn &&
+          ownTeam &&
+          position.role == selectedRole &&
+          !position.player &&
+          !position.team) ||
+        (swapMode && position.role == selectedRole),
+    }"
+    @click="
+      ownTeam && yourTurn
+        ? handlePositionClick(position)
+        : swapMode
+        ? handlePositionClickSwap(position)
+        : null
+    "
+  >
+    <!-- Filled Position -->
+    <template v-if="position.player">
+      <div class="card-header">
+        <span class="team-badge"
+          >vs {{ matchups[position.player.team?.code] }}</span
+        >
+        <span class="role-badge" :class="`role-${position.role.toLowerCase()}`">
+          {{ position.role.toUpperCase() }}
+        </span>
       </div>
-      <div v-if="ownTeam" class="roster-info">
-        <span class="roster-count">{{ filledPositions }}/{{ totalPositions }}</span>
-        <span class="roster-label">Positions</span>
+
+      <div class="player-image-container">
+        <img
+          :src="position.player.imageUrl"
+          :alt="position.player.summonerName"
+          class="player-image"
+          @error="handleImageError"
+        />
       </div>
-    </div>
 
-    <!-- Team Cards Grid -->
-    <div class="team-cards-grid">
-      <div
-        v-for="(position, key) in selectedTeam"
-        :key="key"
-        class="position-card"
-        :class="{
-          'filled': position.player || position.team,
-          'empty': !position.player && !position.team,
-          'rival': !ownTeam,
-          'clickable': !position.player && !position.team && ownTeam && yourTurn,
-          'currently-picked': yourTurn && ownTeam && position.role == selectedRole && !position.player && !position.team
-        }"
-        @click="ownTeam && yourTurn ? handlePositionClick(position) : null"
-      >
-        <!-- Filled Position -->
-        <template v-if="position.player">
-          <div class="card-header">
-            <span class="team-badge">vs {{ matchups[position.player.team?.code] }}</span>
-            <span class="role-badge" :class="`role-${position.role.toLowerCase()}`">
-              {{ position.role.toUpperCase() }}
-            </span>
-          </div>
+      <div class="player-name">{{ position.player.summonerName }}</div>
 
-          <div class="player-image-container">
-            <img 
-              :src="position.player.imageUrl" 
-              :alt="position.player.summonerName"
-              class="player-image"
-              @error="handleImageError"
-            />
-          </div>
-
-          <div class="player-name">{{ position.player.summonerName }}</div>
-
-          <div class="player-stats-mini">
-            <div class="stat-mini">
-              <span class="stat-value">${{ position.player.price }}</span>
-              <span class="stat-label">Price</span>
-            </div>
-            <div class="stat-mini">
-              <span class="stat-value">{{ position.player.points?.toFixed(0) || 0 }}</span>
-              <span class="stat-label">Pts</span>
-            </div>
-          </div>
-        </template>
-        <template v-if="position.team">
-          <div class="card-header">
-            <span class="team-badge">vs {{ matchups[position.team?.code] }}</span>
-            <span class="role-badge" :class="`role-team`">
-              TEAM
-            </span>
-          </div>
-
-          <div class="player-image-container">
-            <img 
-              :src="position.team.imageUrl" 
-              :alt="position.team.name"
-              class="player-image"
-              @error="handleImageError"
-            />
-          </div>
-
-          <div class="player-name">{{ position.team.name }}</div>
-
-          <div class="player-stats-mini">
-            <div class="stat-mini">
-              <span class="stat-value">${{ position.team.price }}</span>
-              <span class="stat-label">Price</span>
-            </div>
-            <div class="stat-mini">
-              <span class="stat-value">{{ position.team.points?.toFixed(0) || 0 }}</span>
-              <span class="stat-label">Pts</span>
-            </div>
-          </div>
-        </template>
-
-        <!-- Empty Position -->
-        <template v-if="!position.player && !position.team">
-          <div class="empty-card-content" >
-            <div class="role-badge-large" :class="`role-${position.role.toLowerCase()}`">
-              {{ position.role.toUpperCase() }}
-            </div>
-            <div v-if="ownTeam" class="plus-icon"><i class="fas fa-plus"></i></div>
-            <div v-if="ownTeam" class="empty-text">Add {{ position.role }}</div>
-            <div v-if="!ownTeam" class="empty-text">{{ position.role }}</div>
-          </div>
-        </template>
+      <div class="player-stats-mini">
+        <div class="stat-mini">
+          <span class="stat-value">${{ position.player.price }}</span>
+          <span class="stat-label">Price</span>
+        </div>
+        <div class="stat-mini">
+          <span class="stat-value">{{
+            position.player.points?.toFixed(0) || 0
+          }}</span>
+          <span class="stat-label">Pts</span>
+        </div>
       </div>
-    </div>
+    </template>
+    <template v-if="position.team">
+      <div class="card-header">
+        <span class="team-badge">vs {{ matchups[position.team?.code] }}</span>
+        <span class="role-badge" :class="`role-team`"> TEAM </span>
+      </div>
+
+      <div class="player-image-container">
+        <img
+          :src="position.team.imageUrl"
+          :alt="position.team.name"
+          class="player-image"
+          @error="handleImageError"
+        />
+      </div>
+
+      <div class="player-name">{{ position.team.name }}</div>
+
+      <div class="player-stats-mini">
+        <div class="stat-mini">
+          <span class="stat-value">${{ position.team.price }}</span>
+          <span class="stat-label">Price</span>
+        </div>
+        <div class="stat-mini">
+          <span class="stat-value">{{
+            position.team.points?.toFixed(0) || 0
+          }}</span>
+          <span class="stat-label">Pts</span>
+        </div>
+      </div>
+    </template>
+
+    <!-- Empty Position -->
+    <template v-if="!position.player && !position.team">
+      <div class="empty-card-content">
+        <div
+          class="role-badge-large"
+          :class="`role-${position.role.toLowerCase()}`"
+        >
+          {{ position.role.toUpperCase() }}
+        </div>
+        <div v-if="ownTeam" class="plus-icon">
+          <i class="fas fa-plus"></i>
+        </div>
+        <div v-if="ownTeam" class="empty-text">Add {{ position.role }}</div>
+        <div v-if="!ownTeam" class="empty-text">{{ position.role }}</div>
+      </div>
+    </template>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'TeamRoster',
+  name: "TeamDisplayDraftPlayer",
   props: {
+    matchups: Object,
+    position: {
+      type: Object,
+    },
+    key: Object,
     ownTeam: {
       type: Boolean,
-      default: false
+      default: false,
     },
     yourTurn: {
       type: Boolean,
-      default: false
+      default: false,
     },
-    rivalName: {
-      type: String,
-      default: "Hakkene"
+    swapMode: {
+      type: Boolean,
+      default: false,
     },
-    selectedTeam: {
-      type: Object,
-      required: true
-    },
-    profileId: {
-      type: [String, Number],
-      required: true
-    },
+    // rivalName: {
+    //   type: String,
+    //   default: "Hakkene",
+    // },
+    // selectedTeam: {
+    //   type: Object,
+    //   required: true,
+    // },
+    // profileId: {
+    //   type: [String, Number],
+    //   required: true,
+    // },
     selectedRole: {
       type: String,
-      default: null
+      default: null,
     },
-    nextFixture: {
-      type: Object,
-      default: null
-    }
-  },
-  computed: {
-    matchups() {
-      if (!this.nextFixture) return [];
-
-      return this.nextFixture.matches.reduce((acc, match) => {
-        acc[match.team1.code] = match.team2.code;
-        acc[match.team2.code] = match.team1.code;
-        return acc;
-      }, {});
-    },
-    filledPositions() {
-      return Object.values(this.selectedTeam).filter(pos => pos.player || pos.team).length;
-    },
-    totalPositions() {
-      return Object.keys(this.selectedTeam).length;
-    },
-    totalCost() {
-      return Object.values(this.selectedTeam)
-        .filter(pos => pos.player)
-        .reduce((sum, pos) => sum + (pos.player.price || 0), 0);
-    },
-    totalPoints() {
-      return Object.values(this.selectedTeam)
-        .filter(pos => pos.player)
-        .reduce((sum, pos) => sum + (pos.player.points || 0), 0);
-    },
-    averagePointsPerGame() {
-      const players = Object.values(this.selectedTeam).filter(pos => pos.player);
-      if (players.length === 0) return '-';
-      
-      const totalGames = players.reduce((sum, pos) => sum + (pos.player.gamesPlayed || 0), 0);
-      const totalPts = players.reduce((sum, pos) => sum + (pos.player.points || 0), 0);
-      
-      return totalGames > 0 ? (totalPts / totalGames).toFixed(1) : '-';
-    }
+    // nextFixture: {
+    //   type: Object,
+    //   default: null,
+    // },
   },
   methods: {
     handlePositionClick(position) {
+      console.log("handlePositionClick: position, player:", position);
+
       if (!position.player) {
-        this.$emit('choose-role', position.role);
+        console.log("handlePositionClick: role", position.role);
+
+        this.$emit("handle-position-click", position);
       }
     },
-    handleImageError(event) {
-      event.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23374151" width="100" height="100"/><text x="50" y="50" font-size="40" text-anchor="middle" dy=".3em" fill="%23fff">?</text></svg>';
-    }
-  }
+    handlePositionClickSwap(position) {
+      console.log("Swap click on position:", position.role);
+      this.$emit("handle-position-swap-click", position.role);
+      if (position.player)
+        this.$emit("handle-position-swap-player", position.player);
+      if (position.team)
+        this.$emit("handle-position-swap-player", position.team);
+    },
+  },
 };
 </script>
 
@@ -246,7 +233,7 @@ export default {
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 25px;
   margin-bottom: 20px;
-  flex: 1;
+  align-items: start;
 }
 
 /* Position Card */
@@ -259,7 +246,8 @@ export default {
   display: flex;
   flex-direction: column;
   transition: all 0.3s ease;
-  min-height: 220px;
+  /* min-height: 220px; */
+  height: stretch;
 }
 
 .position-card.filled {
@@ -288,6 +276,14 @@ export default {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
+.position-card.clickable.swap:hover {
+  border-color: var(--RED-USED-CHIP, #00d9ff) !important;
+}
+
+.position-card.clickable.swap.rival:hover {
+  border-color: var(--GREEN-DARK, #00d9ff) !important;
+}
+
 .position-card.filled:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 20px rgba(168, 85, 247, 0.2);
@@ -297,6 +293,14 @@ export default {
   transform: translateY(-3px);
   animation: pulse 2s infinite;
   box-shadow: 0 0 20px var(--PRIMARY, #00d9ff);
+}
+
+.currently-picked.swap {
+  box-shadow: 0 0 20px var(--RED-USED-CHIP, #00d9ff) !important;
+}
+
+.currently-picked.swap.rival {
+  box-shadow: 0 0 20px var(--GREEN-DARK, #00d9ff) !important;
 }
 
 /* Card Header */

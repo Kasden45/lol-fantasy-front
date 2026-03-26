@@ -1,34 +1,30 @@
 <!-- TeamSelection.vue -->
 <template>
-  <PickTest :leagueId="this.leagueId" :realLeagueId="this.realLeagueId"/>
-  <Chat/>
-    
-  </template>
-  
-  <script>
-  import PickTest from '@/components/ChatTest/PickTest.vue';
-  import Chat from '@/components/ChatTest/Chat.vue';
-  export default {
-    props:{
-      leagueId: String,
-      realLeagueId: Number
-    },
-    components: {
-      PickTest,
-      Chat
-    },
-    data() {
-    },
-    mounted(){
-      // this.getFixtures();
-    },
-    computed: {
-      
-    }        
-  };
-  </script>
+  <DraftLeagueViewManager :leagueId="this.leagueId" />
+  <!-- <Chat /> -->
+</template>
 
-  <style scoped>
+<script>
+import DraftLeagueViewManager from "@/components/Draft/DraftLeagueViewManager.vue";
+import Chat from "@/components/Draft/Chat.vue";
+export default {
+  props: {
+    leagueId: String,
+    realLeagueId: Number,
+  },
+  components: {
+    DraftLeagueViewManager,
+    Chat,
+  },
+  data() {},
+  mounted() {
+    // this.getFixtures();
+  },
+  computed: {},
+};
+</script>
+
+<style scoped>
 .players-list-container {
   height: 40vh;
   overflow-y: scroll;
@@ -39,9 +35,9 @@
 }
 
 ::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
-    background-color: var(--DARK-YELLOW);
+  width: 5px;
+  height: 5px;
+  background-color: var(--DARK-YELLOW);
 }
 
 .game-tabs {
@@ -49,7 +45,8 @@
   margin-bottom: 20px;
 }
 
-.game-tabs, .game-tab {
+.game-tabs,
+.game-tab {
   cursor: pointer;
   padding: 10px 20px;
   border: 1px solid #ccc;
@@ -58,7 +55,7 @@
 }
 
 .game-tabs .active {
-  background-color: #007BFF;
+  background-color: #007bff;
   color: #fff;
 }
 
@@ -76,7 +73,7 @@
 }
 
 .progress-ring__text {
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 .progress-ring__background {
@@ -94,7 +91,6 @@
   fill: var(--PRIMARY);
 }
 
-
 .fill-error {
   fill: red;
 }
@@ -104,7 +100,9 @@
   justify-content: space-between;
 }
 
-.player-list, .team-list, .other-teams {
+.player-list,
+.team-list,
+.other-teams {
   width: 30%;
 }
 

@@ -1,53 +1,38 @@
 <template>
-    <div
+  <div
     class="player-tile-container"
     :class="{
-      'picked-position': currentlyPicked === role
+      'picked-position': currentlyPicked === role,
     }"
   >
     <!-- Team and Player Name -->
     <div class="tile-header row" v-if="teamTeam">
       <div class="col-2 inline-text-flag">
-        <img
-          
-          class="flag"
-          :src="getLeagueFlag(teamTeam?.league)"
-          alt="flag"
-        />
+        <img class="flag" :src="getLeagueFlag(teamTeam?.league)" alt="flag" />
       </div>
       <div class="col-8 align-content-center">
-        <div class="team-name">{{ teamTeam?.league || ' ' }}</div>
+        <div class="team-name">{{ teamTeam?.league || " " }}</div>
       </div>
       <div class="col-2 inline-text-flag role-sub">
         <div
-        v-if="teamTeam"
-        class="action-button remove-button "
-        @click="removePlayerFromRole(role)"
-      >
-        <i class="flag fas fa-circle-minus fa-xl"></i>
-    </div>
+          v-if="teamTeam"
+          class="action-button remove-button"
+          @click="removePlayerFromRole(role)"
+        >
+          <i class="flag fas fa-circle-minus fa-xl"></i>
+        </div>
       </div>
     </div>
     <div class="tile-header row mt-1" v-if="teamTeam">
       <div class="col-2 inline-text-flag">
-        <img
-          
-          class="flag"
-          :src="getFlag('')"
-          alt="flag"
-        />
+        <img class="flag" :src="getFlag('')" alt="flag" />
       </div>
       <div class="col-8 align-content-center">
         <span class="player-name">{{ teamTeam?.code }}</span>
       </div>
       <div class="col-2">
-        <div v-if="teamTeam" class="inline-text-flag role-sub" >
-           <img
-          
-          class="flag "
-          :src="roles_img_url['team']"
-          alt="flag"
-        />
+        <div v-if="teamTeam" class="inline-text-flag role-sub">
+          <img class="flag" :src="roles_img_url['team']" alt="flag" />
         </div>
       </div>
     </div>
@@ -68,12 +53,12 @@
         alt="player image"
       />
       <div
-          v-if="!teamTeam"
-          class="action-button add-button player-image-overlay"
-          @click="addPlayerToRole(role)"
-        >
-          <i class="fas fa-circle-plus fa-xl"></i>
-        </div>
+        v-if="!teamTeam"
+        class="action-button add-button player-image-overlay"
+        @click="addPlayerToRole(role)"
+      >
+        <i class="fas fa-circle-plus fa-xl"></i>
+      </div>
     </div>
     <!-- Bottom Info: Price and Points -->
     <div class="tile-footer" v-if="teamTeam">
@@ -84,51 +69,47 @@
       <div></div>
       <!-- <div class="points pe-2">{{ (teamTeam?.points/teamTeam?.gamesPlayed).toFixed(0) }}pts/g</div> -->
     </div>
-   
   </div>
 </template>
 
 <script>
 import TeamTileV2 from "@/components/TeamSelection-v2/TeamTile-v2.vue";
 export default {
-    name: "TeamTeamTileV2",
-    props:{
-        roles_img_url: Object,
-        img_url: String,
-        teamTeam: Object,
-        role: String,
-        currentlyPicked: String 
+  name: "TeamTeamTileV2",
+  props: {
+    roles_img_url: Object,
+    img_url: String,
+    teamTeam: Object,
+    role: String,
+    currentlyPicked: String,
+  },
+  components: {
+    TeamTileV2,
+  },
+  data() {
+    return {};
+  },
+  methods: {
+    getLeagueFlag(league) {
+      // Placeholder for region flag logic
+      return this.$func_global.leagues_icons[league];
     },
-    components: {
-      TeamTileV2
+    getFlag(countryCode) {
+      return "https://cdn-icons-png.flaticon.com/512/5373/5373301.png";
+      return `/flags/${countryCode.toLowerCase()}.png`; // or use CDN
     },
-    data() {
-      return {
-        
-        }
-    },
-    methods:{
-      getLeagueFlag(league) {
-        // Placeholder for region flag logic
-        return this.$func_global.leagues_icons[league];
-      },
-      getFlag(countryCode) {
-        return 'https://cdn-icons-png.flaticon.com/512/5373/5373301.png'
-        return `/flags/${countryCode.toLowerCase()}.png`; // or use CDN
-      },
-        removePlayerFromRole(role) {
+    removePlayerFromRole(role) {
       // Emit an event to notify the parent component (App) about the selected player
-        console.log("usuwam z ", role)
-        this.$emit("playerRemove", role);
-      },
-      addPlayerToRole(role) {
+      console.log("usuwam z ", role);
+      this.$emit("playerRemove", role);
+    },
+    addPlayerToRole(role) {
       // Emit an event to notify the parent component (App) about the selected player
-        console.log("chce dodac do ", role)
-        this.$emit("rolePick", role);
-      },
-    }
-}
-
+      console.log("chce dodac do ", role);
+      this.$emit("rolePick", role);
+    },
+  },
+};
 </script>
 <style scoped>
 .role-sub {
@@ -176,7 +157,7 @@ export default {
 }
 
 .flag {
-  width: 1.0rem;
+  width: 1rem;
   /* height: 12px; */
   object-fit: cover;
   border-radius: 2px;
@@ -185,7 +166,6 @@ export default {
   position: relative;
   aspect-ratio: 1 / 1;
 }
-
 
 .role-icon {
   width: 100%;

@@ -17,18 +17,38 @@ import DraftView from "./components/League/DraftView.vue"; // Import your compon
 const routes = [
   { name: "Home", path: "/", component: HomeView },
   { name: "TeamSelection", path: "/team-selection", component: TeamSelection },
-  { name: "TeamSelectionV2", path: "/team-selection-v2", component: TeamSelectionV2 },
+  {
+    name: "TeamSelectionV2",
+    path: "/team-selection-v2",
+    component: TeamSelectionV2,
+  },
   { name: "PlayersView", path: "/players", component: PlayersView },
   { name: "LeaguesView", path: "/leagues", component: LeaguesView },
   { name: "MatchesView", path: "/matches", component: MatchesView },
   { name: "SettingsView", path: "/settings", component: SettingsView },
   { name: "StatsView", path: "/stats", component: StatsView },
   { name: "DreamTeamView", path: "/dream-team", component: DreamTeamView },
-  { name: "SingleLeagueView", path: "/leagues/:leagueCode", component: SingleLeagueView },
+  {
+    name: "SingleLeagueView",
+    path: "/leagues/:leagueCode",
+    component: SingleLeagueView,
+  },
   { name: "DraftView", path: "/draft", component: DraftView },
-  { name: "CurrentPointsView", path: "/current-points/:userId", component: CurrentPointsView },
-  { name: "MatchDetailsView", path: "/match-details/:matchId", component: MatchDetailsView },
-  { name: "GamePointsView", path: "/points/team/:teamSlug/game/:gameId", component: GamePointsView },
+  {
+    name: "CurrentPointsView",
+    path: "/current-points/:userId",
+    component: CurrentPointsView,
+  },
+  {
+    name: "MatchDetailsView",
+    path: "/match-details/:matchId",
+    component: MatchDetailsView,
+  },
+  {
+    name: "GamePointsView",
+    path: "/points/team/:teamSlug/game/:gameId",
+    component: GamePointsView,
+  },
   // Define more routes as needed
 ];
 

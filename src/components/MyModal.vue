@@ -2,14 +2,14 @@
 export default {
   props: {
     openModal: Boolean,
-    title: String
+    title: String,
   },
   watch: {
     // Watch for changes in the 'playerDetails' prop
     openModal: {
       handler(newopenModal, oldopenModal) {
         // React to prop changes here
-        // playerDetails = 
+        // playerDetails =
         console.log(newopenModal, oldopenModal);
         this.open = this.openModal;
       },
@@ -18,27 +18,27 @@ export default {
   },
   methods: {
     closeModal() {
-      this.$emit('closeModal', 'details')
-    }
+      this.$emit("closeModal", "details");
+    },
   },
   data() {
     return {
-      open: false
-    }
-  }
-}
+      open: false,
+    };
+  },
+};
 </script>
 
 <template>
   <!-- <button @click="open = true">Open Modal</button> -->
 
- <Teleport to="body">
-  <div v-if="open" class="modal modal-details ">
-    <div class="modal-header">{{ title ? title : 'Modal' }}</div>
-    <button class="btn-close" @click="closeModal()"></button>
-    <slot></slot>
-  </div>
-</Teleport>
+  <Teleport to="body">
+    <div v-if="open" class="modal modal-details">
+      <div class="modal-header">{{ title ? title : "Modal" }}</div>
+      <button class="btn-close" @click="closeModal()"></button>
+      <slot></slot>
+    </div>
+  </Teleport>
 </template>
 
 <style scoped>
@@ -54,7 +54,7 @@ export default {
   z-index: 9999;
   top: 10%;
   left: 10%;
-  
+
   width: 80vw;
   max-height: 75%;
   display: block;
