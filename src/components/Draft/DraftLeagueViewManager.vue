@@ -2,24 +2,26 @@
   <div class="tab-navigation">
     <button
       class="tab-btn"
+      :class="{ active: activeTab === 'results' }"
+      @click="activeTab = 'results'"
+    >
+      Standings
+    </button>
+    <button
+      v-if="this.currentLeague?.isDrafted == false"
+      class="tab-btn"
       :class="{ active: activeTab === 'draft' }"
       @click="activeTab = 'draft'"
     >
       Draft teams
     </button>
     <button
+      v-if="this.currentLeague?.isDrafted == true"
       class="tab-btn"
       :class="{ active: activeTab === 'swaps' }"
       @click="activeTab = 'swaps'"
     >
       Swap players
-    </button>
-    <button
-      class="tab-btn"
-      :class="{ active: activeTab === 'results' }"
-      @click="activeTab = 'results'"
-    >
-      Standings
     </button>
   </div>
   <DraftSwapMain
@@ -240,6 +242,7 @@ export default {
       activeTab: "results",
       realLeagueId: null,
       showSwap: null,
+      currentLeague: null,
       roleToAddPlayer: "",
       availablePlayers: [],
       availableTeams: [
@@ -665,6 +668,17 @@ export default {
           );
         }
 
+        this.axios
+          .post(
+            `${this.apiURL}Draft/league/${this.leagueId}/finishDraft/${this.$store.getters.getProfileId}`,
+          )
+          .then((response) => {
+            this.currentLeague = response.data;
+            this.fillLeagueDetails(this.currentLeague);
+          })
+          .catch((error) => {
+            console.log(error.response);
+          });
         console.log("Finishing the draft - end");
         // Create all teams
       },
@@ -1052,6 +1066,22 @@ export default {
       console.log("nope");
       return null; // Return null if no player with the specified role is found
     },
+    fillLeagueDetails(league) {
+      console.log("get league details", this.currentLeague);
+      this.otherFinishedTeams = this.currentLeague.participants
+        .filter((p) => p.userId != this.$store.getters.getProfileId)
+        .reduce((acc, participant) => {
+          if (participant.userTeam) {
+            acc[participant.userId] = {};
+            acc[participant.userId].team = participant.userTeam;
+            acc[participant.userId].user = {
+              id: participant.userId,
+              username: participant.userLogin,
+            };
+          }
+          return acc;
+        }, {});
+    },
     async getLeagueDetails(invitationCode) {
       try {
         const response = await this.axios.get(
@@ -1060,20 +1090,7 @@ export default {
         this.currentLeague = response.data;
         this.realLeagueId = this.currentLeague.participants[0].fantasyLeagueId;
         console.log("Real League Id", this.realLeagueId);
-        console.log("get league details", this.currentLeague);
-        this.otherFinishedTeams = this.currentLeague.participants
-          .filter((p) => p.userId != this.$store.getters.getProfileId)
-          .reduce((acc, participant) => {
-            if (participant.userTeam) {
-              acc[participant.userId] = {};
-              acc[participant.userId].team = participant.userTeam;
-              acc[participant.userId].user = {
-                id: participant.userId,
-                username: participant.userLogin,
-              };
-            }
-            return acc;
-          }, {});
+        this.fillLeagueDetails(this.currentLeague);
         console.log("other finished teams", this.otherFinishedTeams);
       } catch (error) {
         console.error("Error fetching league details:", error);
@@ -1163,20 +1180,20 @@ li:hover {
 .tab-navigation {
   display: flex;
   gap: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   margin-bottom: 15px;
+  justify-content: center;
 }
 
 .tab-btn {
   background: none;
-  border: none;
   color: #94a3b8;
   padding: 10px 16px;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  border-bottom: 2px solid transparent;
+  border: 2px solid transparent;
   position: relative;
   bottom: -1px;
 }
@@ -1187,6 +1204,7 @@ li:hover {
 
 .tab-btn.active {
   color: var(--PRIMARY-DARKER, #00d9ff);
-  border-bottom-color: var(--PRIMARY-DARKER, #00d9ff);
+  border-radius: 10%;
+  border-color: var(--PRIMARY-DARKER, #00d9ff);
 }
 </style>

@@ -3,6 +3,9 @@
     class="player-tile-container"
     :class="{
       'picked-position': currentlyPicked === role && !teamPlayer,
+      'picked-sub-in': pickedSub && role == 'sub' && teamPlayer,
+      'picked-sub-out': pickedSub && role != 'sub' && teamPlayer,
+      'cannot-swap': !canSub,
       'captain-player-tile': isCaptain,
       sub: role == 'sub',
     }"
@@ -21,11 +24,19 @@
       </div>
       <div class="col-2 inline-text-flag role-sub">
         <div
-          v-if="teamPlayer"
+          v-if="teamPlayer && !draftLeague"
           class="action-button remove-button"
           @click="removePlayerFromRole(role)"
         >
           <i class="flag fas fa-circle-minus fa-xl"></i>
+        </div>
+        <div
+          v-if="teamPlayer && draftLeague"
+          class="action-button swap-button"
+          :class="{ 'disabled-swap': !canSub }"
+          @click="swapWithSub(teamPlayer)"
+        >
+          <i class="flag fas fa-arrow-right-arrow-left fa-xl"></i>
         </div>
       </div>
     </div>
@@ -104,12 +115,18 @@ import PlayerTileV2 from "@/components/TeamSelection-v2/PlayerTile-v2.vue";
 export default {
   name: "PlayerTeamTileV2",
   props: {
+    draftLeague: {
+      type: Boolean,
+      default: false,
+    },
     img_url: String,
     roles_img_url: Object,
     teamPlayer: Object,
     role: String,
     currentlyPicked: String,
     isCaptain: Boolean,
+    pickedSub: Object,
+    canSub: Boolean,
   },
   components: {
     PlayerTileV2,
@@ -139,6 +156,12 @@ export default {
       console.log("usuwam z ", role);
       this.$emit("playerRemove", role);
     },
+    swapWithSub(player) {
+      if (this.canSub) {
+        console.log("zamieniam gracza z ", player);
+        this.$emit("playerSub", player);
+      }
+    },
     addPlayerToRole(role) {
       // Emit an event to notify the parent component (App) about the selected player
       console.log("chce dodac do ", role);
@@ -164,6 +187,18 @@ export default {
 }
 .picked-position.captain-player-tile {
   box-shadow: 8px 8px 8px rgb(52, 118, 194), -8px -8px 8px var(--GOLDEN-CAPTAIN) !important;
+}
+.picked-sub-in {
+  border: 4px solid var(--GREEN-LIGHT) !important;
+}
+.picked-sub-out {
+  border: 4px solid var(--ERROR) !important;
+}
+.can-swap-in {
+  border: 4px solid var(--GREEN-LIGHT) !important;
+}
+.can-swap-out {
+  border: 4px solid var(--ERROR) !important;
 }
 .team-name {
   color: var(--GREY);
@@ -288,6 +323,15 @@ export default {
 }
 .remove-button {
   color: #ff4d4f;
+}
+.cannot-swap {
+  opacity: 50%;
+}
+.swap-button {
+  color: var(--PRIMARY);
+}
+.swap-button.disabled-swap {
+  color: var(--ERROR);
 }
 .border-bot {
   border-right: 2px solid black;

@@ -15,11 +15,18 @@
       </div>
       <div class="col-2 inline-text-flag role-sub">
         <div
-          v-if="teamTeam"
+          v-if="teamTeam && !draftLeague"
           class="action-button remove-button"
           @click="removePlayerFromRole(role)"
         >
           <i class="flag fas fa-circle-minus fa-xl"></i>
+        </div>
+        <div
+          v-if="teamTeam && draftLeague"
+          class="action-button remove-button"
+          @click=""
+        >
+          <!-- <i class="flag fas fa-arrow-right-arrow-left fa-xl"></i> -->
         </div>
       </div>
     </div>
@@ -77,6 +84,10 @@ import TeamTileV2 from "@/components/TeamSelection-v2/TeamTile-v2.vue";
 export default {
   name: "TeamTeamTileV2",
   props: {
+    draftLeague: {
+      type: Boolean,
+      default: false,
+    },
     roles_img_url: Object,
     img_url: String,
     teamTeam: Object,

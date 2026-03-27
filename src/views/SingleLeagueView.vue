@@ -1,6 +1,8 @@
 <template>
   <div v-if="currentLeague != null">
-    <h2>{{ fixturesData.mode }} mode</h2>
+    <h2 class="header-name">
+      {{ currentLeague.name }} - {{ fixturesData.mode }} mode
+    </h2>
     <div class="row w-80 m-auto">
       <DraftView
         v-if="fixturesData && fixturesData.mode == 'Draft'"
@@ -9,7 +11,6 @@
       />
     </div>
     <!-- List of Leagues the User Is In -->
-    <h2>{{ currentLeague.name }} - {{ currentLeague.invitationCode }}</h2>
     <!-- Chart -->
     <button class="btn btn-primary" @click="openModal = !openModal">
       <i class="fa-solid fa-chart-line"></i> See league race Chart
@@ -283,6 +284,11 @@ export default {
 </script>
 
 <style scoped>
+.header-name {
+  color: var(--PRIMARY);
+  font-weight: 800;
+  font-size: large;
+}
 .navbar-brand {
   background: -webkit-linear-gradient(
     0deg,

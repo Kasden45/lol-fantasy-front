@@ -75,6 +75,7 @@ export default {
     userTeam: Array,
     userTeamsPicked: Object,
     matchups: Object,
+    selectedForSwap: Boolean,
   },
   computed: {
     isActive() {
@@ -95,6 +96,7 @@ export default {
     },
     cardClasses() {
       return {
+        "player-selected-for-swap": this.selectedForSwap,
         "player-inactive": !this.isActive,
         "already-owned": this.isOwnedByOther,
         disabled: !this.isSelectable,
@@ -254,7 +256,10 @@ export default {
   opacity: 0.5;
   cursor: not-allowed;
 }
-
+.player-card.player-selected-for-swap {
+  border-color: var(--GREEN-DARK);
+  box-shadow: 0 0 20px var(--GREEN-DARK, #00d9ff) !important;
+}
 .player-card.already-owned {
   border-color: #007bff;
   background: linear-gradient(135deg, #1e3a5f 0%, #152a47 100%);

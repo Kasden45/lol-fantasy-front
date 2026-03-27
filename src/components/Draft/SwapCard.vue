@@ -119,7 +119,7 @@
     @closeModal="closeDetailsModal"
     :title="''"
   >
-    <ComparePlayers :swap="currentSwap" />
+    <ComparePlayers class="modal-compare" :swap="currentSwap" />
   </MyModal>
 </template>
 <script>
@@ -290,5 +290,15 @@ export default {
 .deadline-info {
   font-size: smaller;
   justify-content: end !important;
+}
+</style>
+<style>
+.modal-details {
+  background-color: none;
+  background: linear-gradient(
+    135deg,
+    var(--TABLE-ROW-SECONDARY),
+    var(--TABLE-ROW-MAIN)
+  );
 }
 </style>

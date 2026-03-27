@@ -1,6 +1,6 @@
 <template>
   <div class="comparison-container">
-    <div class="players">
+    <div class="players" v-if="swap.playerInitiator">
       <div class="player-card">
         <div class="name">{{ swap.tradeInitiatorUserTeam.userLogin }}</div>
         <img :src="swap.playerInitiator.imageUrl" />
@@ -14,6 +14,22 @@
         <img :src="swap.playerReceiver.imageUrl" />
         <div class="name">{{ swap.playerReceiver.summonerName }}</div>
         <div class="team">{{ swap.playerReceiver.team.code }}</div>
+      </div>
+    </div>
+    <div class="players" v-if="swap.teamInitiator">
+      <div class="player-card">
+        <div class="name">{{ swap.tradeInitiatorUserTeam.userLogin }}</div>
+        <img :src="swap.teamInitiator.imageUrl" />
+        <div class="name">{{ swap.teamInitiator.name }}</div>
+        <div class="team">{{ swap.teamInitiator.code }}</div>
+      </div>
+      <div class="player-card"><div class="vs">VS</div></div>
+
+      <div class="player-card">
+        <div class="name">{{ swap.tradeReceiverUserTeam.userLogin }}</div>
+        <img :src="swap.teamReceiver.imageUrl" />
+        <div class="name">{{ swap.teamReceiver.name }}</div>
+        <div class="team">{{ swap.teamReceiver.code }}</div>
       </div>
     </div>
 
@@ -47,16 +63,16 @@ export default {
   },
   computed: {
     stats() {
-      const p1 = this.swap.playerInitiator;
-      const p2 = this.swap.playerReceiver;
-      p1.points = 12.5;
-      p2.points = 15.0;
+      const p1 = this.swap.playerInitiator ?? this.swap.teamInitiator;
+      const p2 = this.swap.playerReceiver ?? this.swap.teamReceiver;
+      // p1.points = 12.5;
+      // p2.points = 15.0;
 
-      p1.matchesPlayed = 10;
-      p2.matchesPlayed = 12;
+      // p1.matchesPlayed = 10;
+      // p2.matchesPlayed = 12;
 
-      p1.price = 5.0;
-      p2.price = 6.0;
+      // p1.price = 5.0;
+      // p2.price = 6.0;
       return [
         {
           label: "Points",
