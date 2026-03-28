@@ -54,6 +54,10 @@
               (selectedFromUnusedPlayers && activeTab === 'unused'))
           "
         >
+          <!-- Loader overlay -->
+          <div v-if="swapLoading" class="swap-loading-overlay">
+            <div class="swap-spinner"></div>
+          </div>
           <div class="target-team-name">
             {{ getTeamName(selectedTeamId) }}
           </div>
@@ -66,7 +70,8 @@
               !selectedFromYourTeam ||
               (!selectedFromTargetTeam &&
                 !(selectedFromUnusedPlayers && activeTab === 'unused')) ||
-              canSwap === false
+              canSwap === false ||
+              swapLoading
             "
           >
             Propose Swap
@@ -221,6 +226,7 @@ export default {
   },
   data() {
     return {
+      swapLoading: false,
       openModal: false,
       activeTab: "unused",
       selectedFromYourTeam: null,
@@ -443,8 +449,10 @@ export default {
         this.selectedFromYourTeam = null;
         // this.selectedFromUnusedPlayers = null;
         this.selectedTeamId = null;
+        this.swapLoading = false;
       } catch (error) {
         console.error("Error swapping", error);
+        this.swapLoading = false;
       }
     },
     async proposeSwap() {
@@ -452,7 +460,7 @@ export default {
         console.log("Missing swap data");
         return;
       }
-
+      this.swapLoading = true;
       if (this.activeTab === "unused" && this.selectedFromUnusedPlayers) {
         console.log("Proposing swap with player pool");
         this.proposeSwapFromPlayerPool();
@@ -480,7 +488,9 @@ export default {
         this.selectedFromYourTeam = null;
         this.selectedFromTargetTeam = null;
         this.selectedTeamId = null;
+        this.swapLoading = false;
       } catch (error) {
+        this.swapLoading = false;
         console.error("Error swapping", error);
       }
     },
@@ -641,6 +651,7 @@ export default {
 }
 
 .swap-target-info {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -822,5 +833,30 @@ export default {
   flex-direction: column;
   gap: 15px;
   overflow-y: auto;
+}
+.swap-loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: inherit;
+}
+
+.swap-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #333;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

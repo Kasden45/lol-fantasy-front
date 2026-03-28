@@ -4,7 +4,7 @@
       <Chip
         v-if="userTeam != null"
         v-for="(chip, index) in userTeam.chips.sort((a, b) =>
-          a.id > b.id ? 1 : -1
+          a.id > b.id ? 1 : -1,
         )"
         :id="chip.id"
         class="col-2"
@@ -63,9 +63,11 @@
     <div class="row justify-content-center mb-3">
       <div class="col-xl-3 col-sm-4 col-sm-4 align-content-center">
         <PlayerTeamTileV2
+          :draftLeague="draftLeague"
           :is-captain="captain == 1"
           :currently-picked="this.currentlyPicked"
           @playerRemove="playerRemoved"
+          @playerSub="playerSub"
           @rolePick="rolePicked"
           @captainPick="pickCaptain"
           v-if="userTeam != null"
@@ -73,13 +75,23 @@
           :teamPlayer="userTeam.topPlayer.player"
           :img_url="role_images['top']"
           :roles_img_url="role_images"
+          :canSub="
+            subToSub == null ||
+            subToSub?.role == userTeam.topPlayer.player?.role
+          "
+          :pickedSub="
+            pickedToSub?.esportsPlayerId ==
+            userTeam.topPlayer.player?.esportsPlayerId
+          "
         />
       </div>
       <div class="col-xl-3 col-sm-4 col-sm-4 align-content-center">
         <PlayerTeamTileV2
+          :draftLeague="draftLeague"
           :is-captain="captain == 2"
           :currently-picked="this.currentlyPicked"
           @playerRemove="playerRemoved"
+          @playerSub="playerSub"
           @rolePick="rolePicked"
           @captainPick="pickCaptain"
           v-if="userTeam != null"
@@ -87,13 +99,23 @@
           :teamPlayer="userTeam.junglePlayer.player"
           :img_url="role_images['jungle']"
           :roles_img_url="role_images"
+          :canSub="
+            subToSub == null ||
+            subToSub?.role == userTeam.junglePlayer.player?.role
+          "
+          :pickedSub="
+            pickedToSub?.esportsPlayerId ==
+            userTeam.junglePlayer.player?.esportsPlayerId
+          "
         />
       </div>
       <div class="col-xl-3 col-sm-4 align-content-center">
         <PlayerTeamTileV2
+          :draftLeague="draftLeague"
           :is-captain="captain == 3"
           :currently-picked="this.currentlyPicked"
           @playerRemove="playerRemoved"
+          @playerSub="playerSub"
           @rolePick="rolePicked"
           v-if="userTeam != null"
           :role="'mid'"
@@ -101,15 +123,25 @@
           :img_url="role_images['mid']"
           :roles_img_url="role_images"
           @captainPick="pickCaptain"
+          :canSub="
+            subToSub == null ||
+            subToSub?.role == userTeam.midPlayer.player?.role
+          "
+          :pickedSub="
+            pickedToSub?.esportsPlayerId ==
+            userTeam.midPlayer.player?.esportsPlayerId
+          "
         />
       </div>
     </div>
     <div class="row justify-content-center mb-3">
       <div class="col-xl-3 col-sm-4 align-content-center">
         <PlayerTeamTileV2
+          :draftLeague="draftLeague"
           :is-captain="captain == 4"
           :currently-picked="this.currentlyPicked"
           @playerRemove="playerRemoved"
+          @playerSub="playerSub"
           @rolePick="rolePicked"
           v-if="userTeam != null"
           :role="'bottom'"
@@ -117,6 +149,14 @@
           :img_url="role_images['bottom']"
           :roles_img_url="role_images"
           @captainPick="pickCaptain"
+          :canSub="
+            subToSub == null ||
+            subToSub?.role == userTeam.botPlayer.player?.role
+          "
+          :pickedSub="
+            pickedToSub?.esportsPlayerId ==
+            userTeam.botPlayer.player?.esportsPlayerId
+          "
         />
       </div>
       <div class="col-xl-3 col-sm-4 align-content-center">
@@ -124,6 +164,7 @@
           :is-captain="captain == 5"
           :currently-picked="this.currentlyPicked"
           @playerRemove="playerRemoved"
+          @playerSub="playerSub"
           @rolePick="rolePicked"
           v-if="userTeam != null"
           :role="'support'"
@@ -131,25 +172,45 @@
           :img_url="role_images['support']"
           :roles_img_url="role_images"
           @captainPick="pickCaptain"
+          :draftLeague="draftLeague"
+          :canSub="
+            subToSub == null ||
+            subToSub?.role == userTeam.supportPlayer.player?.role
+          "
+          :pickedSub="
+            pickedToSub?.esportsPlayerId ==
+            userTeam.supportPlayer.player?.esportsPlayerId
+          "
         />
       </div>
     </div>
     <div class="row justify-content-center mb-3">
       <div class="col-xl-3 col-sm-4 align-content-center">
         <PlayerTeamTileV2
+          :draftLeague="draftLeague"
           :currently-picked="this.currentlyPicked"
           @playerRemove="playerRemoved"
+          @playerSub="playerSubSub"
           @rolePick="rolePicked"
           v-if="userTeam != null"
           :role="'sub'"
           :teamPlayer="userTeam.subPlayer.player"
           :img_url="role_images['sub']"
           :roles_img_url="role_images"
+          :canSub="
+            pickedToSub == null ||
+            pickedToSub?.role == userTeam.subPlayer.player?.role
+          "
+          :pickedSub="
+            subToSub?.esportsPlayerId ==
+            userTeam.subPlayer.player?.esportsPlayerId
+          "
         />
       </div>
 
       <div class="col-xl-3 col-sm-4 align-content-center">
         <TeamTeamTileV2
+          :draftLeague="draftLeague"
           :currently-picked="this.currentlyPicked"
           @playerRemove="playerRemoved"
           @rolePick="rolePicked"
@@ -178,10 +239,16 @@ export default {
     TeamTeamTileV2,
   },
   props: {
+    draftLeague: {
+      default: false,
+      type: Boolean,
+    },
     userTeam: Object,
     readOnly: Boolean,
     currentlyPicked: String,
     captain: Number,
+    pickedToSub: Object,
+    subToSub: Object,
   },
   data() {
     return {
@@ -225,6 +292,14 @@ export default {
       // Emit an event to notify the parent component (App) about the selected player
       console.log("usuwam z ", role);
       this.$emit("playerRemove", role);
+    },
+    playerSub(player) {
+      console.log("zamieniam z ", player);
+      this.$emit("playerSub", player);
+    },
+    playerSubSub(player) {
+      console.log("zamieniam z ", player);
+      this.$emit("playerSubSub", player);
     },
     rolePicked(role) {
       // Emit an event to notify the parent component (App) about the selected player

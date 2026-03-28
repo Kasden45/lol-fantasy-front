@@ -6,16 +6,34 @@
         >Team Selection v1</router-link
       >
     </button>
+    <div>
+      <label class="filter-label">Your teams</label>
+      <select
+        class="filter-select"
+        v-model="selectedLeagueId"
+        @change="changeActiveTeam"
+      >
+        <option :value="-1">General team</option>
+        <option v-for="team in userLeaguesTeams" :value="team.idLeague">
+          {{ team.leagueName }}
+        </option>
+      </select>
+    </div>
     <div class="row w-100 justify-content-md-center m-auto">
       <div class="col-md-12 col-lg-6">
         <PlayerTeamV2
+          :draftLeague="draftLeague"
           :captain="selectedUserTeam.captain"
           :currently-picked="this.roleToAddPlayer"
           @playerRemove="playerRemoved"
+          @playerSubSub="playerSubSub"
+          @playerSub="playerSub"
           @rolePick="(r) => (roleToAddPlayer = r)"
           :userTeam="selectedUserTeam"
           @captainPick="pickCaptain"
           @chipUsed="chipUsed"
+          :pickedToSub="playerToSubPlayer"
+          :subToSub="subToSubPlayer"
         />
         <div class="row justify-content-md-center m-auto py-2">
           <div class="col-3 d-flex justify-content-start ps-0">
@@ -55,7 +73,10 @@
         <div v-if="this.errorSubmittingTeam">You can't make such team!</div>
       </div>
 
-      <div class="selection-col col-md-12 col-lg-6">
+      <div
+        class="selection-col col-md-12 col-lg-6"
+        v-if="selectedLeagueId == -1"
+      >
         <div class="row">
           <!-- <div v-if="this.selectedUserTeam.chipActivated != 0" class="col-12">
               <h3 class="text-center">3x captain</h3>
@@ -318,6 +339,8 @@ export default {
   },
   data() {
     return {
+      userLeagues: [],
+      selectedLeagueId: -1,
       lastPlayedFixture: 0,
       selectedForm: 0,
       formNumberOfGames: 0,
@@ -331,6 +354,8 @@ export default {
       selectedTabIndex: 0,
       tabs: ["Players", "|", "Teams"],
       roleToAddPlayer: "jungle",
+      playerToSubPlayer: null,
+      subToSubPlayer: null,
       roleIndex: {
         top: 1,
         jungle: 2,
@@ -387,9 +412,23 @@ export default {
     this.fetchPlayers();
     this.fetchTeams();
     this.getCurrentFixture();
+    this.fetchUserLeagues();
     // this.getFixtures();
   },
   computed: {
+    draftLeague() {
+      return this.userLeaguesTeams
+        .map((ul) => ul.idLeague)
+        .includes(this.selectedLeagueId);
+    },
+    userLeaguesTeams() {
+      return this.userLeagues
+        .filter((ul) => ul.mode == "Draft" && ul.isDrafted == true)
+        .map((ul) => ({
+          idLeague: ul.idLeague,
+          leagueName: ul.name,
+        }));
+    },
     playersRivals() {
       if (
         this.allPlayers.length == null ||
@@ -403,7 +442,7 @@ export default {
         let playerMatch = this.nextFixture.matches.find(
           (m) =>
             (m.team1 != null && m.team1.code === player.team.code) ||
-            (m.team2 != null && m.team2.code === player.team.code)
+            (m.team2 != null && m.team2.code === player.team.code),
         );
         if (playerMatch != null) {
           rivals[player.esportsPlayerId] =
@@ -433,7 +472,7 @@ export default {
         let teamMatch = this.nextFixture.matches.find(
           (m) =>
             (m.team1 != null && m.team1.code === team.code) ||
-            (m.team2 != null && m.team2.code === team.code)
+            (m.team2 != null && m.team2.code === team.code),
         );
         if (teamMatch != null) {
           rivals[team.code] =
@@ -450,7 +489,7 @@ export default {
     },
     pickedPlayers() {
       const playerKeys = Object.keys(this.selectedUserTeam).filter((key) =>
-        key.endsWith("Player")
+        key.endsWith("Player"),
       );
 
       const activeCount = playerKeys.reduce((count, key) => {
@@ -461,7 +500,7 @@ export default {
     },
     pickedTeams() {
       const playerKeys = Object.keys(this.selectedUserTeam).filter((key) =>
-        key.endsWith("team")
+        key.endsWith("team"),
       );
 
       const activeCount = playerKeys.reduce((count, key) => {
@@ -486,7 +525,7 @@ export default {
       } else {
         percent = Math.min(
           this.teamValue / this.nextFixture.fixture.teamValueLimit,
-          1
+          1,
         );
       }
       return this.circumference - percent * this.circumference;
@@ -564,6 +603,7 @@ export default {
     },
     teamValue() {
       let totalValue = 0;
+      if (this.selectedLeagueId != -1) return 0;
       // Iterate through the player roles and team
       for (const role in this.selectedUserTeam) {
         // eslint-disable-next-line
@@ -600,14 +640,14 @@ export default {
         if (this.selectedUserTeam[key].player != null) {
           console.log(
             "taki jest",
-            this.selectedUserTeam[key].player.esportsPlayerId
+            this.selectedUserTeam[key].player.esportsPlayerId,
           );
           currentLineup.push(this.selectedUserTeam[key].player.esportsPlayerId);
         }
         if (this.selectedUserTeam[key].team != null) {
           console.log(
             "taki jest team",
-            this.selectedUserTeam[key].team.esportsTeamId
+            this.selectedUserTeam[key].team.esportsTeamId,
           );
           currentLineup.push(this.selectedUserTeam[key].team.esportsTeamId);
         }
@@ -620,6 +660,46 @@ export default {
     },
   },
   methods: {
+    changeActiveTeam() {
+      this.selectedUserTeam = {
+        topPlayer: {
+          role: "top",
+          player: null,
+        },
+        junglePlayer: {
+          role: "jungle",
+          player: null,
+        },
+        midPlayer: {
+          role: "mid",
+          player: null,
+        },
+        botPlayer: {
+          role: "bottom",
+          player: null,
+        },
+        supportPlayer: {
+          role: "support",
+          player: null,
+        },
+        subPlayer: {
+          role: "sub",
+          player: null,
+        },
+        team: {
+          role: "team",
+          team: null,
+        },
+        captain: 1,
+        transfersMade: 0,
+        transfersAvailable: 100,
+        chipActivated: 0,
+        chips: [],
+      };
+      this.subToSubPlayer = null;
+      this.playerToSubPlayer = null;
+      this.fetchUserTeam(this.selectedLeagueId);
+    },
     chipUsed(id) {
       this.selectedUserTeam.chipActivated = id;
     },
@@ -655,6 +735,16 @@ export default {
       const formattedDate = `${formattedDay}.${formattedMonth}.${formattedYear} ${formattedHours}:${formattedMinutes}`;
 
       return formattedDate;
+    },
+    async fetchUserLeagues() {
+      try {
+        const response = await this.axios.get(
+          `${this.apiURL}User/${this.$store.getters.getCurrentTournamentId}/leagues/${this.$store.getters.getProfileId}`,
+        ); // Replace with the correct endpoint
+        this.userLeagues = response.data;
+      } catch (error) {
+        console.error("Error fetching user leagues:", error);
+      }
     },
     async getCurrentFixture() {
       const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixture`;
@@ -696,7 +786,7 @@ export default {
               .concat(
                 this.nextFixture.matches
                   .filter((m) => m.team1 != null && m.team2 != null)
-                  .map((m) => m.team2)
+                  .map((m) => m.team2),
               )
               .map((m) => m.code);
           }
@@ -714,38 +804,42 @@ export default {
           console.log(error.response);
         });
     },
-    async fetchUserTeam() {
+    async fetchUserTeam(id) {
       try {
         const response = await this.axios.get(
-          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/user_team/${this.$store.getters.getProfileId}`
+          `${this.apiURL}FantasyPoints/${
+            this.$store.getters.getCurrentTournamentId
+          }/user_team/${this.$store.getters.getProfileId}${
+            id == -1 ? "" : "/" + id
+          }`,
         );
         var userTeam = response.data;
         this.selectedUserTeam.topPlayer.player = this.allPlayers.find(
           (element) =>
-            element.esportsPlayerId == userTeam.topPlayer.esportsPlayerId
+            element.esportsPlayerId == userTeam.topPlayer.esportsPlayerId,
         );
         this.selectedUserTeam.junglePlayer.player = this.allPlayers.find(
           (element) =>
-            element.esportsPlayerId == userTeam.junglePlayer.esportsPlayerId
+            element.esportsPlayerId == userTeam.junglePlayer.esportsPlayerId,
         );
         this.selectedUserTeam.midPlayer.player = this.allPlayers.find(
           (element) =>
-            element.esportsPlayerId == userTeam.midPlayer.esportsPlayerId
+            element.esportsPlayerId == userTeam.midPlayer.esportsPlayerId,
         );
         this.selectedUserTeam.botPlayer.player = this.allPlayers.find(
           (element) =>
-            element.esportsPlayerId == userTeam.bottomPlayer.esportsPlayerId
+            element.esportsPlayerId == userTeam.bottomPlayer.esportsPlayerId,
         );
         this.selectedUserTeam.supportPlayer.player = this.allPlayers.find(
           (element) =>
-            element.esportsPlayerId == userTeam.supportPlayer.esportsPlayerId
+            element.esportsPlayerId == userTeam.supportPlayer.esportsPlayerId,
         );
         this.selectedUserTeam.subPlayer.player = this.allPlayers.find(
           (element) =>
-            element.esportsPlayerId == userTeam.subPlayer.esportsPlayerId
+            element.esportsPlayerId == userTeam.subPlayer.esportsPlayerId,
         );
         this.selectedUserTeam.team.team = this.allTeams.find(
-          (element) => element.esportsTeamId == userTeam.team.esportsTeamId
+          (element) => element.esportsTeamId == userTeam.team.esportsTeamId,
         );
         this.selectedUserTeam.captain = userTeam.captain;
         this.selectedUserTeam.transfersMade = userTeam.transfersMade;
@@ -777,7 +871,7 @@ export default {
             this.$store.getters.getCurrentTournamentId
           }/players${
             this.numberOfGames > 0 ? `/form/${this.numberOfGames}` : ""
-          }`
+          }`,
         );
         this.allPlayers = response.data;
         // this.sortedPlayers = this.players;
@@ -790,10 +884,12 @@ export default {
         const response = await this.axios.get(
           `${this.apiURL}FantasyPoints/${
             this.$store.getters.getCurrentTournamentId
-          }/teams${this.numberOfGames > 0 ? `/form/${this.numberOfGames}` : ""}`
+          }/teams${
+            this.numberOfGames > 0 ? `/form/${this.numberOfGames}` : ""
+          }`,
         );
         this.allTeams = response.data;
-        this.fetchUserTeam();
+        this.fetchUserTeam(-1);
         // this.sortedPlayers = this.players;
       } catch (error) {
         console.error("Error fetching teams:", error);
@@ -857,6 +953,7 @@ export default {
       if (!this.validateTeam()) return;
 
       const data = {
+        leagueId: this.selectedLeagueId != -1 ? this.selectedLeagueId : null,
         ownerId: this.$store.getters.getProfileId,
         topPlayerId: this.selectedUserTeam.topPlayer.player.esportsPlayerId,
         junglePlayerId:
@@ -938,6 +1035,54 @@ export default {
         }
       }
     },
+    subPlayers() {
+      if (this.playerToSubPlayer != null && this.subToSubPlayer != null) {
+        if (this.playerToSubPlayer.role == this.subToSubPlayer.role) {
+          for (const key in this.selectedUserTeam) {
+            if (
+              this.selectedUserTeam[key]?.player?.esportsPlayerId ===
+              this.subToSubPlayer.esportsPlayerId
+            ) {
+              console.log("swaping ", this.playerToSubPlayer.summonerName);
+              this.selectedUserTeam[key].player = this.playerToSubPlayer;
+            } else if (
+              this.selectedUserTeam[key]?.player?.esportsPlayerId ===
+              this.playerToSubPlayer.esportsPlayerId
+            ) {
+              console.log("swapping ", this.subToSubPlayer.summonerName);
+              this.selectedUserTeam[key].player = this.subToSubPlayer;
+            }
+          }
+          this.subToSubPlayer = null;
+          this.playerToSubPlayer = null;
+        }
+      }
+    },
+    playerSub(player) {
+      console.log("trying to sub a player from ", player.role);
+      if (player.role == "team") {
+        return;
+      }
+
+      if (player?.esportsPlayerId == this.playerToSubPlayer?.esportsPlayerId)
+        this.playerToSubPlayer = null;
+      else {
+        this.playerToSubPlayer = player;
+        this.subPlayers();
+      }
+    },
+    playerSubSub(player) {
+      console.log("trying to sub a player sub from ", player.role);
+      if (player.role == "team") {
+        return;
+      }
+      if (player?.esportsPlayerId == this.subToSubPlayer?.esportsPlayerId)
+        this.subToSubPlayer = null;
+      else {
+        this.subToSubPlayer = player;
+        this.subPlayers();
+      }
+    },
     addToRole(player, role) {
       var teamPlayer = this.selectPlayerByRole(role);
       if (teamPlayer != null) {
@@ -999,6 +1144,12 @@ export default {
 </script>
 
 <style scoped>
+.filter-label {
+  color: var(--PRIMARY);
+  font-weight: 900;
+  font-size: large;
+  margin-right: 5px;
+}
 .player-circle {
   background-color: var(--GREY-DARKER) !important;
 }

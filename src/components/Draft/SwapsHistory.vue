@@ -98,7 +98,7 @@ export default {
     return {
       openModal: false,
       myOnlyFilter: false,
-      selectedFilter: "all",
+      selectedFilter: "any",
       timeToDeadline: "",
       currentSwap: null,
     };

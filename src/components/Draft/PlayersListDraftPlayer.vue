@@ -269,8 +269,8 @@ export default {
   background: linear-gradient(135deg, #1e3a5f 0%, #152a47 100%);
 }
 .player-card.player-selected-for-swap {
-  border-color: var(--GOLDEN-CAPTAIN);
-  background: linear-gradient(135deg, #4c1d95 0%, #2a0d4e 100%);
+  border-color: var(--GREEN-DARK);
+  box-shadow: 0 0 20px var(--GREEN-DARK, #00d9ff) !important;
 }
 .player-card.player-inactive:not(.already-owned) {
   border-color: #f85a67;
