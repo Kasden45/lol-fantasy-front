@@ -1,5 +1,7 @@
 const port = process.env.PORT || 8080;
 const team_size = 7;
+const apiURL = "https://worlds-fantasy-5b89dfe65b80.herokuapp.com/";
+// const apiURL = "https://localhost:7061/";
 // wire up the module
 const express = require("express");
 const path = require("path");
@@ -8,6 +10,7 @@ const { Server } = require("socket.io");
 // create server instance
 const app = express();
 const server = http.createServer(app);
+const axios = require("axios");
 const io = new Server(server);
 // bind the request to an absolute path or relative to the CWD
 app.use(express.static(path.join(__dirname, "../dist")));
@@ -28,11 +31,13 @@ io.on("connection", (socket) => {
     io.emit("message", { clientId, message });
   });
 
-  socket.on("startDraft", (invitationCode) => {
+  socket.on("startDraft", (invitationCode, leagueId, tournamentId) => {
     if (invitationCode in allDrafts) {
       draft = allDrafts[invitationCode];
     } else {
       draft = {
+        leagueId: leagueId,
+        tournamentId: tournamentId,
         started: true,
         pickedPlayers: {},
         draftQueue: [],
@@ -41,11 +46,12 @@ io.on("connection", (socket) => {
       };
       allDrafts[invitationCode] = draft;
     }
-
+    draft.leagueId = leagueId;
+    draft.tournamentId = tournamentId;
     draft.started = true;
     draft.draftQueue = createDraftQueue(
       draft.draftParticipants,
-      team_size * draft.draftParticipants.length
+      team_size * draft.draftParticipants.length,
     );
     // io.emit('draftStarted', { draftParticipants: draft.draftParticipants, currentDrafter: draft.draftQueue[draft.currentPick]?.user?.id, draftQueue: draft.draftQueue });
     io.emit("currentState", {
@@ -102,50 +108,58 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("playerSelected", ({ clientId, player, invitationCode, role }) => {
-    if (!(invitationCode in allDrafts)) return;
+  socket.on(
+    "playerSelected",
+    async ({ clientId, player, invitationCode, role }) => {
+      if (!(invitationCode in allDrafts)) return;
 
-    let draft = allDrafts[invitationCode];
-    console.log("playerSelected draft:", draft);
-    console.log(draft.draftQueue[draft.currentPick]?.user);
-    if (clientId !== draft.draftQueue[draft.currentPick]?.user?.id) {
-      console.log(`Client ${clientId} tried to pick out of turn`);
-      return;
-    }
+      let draft = allDrafts[invitationCode];
+      console.log("playerSelected draft:", draft);
+      console.log(draft.draftQueue[draft.currentPick]?.user);
+      if (clientId !== draft.draftQueue[draft.currentPick]?.user?.id) {
+        console.log(`Client ${clientId} tried to pick out of turn`);
+        return;
+      }
 
-    console.log(`Client ${clientId} selected player: ${player.summonerName}`);
-    if (!draft.pickedPlayers[clientId]) {
-      draft.pickedPlayers[clientId] = {
-        topPlayer: { role: "top", player: null },
-        junglePlayer: { role: "jungle", player: null },
-        midPlayer: { role: "mid", player: null },
-        bottomPlayer: { role: "bottom", player: null },
-        supportPlayer: { role: "support", player: null },
-        subPlayer: { role: "sub", player: null },
-        team: { role: "team", team: null },
-      };
-    }
-    const roleKey = `${role}Player`;
-    if (draft.pickedPlayers[clientId][roleKey]) {
-      draft.pickedPlayers[clientId][roleKey].player = player;
-      draft.draftQueue[draft.currentPick].player = player;
-    }
+      console.log(`Client ${clientId} selected player: ${player.summonerName}`);
+      if (!draft.pickedPlayers[clientId]) {
+        draft.pickedPlayers[clientId] = {
+          topPlayer: { role: "top", player: null },
+          junglePlayer: { role: "jungle", player: null },
+          midPlayer: { role: "mid", player: null },
+          bottomPlayer: { role: "bottom", player: null },
+          supportPlayer: { role: "support", player: null },
+          subPlayer: { role: "sub", player: null },
+          team: { role: "team", team: null },
+        };
+      }
+      const roleKey = `${role}Player`;
+      if (draft.pickedPlayers[clientId][roleKey]) {
+        draft.pickedPlayers[clientId][roleKey].player = player;
+        draft.draftQueue[draft.currentPick].player = player;
+      }
 
-    // Move to the next drafter
-    draft.currentPick++;
+      // Move to the next drafter
+      draft.currentPick++;
 
-    io.emit("playerSelected", { clientId, player });
-    io.emit("currentState", {
-      pickedPlayers: draft.pickedPlayers,
-      draftParticipants: draft.draftParticipants,
-      currentDrafter: draft.draftQueue[draft.currentPick]?.user?.id,
-      draftQueue: draft.draftQueue,
-      draftStarted: draft.started,
-    });
-    io.emit("currentDrafter", draft.draftQueue[draft.currentPick]?.user?.id);
-  });
+      io.emit("playerSelected", { clientId, player });
+      io.emit("currentState", {
+        pickedPlayers: draft.pickedPlayers,
+        draftParticipants: draft.draftParticipants,
+        currentDrafter: draft.draftQueue[draft.currentPick]?.user?.id,
+        draftQueue: draft.draftQueue,
+        draftStarted: draft.started,
+      });
+      io.emit("currentDrafter", draft.draftQueue[draft.currentPick]?.user?.id);
+      console.log("currentPick", draft.currentPick);
+      console.log("draftQueue length", draft.draftQueue.length);
+      if (draft.currentPick >= draft.draftQueue.length) {
+        await finishDraftCall(draft, invitationCode);
+      }
+    },
+  );
 
-  socket.on("teamSelected", ({ clientId, team, invitationCode }) => {
+  socket.on("teamSelected", async ({ clientId, team, invitationCode }) => {
     if (!(invitationCode in allDrafts)) return;
 
     let draft = allDrafts[invitationCode];
@@ -186,6 +200,11 @@ io.on("connection", (socket) => {
       draftStarted: draft.started,
     });
     io.emit("currentDrafter", draft.draftQueue[draft.currentPick]?.user?.id);
+    console.log("currentPick", draft.currentPick);
+    console.log("draftQueue length", draft.draftQueue.length);
+    if (draft.currentPick >= draft.draftQueue.length) {
+      await finishDraftCall(draft, invitationCode);
+    }
   });
 
   socket.on("disconnect", () => {
@@ -224,9 +243,73 @@ io.on("connection", (socket) => {
 // start the server
 server.listen(port, () =>
   console.log(
-    `Listening on port ${port} and ${path.join(__dirname, "../dist")}`
-  )
+    `Listening on port ${port} and ${path.join(__dirname, "../dist")}`,
+  ),
 );
+
+async function finishDraftCall(draft, invitationCode) {
+  console.log(`Finishing draft for league: ${invitationCode}`);
+  for (const [key, value] of Object.entries(draft.pickedPlayers)) {
+    for (const [key2, value2] of Object.entries(value)) {
+      if (
+        (key2.endsWith("Player") && value2.player == null) ||
+        (key2 == "team" && value2.team == null)
+      ) {
+        console.log(`Player ${key} have no ${key2}`);
+        return;
+      }
+    }
+  }
+  console.log(`Found valid data for league: ${invitationCode}`);
+
+  //Finish draft logic here, e.g. save to database, call external API, etc.
+  for (const [key, value] of Object.entries(draft.pickedPlayers)) {
+    console.log(key, value);
+
+    try {
+      const response = await axios.post(
+        `${apiURL}FantasyPoints/${draft.tournamentId}/user_team`,
+        {
+          OwnerId: parseInt(key), // Set the user's ID
+          TopPlayerId:
+            draft.pickedPlayers[key]["topPlayer"].player.esportsPlayerId,
+          JunglePlayerId:
+            draft.pickedPlayers[key]["junglePlayer"].player.esportsPlayerId,
+          MidPlayerId:
+            draft.pickedPlayers[key]["midPlayer"].player.esportsPlayerId,
+          BottomPlayerId:
+            draft.pickedPlayers[key]["bottomPlayer"].player.esportsPlayerId,
+          SupportPlayerId:
+            draft.pickedPlayers[key]["supportPlayer"].player.esportsPlayerId,
+          SubPlayerId:
+            draft.pickedPlayers[key]["subPlayer"].player.esportsPlayerId,
+          TeamSlug: draft.pickedPlayers[key]["team"].team.slug,
+          LeagueId: draft.leagueId,
+          Captain: 3,
+        },
+      );
+    } catch (err) {
+      console.error("Request failed:", err);
+      return;
+    }
+  }
+  try {
+    axios
+      .post(
+        `${apiURL}Draft/${draft.tournamentId}/league/${invitationCode}/finishDraft/${draft.draftParticipants[0].id}`,
+      )
+      .then((response) => {
+        console.log(response.data);
+        io.emit("draftFinished", draft);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  } catch (err) {
+    console.error("Error processing draft data:", err);
+    return;
+  }
+}
 
 function createDraftQueue(participants, totalPicks) {
   // create snake draft order

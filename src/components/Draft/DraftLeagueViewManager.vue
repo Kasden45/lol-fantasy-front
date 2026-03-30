@@ -630,6 +630,11 @@ export default {
       this.currentDrafter = currentDrafter;
     });
 
+    socket.on("draftFinished", (draft) => {
+      this.refetchTeams();
+      this.activeTab = "swaps";
+    });
+
     socket.on("draftOrderUpdated", ({ draftParticipants, currentDrafter }) => {
       this.draftParticipants = draftParticipants;
       this.currentDrafter = currentDrafter;
@@ -750,6 +755,7 @@ export default {
     },
     finishDraft() {
       console.log(this.leagueId);
+      return;
       socket.emit("finishDraft", this.leagueId);
     },
     choseRole(role) {
@@ -951,7 +957,12 @@ export default {
       });
     },
     startDraft() {
-      socket.emit("startDraft", this.leagueId);
+      socket.emit(
+        "startDraft",
+        this.leagueId,
+        this.realLeagueId,
+        this.$store.getters.getCurrentTournamentId,
+      );
     },
     selectPlayer(player) {
       // if (!this.isCurrentDrafter) {

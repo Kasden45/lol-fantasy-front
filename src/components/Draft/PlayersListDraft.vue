@@ -193,8 +193,11 @@ export default {
       if (!this.nextFixture) return [];
 
       return this.nextFixture.matches.reduce((acc, match) => {
-        acc[match.team1.code] = match.team2.code;
-        acc[match.team2.code] = match.team1.code;
+        if (!acc[match.team1.code]) acc[match.team1.code] = [];
+        if (!acc[match.team2.code]) acc[match.team2.code] = [];
+
+        acc[match.team1.code].push(match.team2.code);
+        acc[match.team2.code].push(match.team1.code);
         return acc;
       }, {});
     },
