@@ -2,7 +2,21 @@
   <div class="player-card" :class="cardClasses" @click="handleClick">
     <!-- Header -->
     <div class="player-header">
-      <span class="team-badge">vs {{ matchups[player.team.code] }}</span>
+      <div class="team-badges">
+        <template v-if="Array.isArray(matchups[player.team.code])">
+          <span
+            v-for="code in matchups[player.team.code]"
+            :key="code"
+            class="team-badge"
+          >
+            vs {{ code }}
+          </span>
+        </template>
+        <span v-else class="team-badge">
+          vs {{ matchups[player.team.code] }}
+        </span>
+      </div>
+
       <span class="role-badge" :class="`role-${player.role.toLowerCase()}`">
         {{ player.role.toUpperCase() }}
       </span>
@@ -288,12 +302,17 @@ export default {
 .team-badge {
   font-size: 11px;
   font-weight: bold;
+  text-align: left;
   color: #fff;
   background: rgba(0, 217, 255, 0.1);
   padding: 2px 6px;
   border-radius: 4px;
 }
-
+.team-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 .role-badge {
   font-size: 10px;
   font-weight: bold;

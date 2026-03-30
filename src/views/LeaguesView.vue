@@ -1,5 +1,6 @@
 <template>
   <div>
+    <LazyLoader v-if="loader" />
     <!-- Create League Section -->
     <div>
       <h2>Create a League</h2>
@@ -55,9 +56,14 @@
 </template>
 
 <script>
+import LazyLoader from "@/components/LazyLoader.vue";
 export default {
+  components: {
+    LazyLoader,
+  },
   data() {
     return {
+      loader: false,
       newLeagueName: "",
       selectedMode: "Normal",
       invitationCode: "",
@@ -67,6 +73,7 @@ export default {
   },
   methods: {
     async createLeague() {
+      this.loader = true;
       try {
         const response = await this.axios.post(
           `${this.apiURL}User/${this.$store.getters.getCurrentTournamentId}/league/create`,
@@ -74,35 +81,40 @@ export default {
             idOwner: this.$store.getters.getProfileId, // Set the user's ID
             name: this.newLeagueName,
             mode: this.selectedMode,
-          }
+          },
         );
         // Add the created league to the list of user leagues
         this.userLeagues.push(response.data);
         this.newLeagueName = ""; // Clear the input field
+        this.loader = false;
       } catch (error) {
         console.error("Error creating league:", error);
+        this.loader = false;
       }
     },
     async joinLeague() {
+      this.loader = true;
       try {
         const response = await this.axios.post(
           `${this.apiURL}User/league/join`,
           {
             userId: this.$store.getters.getProfileId, // Set the user's ID
             invitationCode: this.invitationCode,
-          }
+          },
         );
         // Add the joined league to the list of user leagues
         this.userLeagues.push(response.data);
         this.invitationCode = ""; // Clear the input field
+        this.loader = false;
       } catch (error) {
         console.error("Error joining league:", error);
+        this.loader = false;
       }
     },
     async getLeagueDetails(invitationCode) {
       try {
         const response = await this.axios.get(
-          `${this.apiURL}User/league/${invitationCode}`
+          `${this.apiURL}User/league/${invitationCode}`,
         );
         this.currentLeague = response.data;
       } catch (error) {
@@ -112,7 +124,7 @@ export default {
     async fetchUserLeagues() {
       try {
         const response = await this.axios.get(
-          `${this.apiURL}User/${this.$store.getters.getCurrentTournamentId}/leagues/${this.$store.getters.getProfileId}`
+          `${this.apiURL}User/${this.$store.getters.getCurrentTournamentId}/leagues/${this.$store.getters.getProfileId}`,
         ); // Replace with the correct endpoint
         this.userLeagues = response.data;
       } catch (error) {

@@ -55,9 +55,10 @@
           "
         >
           <!-- Loader overlay -->
-          <div v-if="swapLoading" class="swap-loading-overlay">
+          <!-- <div v-if="swapLoading" class="swap-loading-overlay">
             <div class="swap-spinner"></div>
-          </div>
+          </div> -->
+          <LazyLoader v-if="swapLoading" />
           <div class="target-team-name">
             {{ getTeamName(selectedTeamId) }}
           </div>
@@ -124,13 +125,13 @@
                   "Team " + userTeam.user.username
                 }}
               </span>
-              <span class="team-selector-count">
+              <!-- <span class="team-selector-count">
                 {{
                   Object.values(userTeam.team).filter(
                     (pos) => pos != null && (pos.player || pos.team),
                   ).length
                 }}/{{ Object.keys(userTeam.team).length }}
-              </span>
+              </span> -->
             </div>
           </div>
 
@@ -178,6 +179,7 @@ import MyModal from "../MyModal.vue";
 import ComparePlayers from "./ComparePlayers.vue";
 import SwapsHistory from "./SwapsHistory.vue";
 import SwapCard from "./SwapCard.vue";
+import LazyLoader from "../LazyLoader.vue";
 export default {
   name: "DraftSwapMain",
   components: {
@@ -186,6 +188,7 @@ export default {
     ComparePlayers,
     SwapsHistory,
     SwapCard,
+    LazyLoader,
   },
   props: {
     selectedTeam: {
@@ -833,30 +836,5 @@ export default {
   flex-direction: column;
   gap: 15px;
   overflow-y: auto;
-}
-.swap-loading-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(255, 255, 255, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-  border-radius: inherit;
-}
-
-.swap-spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid rgba(0, 0, 0, 0.1);
-  border-top-color: #333;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 </style>

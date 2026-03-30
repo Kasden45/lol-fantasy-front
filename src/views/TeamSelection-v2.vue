@@ -1,11 +1,12 @@
 <!-- TeamSelection.vue -->
 <template>
   <div class="container">
-    <button class="btn btn-info mb-2">
+    <LazyLoader v-if="loader" />
+    <!-- <button class="btn btn-info mb-2">
       <router-link class="nav-link" :to="{ name: 'TeamSelection' }"
         >Team Selection v1</router-link
       >
-    </button>
+    </button> -->
     <div>
       <label class="filter-label">Your teams</label>
       <select
@@ -330,15 +331,18 @@ import PlayersListV2 from "@/components/Players/AllPlayersListV2.vue";
 import TeamsListV2 from "@/components/Players/AllTeamsListV2.vue";
 import PlayerTeamV2 from "@/components/TeamSelection-v2/PlayerTeam-v2.vue";
 import MatchesView from "./MatchesView.vue";
+import LazyLoader from "@/components/LazyLoader.vue";
 export default {
   components: {
     PlayersListV2,
     TeamsListV2,
     PlayerTeamV2,
     MatchesView,
+    LazyLoader,
   },
   data() {
     return {
+      loader: false,
       userLeagues: [],
       selectedLeagueId: -1,
       lastPlayedFixture: 0,
@@ -696,6 +700,7 @@ export default {
         chipActivated: 0,
         chips: [],
       };
+      this.loader = true;
       this.subToSubPlayer = null;
       this.playerToSubPlayer = null;
       this.fetchUserTeam(this.selectedLeagueId);
@@ -859,6 +864,7 @@ export default {
         ];
 
         console.log("loaded first", this.loadedPlayers);
+        this.loader = false;
         // this.sortedPlayers = this.players;
       } catch (error) {
         console.error("Error fetching players:", error);

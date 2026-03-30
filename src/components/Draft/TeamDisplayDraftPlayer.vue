@@ -28,9 +28,20 @@
     <!-- Filled Position -->
     <template v-if="position.player">
       <div class="card-header">
-        <span class="team-badge"
-          >vs {{ matchups[position.player.team?.code] }}</span
-        >
+        <div class="team-badges">
+          <template v-if="Array.isArray(matchups[position.player.team?.code])">
+            <span
+              v-for="code in matchups[position.player.team?.code]"
+              :key="code"
+              class="team-badge"
+            >
+              vs {{ code }}
+            </span>
+          </template>
+          <span v-else class="team-badge">
+            vs {{ matchups[position.player.team?.code] }}
+          </span>
+        </div>
         <span class="role-badge" :class="`role-${position.role.toLowerCase()}`">
           {{ position.role.toUpperCase() }}
         </span>
@@ -45,7 +56,9 @@
         />
       </div>
 
-      <div class="player-name">{{ position.player.summonerName }}</div>
+      <div class="player-name">
+        {{ position.player.team.code }} {{ position.player.summonerName }}
+      </div>
 
       <div class="player-stats-mini">
         <div class="stat-mini">
@@ -62,7 +75,20 @@
     </template>
     <template v-if="position.team">
       <div class="card-header">
-        <span class="team-badge">vs {{ matchups[position.team?.code] }}</span>
+        <div class="team-badges">
+          <template v-if="Array.isArray(matchups[position.team?.code])">
+            <span
+              v-for="code in matchups[position.team?.code]"
+              :key="code"
+              class="team-badge"
+            >
+              vs {{ code }}
+            </span>
+          </template>
+          <span v-else class="team-badge">
+            vs {{ matchups[position.team?.code] }}
+          </span>
+        </div>
         <span class="role-badge" :class="`role-team`"> TEAM </span>
       </div>
 
@@ -313,13 +339,18 @@ export default {
 
 .team-badge {
   font-size: 10px;
+  text-align: left;
   font-weight: bold;
   color: #fff;
   background: rgba(0, 217, 255, 0.1);
   padding: 2px 6px;
   border-radius: 4px;
 }
-
+.team-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 .role-badge {
   font-size: 9px;
   font-weight: bold;
