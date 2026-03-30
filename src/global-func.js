@@ -77,7 +77,9 @@ export const func_global = {
   mapSettings(settingCode) {
     if (settingCode == "SEND_MAIL")
       return "Send email notification reminding about the upcoming fixture";
-    else if (day == "STH") return "Not defined";
+    else if (settingCode == "SWAP_NOTIFY")
+      return "Send email notification about the swap request";
+    else return "Not defined";
   },
   formatDate(inputDate) {
     // Create a Date object from the input string
