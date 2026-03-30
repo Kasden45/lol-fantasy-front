@@ -117,7 +117,7 @@
     </div>
 
     <!-- Players Grid -->
-    <div class="players-grid">
+    <div class="players-grid" ref="playersGrid">
       <PlayerDraftCard
         v-if="selectedFilter !== 'team'"
         v-for="player in filteredAndSortedPlayers"
@@ -180,7 +180,7 @@ export default {
   data() {
     return {
       hideInactive: true,
-      selectedSorting: "points",
+      selectedSorting: "priceDesc",
       selectedFilter: "any",
       selectedTeamFilter: "all",
       sortedPlayers: [],
@@ -287,6 +287,7 @@ export default {
           a.team.name.toLowerCase().localeCompare(b.team.name.toLowerCase()),
         );
       }
+      this.scrollGridToTop();
     },
     orderTeams(option) {
       if (option === "points") {
@@ -322,6 +323,7 @@ export default {
       if (option === "priceDesc") {
         this.sortedTeams.sort((a, b) => b.price - a.price);
       }
+      this.scrollGridToTop();
     },
     extractUniqueTeamCodes() {
       this.uniqueTeamCodes = Array.from(
@@ -386,6 +388,9 @@ export default {
     fetchTeams() {
       this.sortedTeams = this.teams.filter((p) => p.price > 0);
       this.orderTeams("points");
+    },
+    scrollGridToTop() {
+      this.$refs.playersGrid?.scrollTo({ top: 0, behavior: "smooth" });
     },
   },
   created() {
