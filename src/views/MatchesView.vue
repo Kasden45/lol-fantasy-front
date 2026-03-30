@@ -1,26 +1,32 @@
 <template>
-  <button
-    v-if="
-      this.$store.getters.getProfileId != null &&
-      this.$store.getters.getProfileId == 5
-    "
-    class="btn btn-info"
-    @click="fetchMatches()"
-  >
-    Fetch matches
-  </button>
-  <div class="button-container m-auto row" v-if="this.oneFixtureId == null">
-    <div class="col-6 d-flex justify-self-start">
-      <button class="btn btn-info btn-purple" @click="scrollLeft">&lt;</button>
+  <div class="matches-back">
+    <button
+      v-if="$store.getters.getProfileId == 5"
+      class="admin-btn"
+      @click="fetchMatches()"
+    >
+      Fetch matches
+    </button>
+
+    <div class="fixtures-wrapper" v-if="oneFixtureId == null">
+      <button class="scroll-btn" @click="scrollLeft">‹</button>
+
+      <div class="fixtures-container">
+        <div class="fixtures" ref="fixturesContainer">
+          <FixtureCard
+            v-for="fixture in matchesByFixture"
+            :key="fixture.id"
+            :fixture="fixture"
+          />
+        </div>
+      </div>
+
+      <button class="scroll-btn" @click="scrollRight">›</button>
     </div>
-    <div class="col-6 d-flex justify-content-end sticky-end">
-      <button class="btn btn-info btn-purple" @click="scrollRight">></button>
-    </div>
-  </div>
-  <div class="fixtures-container m-auto">
-    <div class="fixtures" ref="fixturesContainer">
+
+    <div v-else class="fixtures-single">
       <FixtureCard
-        v-for="fixture in this.matchesByFixture"
+        v-for="fixture in matchesByFixture"
         :key="fixture.id"
         :fixture="fixture"
       />
@@ -137,11 +143,11 @@ export default {
         .then((response) => {
           if (this.oneFixtureId == null) {
             this.matchesByFixture = response.data.fixturesWithMatches.sort(
-              (a, b) => a.fixture.order - b.fixture.order
+              (a, b) => a.fixture.order - b.fixture.order,
             );
           } else {
             this.matchesByFixture = response.data.fixturesWithMatches.filter(
-              (f) => f.fixture.fixtureId == this.oneFixtureId
+              (f) => f.fixture.fixtureId == this.oneFixtureId,
             );
           }
           this.positionScroll();
@@ -173,49 +179,99 @@ export default {
 </script>
 
 <style scoped>
-.player-photo {
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
-  border-radius: 50%;
-  margin-right: 20px;
-}
-
 .matches-back {
-  background-color: var(--PRIMARY-LIGHTER);
-}
-.fixtures-container {
-  width: 80vw;
-  padding: 20px;
-  /* display: flex; */
+  background-color: var(--BACKGROUND-DARK);
+  min-height: 100vh;
+  padding: 24px;
 }
 
-.button-container {
-  width: 80vw;
-  padding-left: 50px;
-  padding-right: 0px;
+.admin-btn {
+  margin-bottom: 16px;
+  padding: 8px 16px;
+  background: var(--PRIMARY);
+  border: none;
+  border-radius: 8px;
+  color: var(--GREY-LIGHT);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.admin-btn:hover {
+  opacity: 0.85;
+}
+
+.fixtures-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 90vw;
+  margin: 0 auto;
+}
+
+.fixtures-container {
+  flex: 1;
+  overflow: hidden;
 }
 
 .fixtures {
   display: flex;
-  justify-content: space-between;
-  width: 80vw;
+  gap: 16px;
   overflow-x: auto;
-  white-space: nowrap;
-  /* background-color: rgb(252, 240, 255) */
-  /* border: 1px solid #ddd; */
+  scroll-behavior: smooth;
+  padding-bottom: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--PRIMARY-DARKER) var(--SECONDARY);
 }
 
-::-webkit-scrollbar {
-  width: 5px;
-  height: 10px;
-  background-color: var(--DARK-YELLOW);
+.fixtures::-webkit-scrollbar {
+  height: 6px;
 }
 
-.btn-purple {
-  background-color: var(--PRIMARY-LIGHTER);
-  font-weight: 800;
-  color: white;
-  border: none;
+.fixtures::-webkit-scrollbar-track {
+  background: var(--SECONDARY);
+  border-radius: 4px;
+}
+
+.fixtures::-webkit-scrollbar-thumb {
+  background: var(--PRIMARY-DARKER);
+  border-radius: 4px;
+}
+
+/* Make each fixture card a fixed width so scrolling works predictably */
+.fixtures > :deep(.fixture-card) {
+  min-width: 320px;
+  max-width: 320px;
+  flex-shrink: 0;
+  white-space: normal;
+}
+
+.scroll-btn {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  margin-top: 16px;
+  background: var(--SECONDARY);
+  border: 1px solid var(--GREY-DARKER);
+  border-radius: 8px;
+  color: var(--PRIMARY-LIGHTER);
+  font-size: 22px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scroll-btn:hover {
+  border-color: var(--PRIMARY);
+  color: var(--PRIMARY);
+}
+
+.fixtures-single {
+  max-width: 400px;
+  margin: 0 auto;
 }
 </style>
