@@ -1,107 +1,94 @@
 <template>
-  <div class="fixture-card col-lg-4 col-md-8 col-sm-12 mx-2">
+  <div class="fixture-card">
     <div class="card-header">
+      <div class="header-top">
+        <div>
+          <p class="fixture-eyebrow">Fixture</p>
+          <h4 class="fixture-title">{{ fixture.fixture.name }}</h4>
+        </div>
+        <span class="deadline-badge">
+          {{ $func_global.formatDate(fixture.fixture.deadlineDate) }}
+        </span>
+      </div>
       <button
-        v-if="
-          this.$store.getters.getProfileId != null &&
-          this.$store.getters.getProfileId == 5
-        "
-        class="me-2 btn btn-info"
+        v-if="$store.getters.getProfileId == 5"
+        class="update-btn"
         @click="calculatePoints(fixture.fixture.fixtureId)"
       >
         Update points
       </button>
-      <h4>
-        {{ fixture.fixture.name }} -
-        {{ this.$func_global.formatDate(fixture.fixture.deadlineDate) }}
-      </h4>
     </div>
-    <div class="match-list container">
+
+    <div class="match-list">
       <div
         v-for="(time, index) in fixture.matches
-          .map((m) => this.$func_global.formatDateOnly(m.startTime))
+          .map((m) => $func_global.formatDateOnly(m.startTime))
           .filter((value, index, self) => self.indexOf(value) === index)"
         :key="index"
-        class="row"
       >
-        <div class="col-12 fixture-headline">
-          {{ this.$func_global.getDayOfWeek(time) }} {{ time }}
+        <div class="day-header">
+          {{ $func_global.getDayOfWeek(time) }} {{ time }}
         </div>
+
         <div
-          v-for="(match, index) in fixture.matches.filter(
-            (m) => this.$func_global.formatDateOnly(m.startTime) == time
+          v-for="(match, mIndex) in fixture.matches.filter(
+            (m) => $func_global.formatDateOnly(m.startTime) == time,
           )"
-          :key="index"
+          :key="mIndex"
           class="match-item"
-          :class="{ 'active-match-item': isInPlay(match) }"
+          :class="{ 'match-live': isInPlay(match) }"
         >
-          <div class="col-2">
-            {{ match.team1 != null ? match.team1.code : "TBD" }}
-          </div>
-          <div class="col-2">
+          <!-- Team 1 -->
+          <div class="team-side">
             <img
-              v-if="match.team1 != null"
+              v-if="match.team1"
               :src="match.team1.imageUrl"
-              class="team-photo"
-              alt="Player Photo"
+              class="team-logo"
             />
+            <span class="team-code">{{
+              match.team1 ? match.team1.code : "TBD"
+            }}</span>
           </div>
-          <router-link
-            :to="{ name: 'MatchDetailsView', params: { matchId: match.id } }"
-            class="col-2 router-black"
-            v-if="
-              this.$store.getters.getProfileId != null &&
-              this.$store.getters.getProfileId == 5 &&
-              match.team1 != null &&
-              match.team1.wins != null &&
-              match.team2 != null &&
-              match.team2.wins != null
-            "
-          >
-            {{ match.team1.wins }} - {{ match.team2.wins }}
-            {{ isInPlay(match) ? "🔴" : "" }}
-          </router-link>
-          <div
-            class="col-2"
-            v-if="
-              (this.$store.getters.getProfileId == null ||
-                this.$store.getters.getProfileId != 5) &&
-              match.team1 != null &&
-              match.team1.wins != null &&
-              match.team2 != null &&
-              match.team2.wins != null
-            "
-          >
-            {{ match.team1.wins }} - {{ match.team2.wins }}
-            {{ isInPlay(match) ? "🔴" : "" }}
+
+          <!-- Score / Time -->
+          <div class="match-center">
+            <template
+              v-if="match.team1?.wins != null && match.team2?.wins != null"
+            >
+              <router-link
+                v-if="$store.getters.getProfileId == 5"
+                :to="{
+                  name: 'MatchDetailsView',
+                  params: { matchId: match.id },
+                }"
+                class="score"
+              >
+                {{ match.team1.wins }} - {{ match.team2.wins }}
+              </router-link>
+              <span v-else class="score"
+                >{{ match.team1.wins }} - {{ match.team2.wins }}</span
+              >
+              <span v-if="isInPlay(match)" class="live-dot">🔴</span>
+            </template>
+            <template v-else>
+              <span class="bo-label">Bo{{ match.maxGames }}</span>
+              <span class="match-time">{{
+                $func_global.formatTime(match.startTime)
+              }}</span>
+              <span v-if="isInPlay(match)" class="live-dot">🔴</span>
+            </template>
           </div>
-          <div
-            class="col-2"
-            v-if="
-              !(
-                match.team1 != null &&
-                match.team1.wins != null &&
-                match.team2 != null &&
-                match.team2.wins != null
-              )
-            "
-          >
-            <div class="match-result">Bo{{ match.maxGames }}</div>
-            <div class="match-result">
-              {{ this.$func_global.formatTime(match.startTime) }}
-              {{ isInPlay(match) ? "🔴" : "" }}
-            </div>
-          </div>
-          <div class="col-2">
+
+          <!-- Team 2 -->
+          <div class="team-side team-side-right">
+            <span class="team-code">{{
+              match.team2 ? match.team2.code : "TBD"
+            }}</span>
             <img
-              v-if="match.team2 != null"
+              v-if="match.team2"
               :src="match.team2.imageUrl"
-              class="team-photo"
-              alt="Player Photo"
+              class="team-logo"
             />
-          </div>
-          <div class="col-2">
-            {{ match.team2 != null ? match.team2.code : "TBD" }}
           </div>
         </div>
       </div>
@@ -136,7 +123,7 @@ export default {
     calculateTotalPoints(pointsDetails) {
       return Object.values(pointsDetails).reduce(
         (total, points) => total + points.points,
-        0
+        0,
       );
     },
     selectGame(index) {
@@ -188,58 +175,160 @@ export default {
 
 <style scoped>
 .fixture-card {
-  /* border: 1px solid pink; */
-  /* padding: 10px; */
-  /* margin: 1px; */
-  /* width: 30%; */
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--GREY-DARKER);
+  background: var(--BACKGROUND-LIGHTER);
 }
 
 .card-header {
-  background-color: VAR(--TEXT-SECONDARY);
-  color: white;
-  padding: 10px;
-  text-align: center;
-  border-radius: 10px 10px 0 0;
+  background: var(--SECONDARY);
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--GREY-DARKER);
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.fixture-eyebrow {
+  margin: 0 0 2px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--PRIMARY-LIGHTER);
+}
+
+.fixture-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--GREY-LIGHT);
+}
+
+.deadline-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--PRIMARY-LIGHTER);
+  background: var(--BACKGROUND-DARK);
+  border: 1px solid var(--GREY-DARKER);
+  border-radius: 6px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.update-btn {
+  margin-top: 12px;
+  padding: 6px 14px;
+  background: var(--PRIMARY);
+  border: none;
+  border-radius: 6px;
+  color: var(--GREY-LIGHT);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.update-btn:hover {
+  opacity: 0.85;
 }
 
 .match-list {
-  /* margin-top: 10px; */
-  background-color: VAR(--PRIMARY-LIGHTER);
-  border-radius: 0 0 10px 10px; /* Round the edges */
+  padding: 8px 0;
 }
 
-.fixture-headline {
-  /* padding: 5px 5px; */
-  /* margin-top: 10px; */
-  color: VAR(--TEXT-SECONDARY);
-  padding: 0px;
-  background-color: VAR(--TABLE-ROW-MAIN);
+.day-header {
+  padding: 6px 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--PRIMARY-LIGHTER);
+  background: var(--BACKGROUND-DARK);
+  border-top: 1px solid var(--GREY-DARKER);
+  border-bottom: 1px solid var(--GREY-DARKER);
 }
 
 .match-item {
-  padding: 3px 0px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  padding: 6px 20px;
+  border-bottom: 1px solid var(--GREY-DARKER);
+  transition: background 0.15s;
 }
 
-.active-match-item {
-  background-color: rgba(248, 90, 90, 0.26);
+.match-item:last-child {
+  border-bottom: none;
 }
 
-.team-photo {
-  width: 30px;
-  height: 30px;
-  object-fit: cover;
+.match-item:hover {
+  background: var(--SECONDARY);
+}
+
+.match-live {
+  background: rgba(244, 67, 54, 0.08);
+}
+
+.team-side {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 80px;
+}
+
+.team-side-right {
+  justify-content: flex-end;
+}
+
+.team-logo {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
   border-radius: 50%;
-  margin-right: 20px;
 }
 
-.router-black {
-  color: black;
+.team-code {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--GREY);
 }
 
-.match-result {
-  font-size: 14px;
+.match-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+}
+
+.score {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--GREY-LIGHT);
+  text-decoration: none;
+}
+
+.bo-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--GREY-DARKER);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.match-time {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--GREY);
+}
+
+.live-dot {
+  font-size: 10px;
 }
 </style>

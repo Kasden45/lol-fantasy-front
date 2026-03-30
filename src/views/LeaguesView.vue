@@ -1,43 +1,89 @@
 <template>
-  <div>
+  <div class="leagues-page">
     <LazyLoader v-if="loader" />
-    <!-- Create League Section -->
-    <div>
-      <h2>Create a League</h2>
-      <label for="league-mode">League Mode:</label>
-      <select id="league-mode" v-model="selectedMode" class="me-2">
-        <option value="Normal">Regular Mode</option>
-        <option value="Draft">Draft Mode</option>
-      </select>
-      <input v-model="newLeagueName" placeholder="Enter league name" />
-      <button @click="createLeague">Create League</button>
+
+    <div class="page-header">
+      <div class="header-accent" />
+      <div>
+        <p class="eyebrow">LOL Fantasy</p>
+        <h1 class="page-title">Leagues</h1>
+      </div>
     </div>
 
-    <!-- Join League Section -->
-    <div>
-      <h2>Join a League</h2>
-      <input v-model="invitationCode" placeholder="Enter invitation code" />
-      <button @click="joinLeague">Join League</button>
-    </div>
+    <div class="leagues-layout">
+      <!-- Left Column: Actions -->
+      <div class="actions-column">
+        <!-- Create League -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Create a League</h2>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Mode</label>
+            <select v-model="selectedMode" class="field-select">
+              <option value="Normal">Regular Mode</option>
+              <option value="Draft">Draft Mode</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">League Name</label>
+            <input
+              v-model="newLeagueName"
+              class="field-input"
+              placeholder="Enter league name"
+            />
+          </div>
+          <button class="btn-primary" @click="createLeague">
+            Create League
+          </button>
+        </div>
 
-    <!-- List of Leagues the User Is In -->
-    <h2>Your Leagues</h2>
-    <div class="container">
-      <div
-        class="row w-50 justify-content-md-center m-auto my-2"
-        v-for="league in userLeagues"
-        :key="league.invitationCode"
-      >
-        <div class="col-md-2 league-name fw-normal fst-italic">
-          {{ league.mode }}
+        <!-- Join League -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Join a League</h2>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Invitation Code</label>
+            <input
+              v-model="invitationCode"
+              class="field-input"
+              placeholder="Enter invitation code"
+            />
+          </div>
+          <button class="btn-secondary" @click="joinLeague">Join League</button>
         </div>
-        <div class="col-md-3 league-name">
-          {{ league.name }}
+      </div>
+
+      <!-- Right Column: League List -->
+      <div class="leagues-column">
+        <div class="leagues-list-header">
+          <h2 class="section-title">Your Leagues</h2>
+          <span class="league-count">{{ userLeagues.length }}</span>
         </div>
-        <div class="col-md-3">
+
+        <div v-if="userLeagues.length === 0" class="empty-state">
+          <p class="empty-text">No leagues yet</p>
+          <p class="empty-sub">Create or join one to get started</p>
+        </div>
+
+        <div
+          v-for="(league, index) in userLeagues"
+          :key="league.invitationCode"
+          class="league-row"
+          :style="{ animationDelay: `${index * 60}ms` }"
+        >
+          <div class="league-row-left">
+            <span
+              class="mode-badge"
+              :class="`mode-${league.mode.toLowerCase()}`"
+            >
+              {{ league.mode }}
+            </span>
+            <span class="league-row-name">{{ league.name }}</span>
+          </div>
           <router-link
-            class="btn details btn-info"
-            :class="{ active: this.$route.name === 'Offer' }"
+            class="btn-details"
             :to="{
               name: 'SingleLeagueView',
               params: {
@@ -45,13 +91,12 @@
                 leagueMode: league.mode,
               },
             }"
-            >Details</router-link
           >
+            Details →
+          </router-link>
         </div>
       </div>
     </div>
-
-    <!-- <button @click="getLeagueDetails(league.invitationCode)">View Details</button> -->
   </div>
 </template>
 
@@ -140,25 +185,317 @@ export default {
 </script>
 
 <style scoped>
-.league-name {
-  font-size: medium;
-  font-weight: 500;
-  text-align: end;
-  align-self: center;
-}
-.details {
-  display: flex;
-  align-items: flex-start;
-  width: fit-content;
-}
-.mode-selection {
-  margin: 15px 0;
+.leagues-page {
+  min-height: 100vh;
+  background-color: var(--BACKGROUND-DARK);
+  padding: 48px 32px;
+  font-family: "DM Sans", sans-serif;
 }
 
-select {
-  padding: 8px;
+/* Header */
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: 1100px;
+  margin: 0 auto 40px;
+}
+
+.header-accent {
+  width: 4px;
+  height: 52px;
   border-radius: 4px;
-  border: 1px solid #ccc;
-  margin-left: 10px;
+  background: linear-gradient(180deg, var(--PRIMARY), var(--PRIMARY-LIGHTER));
+  flex-shrink: 0;
+}
+
+.eyebrow {
+  margin: 0 0 2px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--PRIMARY);
+}
+
+.page-title {
+  margin: 0;
+  font-family: "Syne", sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--GREY-LIGHT);
+  line-height: 1;
+}
+
+/* Layout */
+.leagues-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .leagues-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Actions Column */
+.actions-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  background: var(--BACKGROUND-LIGHTER);
+  border: 1px solid var(--GREY-DARKER);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-icon {
+  font-size: 18px;
+}
+
+.card-title {
+  margin: 0;
+  font-family: "Syne", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--GREY-LIGHT);
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--PRIMARY-LIGHTER);
+}
+
+.field-input,
+.field-select {
+  background: var(--BACKGROUND-DARK);
+  border: 1px solid var(--GREY-DARKER);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--GREY);
+  font-size: 14px;
+  font-family: "DM Sans", sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.field-input:focus,
+.field-select:focus {
+  border-color: var(--PRIMARY);
+}
+
+.field-input::placeholder {
+  color: var(--GREY-DARKER);
+}
+
+.field-select option {
+  background: var(--SECONDARY);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, var(--PRIMARY), var(--PRIMARY-DARKER));
+  border: none;
+  border-radius: 8px;
+  color: var(--GREY-LIGHT);
+  font-size: 14px;
+  font-weight: 700;
+  font-family: "DM Sans", sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid var(--PRIMARY);
+  border-radius: 8px;
+  color: var(--PRIMARY-LIGHTER);
+  font-size: 14px;
+  font-weight: 700;
+  font-family: "DM Sans", sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.btn-secondary:hover {
+  background: var(--BACKGROUND-LIGHTER);
+  transform: translateY(-1px);
+}
+
+/* Leagues Column */
+.leagues-column {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.leagues-list-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  margin: 0;
+  font-family: "Syne", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--GREY-LIGHT);
+}
+
+.league-count {
+  background: var(--BACKGROUND-LIGHTER);
+  color: var(--PRIMARY-LIGHTER);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--GREY-DARKER);
+}
+
+.league-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  background: var(--BACKGROUND-LIGHTER);
+  border: 1px solid var(--GREY-DARKER);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  transition: border-color 0.2s, background 0.2s;
+  animation: fadeSlideIn 0.4s ease both;
+}
+
+.league-row:hover {
+  border-color: var(--PRIMARY-DARKER);
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.league-row-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mode-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.mode-draft {
+  background: var(--BACKGROUND-LIGHTER);
+  color: var(--PRIMARY-LIGHTER);
+  border: 1px solid var(--PRIMARY-DARKER);
+}
+
+.mode-normal {
+  background: var(--BACKGROUND-LIGHTER);
+  color: var(--BLUE);
+  border: 1px solid var(--BLUE);
+}
+
+.league-row-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--GREY-LIGHT);
+}
+
+.btn-details {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--PRIMARY);
+  text-decoration: none;
+  padding: 8px 16px;
+  border: 1px solid var(--PRIMARY-DARKER);
+  border-radius: 8px;
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+
+.btn-details:hover {
+  background: var(--BACKGROUND-LIGHTER);
+  color: var(--PRIMARY-LIGHTER);
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: var(--BACKGROUND-LIGHTER);
+  border: 1px dashed var(--GREY-DARKER);
+  border-radius: 12px;
+}
+
+.empty-icon {
+  font-size: 40px;
+  margin: 0 0 12px;
+}
+
+.empty-text {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--GREY-LIGHT);
+}
+
+.empty-sub {
+  margin: 0;
+  font-size: 13px;
+  color: var(--GREY-DARKER);
 }
 </style>
