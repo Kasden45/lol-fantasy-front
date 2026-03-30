@@ -58,6 +58,7 @@
   </DraftSwapMain>
   <!-- Draft and league -->
   <div v-if="activeTab == 'draft'" class="container">
+    <LazyLoader v-if="loader" />
     <button
       class="cta-btn"
       @click="joinDraft"
@@ -82,17 +83,18 @@
     >
       Start Draft
     </button>
-    <div>
-      <a
-        v-if="
-          !this.draftStarted &&
-          this.draftParticipants
-            .map((p) => p.id)
-            .includes(this.$store.getters.getProfileId)
-        "
-        >Players waiting for draft:
-        {{ this.draftParticipants.map((p) => p.username) }}</a
-      >
+    <div
+      v-if="
+        !draftStarted &&
+        draftParticipants.map((p) => p.id).includes($store.getters.getProfileId)
+      "
+    >
+      <p class="waiting-label">Players waiting for draft:</p>
+      <ul class="waiting-list">
+        <li v-for="participant in draftParticipants" :key="participant.id">
+          {{ participant.username }}
+        </li>
+      </ul>
     </div>
     <!-- <div v-if="isCurrentDrafter">
         <h3>It's your turn to pick!</h3>
@@ -209,11 +211,11 @@
             />
           </div> -->
     </div>
-    <div>
+    <!-- <div>
       <button class="btn btn-success" @click="finishDraft()">
         Finish draft
       </button>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -224,6 +226,7 @@ import PlayersList from "@/components/Players/AllPlayersList.vue";
 import PlayersListDraft from "@/components/Draft/PlayersListDraft.vue";
 import TeamRoster from "@/components/Draft/TeamDisplayDraft.vue";
 import DraftSwapMain from "@/components/Draft/DraftSwapMain.vue";
+import LazyLoader from "../LazyLoader.vue";
 export default {
   props: {
     leagueId: String,
@@ -235,9 +238,11 @@ export default {
     PlayersListDraft,
     TeamRoster,
     DraftSwapMain,
+    LazyLoader,
   },
   data() {
     return {
+      loader: false,
       name: "DraftLeagueViewManager",
       activeTab: "results",
       realLeagueId: null,
@@ -264,36 +269,7 @@ export default {
         junglePlayer: { role: "jungle", player: null },
         midPlayer: {
           role: "mid",
-          player: {
-            esportsPlayerId: "99871276342168416",
-            firstName: "Jihun",
-            lastName: "Jung",
-            summonerName: "Chovy",
-            role: "mid",
-            imageUrl:
-              "http://static.lolesports.com/players/1686474439543_GEN_Chovy.png",
-            nationality: "South Korea",
-            price: 100,
-            points: 0,
-            gamesPlayed: 0,
-            matchesPlayed: 0,
-            team: {
-              esportsTeamId: "100205573495116443",
-              slug: "geng",
-              name: "Gen.G Esports",
-              region: "KOREA",
-              league: "LCK",
-              code: "GEN",
-              imageUrl:
-                "http://static.lolesports.com/teams/1655210113163_GenG_logo_200407-05.png",
-              backgroundImageUrl:
-                "https://lolstatic-a.akamaihd.net/esports-assets/production/team/geng-bnm75bf5.png",
-              price: 15,
-              gamesPlayed: 0,
-              matchesPlayed: 0,
-              points: 0,
-            },
-          },
+          player: null,
         },
         bottomPlayer: { role: "bottom", player: null },
         supportPlayer: { role: "support", player: null },
@@ -303,122 +279,7 @@ export default {
       // selectedPlayers: [],
       draftQueue: [],
       otherFinishedTeams: {},
-      otherTeams: {
-        // "Sly Marb0": {
-        //   topPlayer: {
-        //     role: "top",
-        //     player: {
-        //       esportsPlayerId: "99871276342168416",
-        //       firstName: "Jihun",
-        //       lastName: "Jung",
-        //       summonerName: "Chovy",
-        //       role: "mid",
-        //       imageUrl:
-        //         "http://static.lolesports.com/players/1686474439543_GEN_Chovy.png",
-        //       nationality: "South Korea",
-        //       price: 100,
-        //       points: 0,
-        //       gamesPlayed: 0,
-        //       matchesPlayed: 0,
-        //       team: {
-        //         esportsTeamId: "100205573495116443",
-        //         slug: "geng",
-        //         name: "Gen.G Esports",
-        //         region: "KOREA",
-        //         league: "LCK",
-        //         code: "GEN",
-        //         imageUrl:
-        //           "http://static.lolesports.com/teams/1655210113163_GenG_logo_200407-05.png",
-        //         backgroundImageUrl:
-        //           "https://lolstatic-a.akamaihd.net/esports-assets/production/team/geng-bnm75bf5.png",
-        //         price: 15,
-        //         gamesPlayed: 0,
-        //         matchesPlayed: 0,
-        //         points: 0,
-        //       },
-        //     },
-        //   },
-        //   junglePlayer: { role: "jungle", player: null },
-        //   midPlayer: { role: "mid", player: null },
-        //   bottomPlayer: { role: "bottom", player: null },
-        //   supportPlayer: { role: "support", player: null },
-        //   subPlayer: { role: "sub", player: null },
-        //   team: { role: "team", team: null },
-        // },
-        // Hakkene: {
-        //   topPlayer: {
-        //     role: "top",
-        //     player: {
-        //       esportsPlayerId: "99871276342168416",
-        //       firstName: "Jihun",
-        //       lastName: "Jung",
-        //       summonerName: "Chovy",
-        //       role: "mid",
-        //       imageUrl:
-        //         "http://static.lolesports.com/players/1686474439543_GEN_Chovy.png",
-        //       nationality: "South Korea",
-        //       price: 100,
-        //       points: 0,
-        //       gamesPlayed: 0,
-        //       matchesPlayed: 0,
-        //       team: {
-        //         esportsTeamId: "100205573495116443",
-        //         slug: "geng",
-        //         name: "Gen.G Esports",
-        //         region: "KOREA",
-        //         league: "LCK",
-        //         code: "GEN",
-        //         imageUrl:
-        //           "http://static.lolesports.com/teams/1655210113163_GenG_logo_200407-05.png",
-        //         backgroundImageUrl:
-        //           "https://lolstatic-a.akamaihd.net/esports-assets/production/team/geng-bnm75bf5.png",
-        //         price: 15,
-        //         gamesPlayed: 0,
-        //         matchesPlayed: 0,
-        //         points: 0,
-        //       },
-        //     },
-        //   },
-        //   junglePlayer: { role: "jungle", player: null },
-        //   midPlayer: {
-        //     role: "mid",
-        //     player: {
-        //       esportsPlayerId: "99871276342168416",
-        //       firstName: "Jihun",
-        //       lastName: "Jung",
-        //       summonerName: "Faker",
-        //       role: "mid",
-        //       imageUrl:
-        //         "http://static.lolesports.com/players/1686475867148_T1_Faker.png",
-        //       nationality: "South Korea",
-        //       price: 100,
-        //       points: 0,
-        //       gamesPlayed: 0,
-        //       matchesPlayed: 0,
-        //       team: {
-        //         esportsTeamId: "100205573495116443",
-        //         slug: "t1",
-        //         name: "T1",
-        //         region: "KOREA",
-        //         league: "LCK",
-        //         code: "T1",
-        //         imageUrl:
-        //           "http://static.lolesports.com/teams/1726801573959_539px-T1_2019_full_allmode.png",
-        //         backgroundImageUrl:
-        //           "http://static.lolesports.com/teams/1596305556675_T1T1.png",
-        //         price: 15,
-        //         gamesPlayed: 0,
-        //         matchesPlayed: 0,
-        //         points: 0,
-        //       },
-        //     },
-        //   },
-        //   bottomPlayer: { role: "bottom", player: null },
-        //   supportPlayer: { role: "support", player: null },
-        //   subPlayer: { role: "sub", player: null },
-        //   team: { role: "team", team: null },
-        // },
-      },
+      otherTeams: {},
       teamsPlayingInNextFixture: [],
       matchesByFixture: null,
       nextFixture: null,
@@ -630,8 +491,10 @@ export default {
       this.currentDrafter = currentDrafter;
     });
 
-    socket.on("draftFinished", (draft) => {
-      this.refetchTeams();
+    socket.on("draftFinished", async (draft) => {
+      this.loader = true;
+      await this.refetchTeams();
+      this.loader = false;
       this.activeTab = "swaps";
     });
 
@@ -769,124 +632,7 @@ export default {
       this.axios
         .get(url)
         .then((response) => {
-          this.matchesByFixture =
-            // [
-            //   {
-            //     fixture: {
-            //       fixtureId: 26,
-            //       order: 1,
-            //       name: "Round 1",
-            //       isFinished: false,
-            //       opensAtDate: "2026-03-05T15:00:00Z",
-            //       deadlineDate: "2026-03-10T04:40:00Z",
-            //       transfersLimit: 100,
-            //       teamValueLimit: 72,
-            //     },
-            //     matches: [
-            //       {
-            //         id: "113475798006599034",
-            //         state: null,
-            //         startTime: "2026-03-10T05:00:00Z",
-            //         maxGames: 1,
-            //         team1: {
-            //           wins: 0,
-            //           imageUrl:
-            //             "http://static.lolesports.com/teams/1767340467921_DN_SOOPerslogo_profile.webp",
-            //           name: "DN FREECS",
-            //           code: "DNS",
-            //         },
-            //         team2: {
-            //           wins: 0,
-            //           imageUrl:
-            //             "http://static.lolesports.com/teams/1726801573959_539px-T1_2019_full_allmode.png",
-            //           name: "T1",
-            //           code: "T1",
-            //         },
-            //       },
-            //       {
-            //         id: "113475798006664572",
-            //         state: null,
-            //         startTime: "2026-03-10T06:00:00Z",
-            //         maxGames: 1,
-            //         team1: {
-            //           wins: 0,
-            //           imageUrl:
-            //             "http://static.lolesports.com/teams/1655210113163_GenG_logo_200407-05.png",
-            //           name: "Gen.G Esports",
-            //           code: "GEN",
-            //         },
-            //         team2: {
-            //           wins: 0,
-            //           imageUrl:
-            //             "http://static.lolesports.com/teams/1631819564399_hle-2021-worlds.png",
-            //           name: "Hanwha Life Esports",
-            //           code: "HLE",
-            //         },
-            //       },
-            //       {
-            //         id: "113475798006730110",
-            //         state: null,
-            //         startTime: "2026-03-10T07:00:00Z",
-            //         maxGames: 1,
-            //         team1: {
-            //           wins: 0,
-            //           imageUrl:
-            //             "http://static.lolesports.com/teams/1672910733664_01.Basic_W.png",
-            //           name: "DRX",
-            //           code: "DRX",
-            //         },
-            //         team2: {
-            //           wins: 0,
-            //           imageUrl:
-            //             "http://static.lolesports.com/teams/NSFullonDark.png",
-            //           name: "NONGSHIM RED FORCE",
-            //           code: "NS",
-            //         },
-            //       },
-            //       {
-            //         id: "113475798006795648",
-            //         state: null,
-            //         startTime: "2026-03-10T08:00:00Z",
-            //         maxGames: 1,
-            //         team1: {
-            //           wins: 0,
-            //           imageUrl:
-            //             "http://static.lolesports.com/teams/kt_darkbackground.png",
-            //           name: "kt Rolster",
-            //           code: "KT",
-            //         },
-            //         team2: {
-            //           wins: 0,
-            //           imageUrl:
-            //             "http://static.lolesports.com/teams/1673260049703_DPlusKIALOGO11.png",
-            //           name: "Dplus KIA",
-            //           code: "DK",
-            //         },
-            //       },
-            //       {
-            //         id: "113475798006861186",
-            //         state: null,
-            //         startTime: "2026-03-10T09:00:00Z",
-            //         maxGames: 1,
-            //         team1: {
-            //           wins: 0,
-            //           imageUrl:
-            //             "http://static.lolesports.com/teams/1716454325887_Nowyprojekt.png",
-            //           name: "OKSavingsBank BRION",
-            //           code: "BRO",
-            //         },
-            //         team2: {
-            //           wins: 0,
-            //           imageUrl:
-            //             "http://static.lolesports.com/teams/1734691810721_BFXfullcolorfordarkbg.png",
-            //           name: "BNK FEARX",
-            //           code: "BFX",
-            //         },
-            //       },
-            //     ],
-            //   },
-            // ];
-            response.data.fixturesWithMatches;
+          this.matchesByFixture = response.data.fixturesWithMatches;
           this.nextFixture = this.matchesByFixture
             .filter((m) => new Date(m.fixture.deadlineDate) > new Date())
             .sort(function (a, b) {
@@ -1217,5 +963,31 @@ li:hover {
   color: var(--PRIMARY-DARKER, #00d9ff);
   border-radius: 10%;
   border-color: var(--PRIMARY-DARKER, #00d9ff);
+}
+.waiting-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--PRIMARY);
+  margin-bottom: 6px;
+}
+
+.waiting-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 4px;
+}
+
+.waiting-list li {
+  font-size: 14px;
+  color: var(--PRIMARY);
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
 }
 </style>

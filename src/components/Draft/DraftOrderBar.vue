@@ -2,9 +2,7 @@
   <div class="draft-order-section">
     <div class="header">
       <div class="title">
-        {{
-          this.tournaments[this.$store.getters.getCurrentTournamentId]
-        }}
+        {{ this.tournaments[this.$store.getters.getCurrentTournamentId] }}
         Fantasy2KPI - Draft League
       </div>
       <div class="draft-info">
@@ -18,10 +16,10 @@
             {{ currentPick + 1 }} of {{ totalPicks }}
           </div>
         </div>
-        <div class="info-item">
+        <!-- <div class="info-item">
           <div class="info-label">Time Remaining</div>
           <div class="timer">1:45</div>
-        </div>
+        </div> -->
       </div>
     </div>
 
@@ -78,50 +76,7 @@ export default {
   props: {
     draftQueue: {
       type: Object,
-      default: {
-        0: {
-          user: { id: 5, username: "Cond1tion" },
-          player: { team: "T1", summonerName: "Faker" },
-        },
-        1: {
-          user: { id: 6, username: "SlyMarb0" },
-          player: { team: "GEN", summonerName: "Ruler" },
-        },
-        2: {
-          user: { id: 7, username: "Konjix" },
-          player: { team: "GEN", summonerName: "Chovy" },
-        },
-        3: {
-          user: { id: 8, username: "Hakkene" },
-          player: { team: "GEN", summonerName: "Canyon" },
-        },
-        4: {
-          user: { id: 8, username: "Hakkene" },
-          player: { team: "T1", summonerName: "Faker" },
-        },
-        5: {
-          user: { id: 7, username: "Konjix" },
-          player: { team: "GEN", summonerName: "Ruler" },
-        },
-        6: { user: { id: 5, username: "SlyMarb0" }, player: null },
-        7: { user: { id: 5, username: "Cond1tion" }, player: null },
-        8: { user: { id: 5, username: "Cond1tion" }, player: null },
-        9: { user: { id: 5, username: "SlyMarb0" }, player: null },
-        10: { user: { id: 5, username: "Konjix" }, player: null },
-        11: { user: { id: 5, username: "Hakkene" }, player: null },
-        12: { user: { id: 5, username: "Hakkene" }, player: null },
-        13: { user: { id: 5, username: "Konjix" }, player: null },
-        14: { user: { id: 5, username: "SlyMarb0" }, player: null },
-        15: { user: { id: 5, username: "Cond1tion" }, player: null },
-        16: { user: { id: 5, username: "Cond1tion" }, player: null },
-        17: { user: { id: 5, username: "SlyMarb0" }, player: null },
-        18: { user: { id: 5, username: "Konjix" }, player: null },
-        19: { user: { id: 5, username: "Hakkene" }, player: null },
-        20: { user: { id: 5, username: "Hakkene" }, player: null },
-        21: { user: { id: 5, username: "Player3" }, player: null },
-        22: { user: { id: 5, username: "Player2" }, player: null },
-        23: { user: { id: 5, username: "Cond1tion" }, player: null },
-      },
+      default: {},
     },
     participants: {
       type: Number,
@@ -155,6 +110,12 @@ export default {
   },
   computed: {
     currentRound() {
+      if (
+        this.currentPick == null ||
+        this.currentPick === 0 ||
+        this.participants === 0
+      )
+        return 1;
       return Math.floor(this.currentPick / this.participants) + 1;
     },
     totalPicks() {
