@@ -5,15 +5,26 @@
       <div class="team-badges">
         <template v-if="Array.isArray(matchups[player.team.code])">
           <span
-            v-for="code in matchups[player.team.code]"
-            :key="code"
+            v-for="matchup in matchups[player.team.code]"
+            :key="matchup.code"
             class="team-badge"
+            :style="{
+              backgroundColor: $func_global.difficultyMap(matchup?.difficulty),
+            }"
           >
-            vs {{ code }}
+            vs {{ matchup.code }}
           </span>
         </template>
-        <span v-else class="team-badge">
-          vs {{ matchups[player.team.code] }}
+        <span
+          v-else
+          class="team-badge"
+          :style="{
+            backgroundColor: $func_global.difficultyMap(
+              matchups[player.team.code]?.difficulty,
+            ),
+          }"
+        >
+          vs {{ matchups[player.team.code]?.code }}
         </span>
       </div>
 

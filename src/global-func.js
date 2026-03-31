@@ -345,6 +345,10 @@ export const func_global = {
       color: "red",
     },
   },
+  difficultyMap(difficulty) {
+    console.log("difficulty", `var(--FIXTURE-DIFFICULTY-${difficulty})`);
+    return `var(--FIXTURE-DIFFICULTY-${difficulty})`;
+  },
   mapSex(sex) {
     if (sex == "WOMAN") return "Kobieta";
     else if (sex == "MAN") return "Mężczyzna";
