@@ -1,8 +1,28 @@
+<template>
+  <!-- <button @click="open = true">Open Modal</button> -->
+
+  <Teleport to="body">
+    <div
+      v-if="open"
+      :style="{ backgroundColor: bgColor }"
+      class="modal modal-details"
+    >
+      <div class="modal-header">{{ title ? title : "Modal" }}</div>
+      <button class="btn-close" @click="closeModal()"></button>
+      <slot></slot>
+    </div>
+  </Teleport>
+</template>
+
 <script>
 export default {
   props: {
     openModal: Boolean,
     title: String,
+    bgColor: {
+      type: String,
+      default: "white",
+    },
   },
   watch: {
     // Watch for changes in the 'playerDetails' prop
@@ -28,18 +48,6 @@ export default {
   },
 };
 </script>
-
-<template>
-  <!-- <button @click="open = true">Open Modal</button> -->
-
-  <Teleport to="body">
-    <div v-if="open" class="modal modal-details">
-      <div class="modal-header">{{ title ? title : "Modal" }}</div>
-      <button class="btn-close" @click="closeModal()"></button>
-      <slot></slot>
-    </div>
-  </Teleport>
-</template>
 
 <style scoped>
 .modal-header {

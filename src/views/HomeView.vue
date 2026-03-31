@@ -5,9 +5,10 @@
       <div class="row h-auto justify-content-center" id="content">
         <div class="col-md-5 col-sm-11" v-if="profile == null || profile == ''">
           <MyModal
+            :bg-color="'var(--PRIMARY)'"
             :openModal="this.openModal"
             @closeModal="closeDetailsModal"
-            :title="''"
+            :title="'Login'"
           >
             <login-panel />
           </MyModal>
@@ -77,147 +78,98 @@
             </div>
           </div>
         </div>
-        <!-- <div class="hero col-md-8">
-        <div class="overlay">
-          <div class="content">
-            <h1>
-              Introducing the <span class="highlight">2KPI LoL Fantasy Game</span>
-            </h1>
-            <p>
-              Step into the shoes of a team manager and put your strategic prowess to the test.
-              Just like Fantasy Premier League (FPL) in football, our fantasy format brings the thrill of esports to life.
-            </p>
-            <p>
-              Assemble your <b>dream team</b> of professional League of Legends players and draft a roster that scores points
-              based on real-world tournament performance.
-            </p>
-            <p>
-              Make smart decisions using player roles, stats, and synergy to maximize your points through kills,
-              assists, and objectives taken.
-            </p>
-            <p>
-              Whether you're a LoL fanatic or a strategic mastermind, it's your time to compete, manage,
-              and <b>conquer the fantasy world of professional League of Legends!</b>
-            </p>
-            <button v-if="profile == null || profile == ''" class="cta-btn" @click="openDetailsModal">Start Building Your Team</button>
-          </div>
-        </div>
-      </div> -->
 
-        <div class="col-md-10" v-if="this.currentFixture != null">
-          <div class="overlay">
-            <div class="text-danger">
-              <h3 v-if="new Date() < new Date('2023-11-02')">
-                NEW LIMITS FOR UPCOMING FIXTURES
-              </h3>
-            </div>
-            <div class="game-tabs ms-2 justify-content-md-center fs-6">
-              <div
-                v-for="(fixture, index) in tabs"
-                :key="fixture.order"
-                @click="selectTab(fixture.order, fixture.id)"
-                :class="{ active: selectedTabIndex === fixture.order }"
-              >
-                <!-- {{ fixture != 0 ? fixture : 'General' }}  -->
-                {{ fixture.title }}
-              </div>
-            </div>
-
-            <!--  -->
+        <!-- Replace the entire rules/points section inside the overlay div -->
+        <div v-if="currentFixture != null" class="rules-section">
+          <div class="game-tabs ms-2 justify-content-md-center fs-6">
             <div
-              class="info-section"
-              v-if="
-                this.currentFixture != null &&
-                this.currentFixture.fixture.id != null
-              "
+              v-for="(fixture, index) in tabs"
+              :key="fixture.order"
+              @click="selectTab(fixture.order, fixture.id)"
+              :class="{ active: selectedTabIndex === fixture.order }"
             >
-              <h2 class="pb-4">{{ this.currentFixture.fixture.name }}</h2>
-              <!-- <h4 class=" pb-2">{{this.currentFixture.fixture.name}}</h4> -->
-              <h4
-                :class="{
-                  'text-danger':
-                    (new Date(this.currentFixture.fixture.deadlineDateTime) -
-                      new Date()) /
-                      36e5 <
-                    48,
-                  'text-warning':
-                    (new Date(this.currentFixture.fixture.deadlineDateTime) -
-                      new Date()) /
-                      36e5 >
-                      48 &&
-                    (new Date(this.currentFixture.fixture.deadlineDateTime) -
-                      new Date()) /
-                      36e5 <
-                      96,
-                }"
-              >
-                Deadline:
+              <!-- {{ fixture != 0 ? fixture : 'General' }}  -->
+              {{ fixture.title }}
+            </div>
+          </div>
+          <!-- Fixture Info -->
+          <div class="fixture-info" v-if="currentFixture.fixture.id != null">
+            <div class="fixture-info-left">
+              <p class="eyebrow">Current Fixture</p>
+              <h2 class="fixture-name">{{ currentFixture.fixture.name }}</h2>
+            </div>
+            <div class="deadline-block" :class="deadlineClass">
+              <p class="deadline-label">Deadline</p>
+              <p class="deadline-value">
                 {{
-                  this.$func_global.formatDate(
-                    this.currentFixture.fixture.deadlineDateTime
+                  $func_global.formatDate(
+                    currentFixture.fixture.deadlineDateTime,
                   )
                 }}
-              </h4>
-              {{}}
+              </p>
             </div>
+          </div>
 
-            <div
-              class="info-section col-md-4 offset-md-4"
-              v-if="this.currentFixture != null"
-            >
-              <!-- <h2 class=" pb-4">Rules</h2> -->
-              <table class="rules-table px-2">
-                <tbody>
-                  <tr v-for="rule in rules" :key="rule.name">
-                    <td>{{ rule.name }}</td>
-                    <td>{{ rule.value }}</td>
-                  </tr>
-                </tbody>
-              </table>
+          <!-- Quick Rules -->
+          <div class="quick-rules">
+            <div class="quick-rule-item" v-for="rule in rules" :key="rule.name">
+              <span class="quick-rule-name">{{ rule.name }}</span>
+              <span class="quick-rule-value">{{ rule.value }}</span>
             </div>
-            <div class="row justify-content-center">
-              <div
-                class="info-section col-lg-6 col-md-12"
-                v-if="this.currentFixture != null"
-              >
-                <h2>Player Points</h2>
-                <table class="rules-table px-2">
-                  <thead>
-                    <tr>
-                      <th>Event</th>
-                      <th>Points</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="rule in playerPointsRules" :key="rule.name">
-                      <td>{{ rule.name }}</td>
-                      <td>{{ rule.value }}</td>
-                    </tr>
-                  </tbody>
-                </table>
+          </div>
+
+          <!-- Points Grid -->
+          <div class="points-grid">
+            <!-- Player Points -->
+            <div class="points-card">
+              <div class="points-card-header">
+                <h3 class="points-card-title">Player Points</h3>
               </div>
+              <div class="points-list">
+                <div
+                  v-for="rule in playerPointsRules"
+                  :key="rule.name"
+                  class="points-row"
+                  :class="{ 'points-negative': rule.value < 0 }"
+                >
+                  <span class="points-event">{{ rule.name }}</span>
+                  <span
+                    class="points-value"
+                    :class="
+                      rule.value < 0 ? 'value-negative' : 'value-positive'
+                    "
+                  >
+                    {{ rule.value > 0 ? "+" : "" }}{{ rule.value }}
+                  </span>
+                </div>
+              </div>
+            </div>
 
-              <!-- TeamPoints Section -->
-              <div class="info-section col-lg-6 col-md-12">
-                <h2>Team Points</h2>
-                <table class="rules-table px-2">
-                  <thead>
-                    <tr>
-                      <th>Event</th>
-                      <th>Points</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="rule in teamPointsRules" :key="rule.name">
-                      <td>{{ rule.name }}</td>
-                      <td>{{ rule.value }}</td>
-                    </tr>
-                  </tbody>
-                </table>
+            <!-- Team Points -->
+            <div class="points-card">
+              <div class="points-card-header">
+                <h3 class="points-card-title">Team Points</h3>
+              </div>
+              <div class="points-list">
+                <div
+                  v-for="rule in teamPointsRules"
+                  :key="rule.name"
+                  class="points-row"
+                  :class="{ 'points-negative': rule.value < 0 }"
+                >
+                  <span class="points-event">{{ rule.name }}</span>
+                  <span
+                    class="points-value"
+                    :class="
+                      rule.value < 0 ? 'value-negative' : 'value-positive'
+                    "
+                  >
+                    {{ rule.value > 0 ? "+" : "" }}{{ rule.value }}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-          <!-- PlayerPoints Section -->
         </div>
       </div>
     </div>
@@ -241,12 +193,7 @@ export default {
       },
       openModal: false,
       tabs: [], // {id, name, order}
-      rulesData: [
-        // Your rules data here
-      ],
-      newRulesData: [
-        // Your rules data here
-      ],
+      newRulesData: [],
       selectedTabIndex: 0,
     };
   },
@@ -274,13 +221,13 @@ export default {
       this.selectedTabIndex = index;
       console.log(this.selectedTabIndex);
       this.currentFixture = this.newRulesData.find(
-        (element) => element.fixture.id == fixture
+        (element) => element.fixture.id == fixture,
       );
     },
     async fetchRulesData() {
       try {
         const response = await this.axios.get(
-          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/rules`
+          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/rules`,
         );
         this.newRulesData = response.data;
         this.tabs = response.data
@@ -297,9 +244,9 @@ export default {
 
         this.selectTab(
           this.tabs.find(
-            (element) => element.id == this.$store.getters.getFixtureId
+            (element) => element.id == this.$store.getters.getFixtureId,
           ).order,
-          this.$store.getters.getFixtureId
+          this.$store.getters.getFixtureId,
         );
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -322,14 +269,22 @@ export default {
     },
   },
   computed: {
+    deadlineClass() {
+      const hoursLeft =
+        (new Date(this.currentFixture.fixture.deadlineDateTime) - new Date()) /
+        36e5;
+      if (hoursLeft < 48) return "text-danger";
+      if (hoursLeft < 96) return "text-warning";
+      return "";
+    },
     playerPointsRules() {
       return this.currentFixture.rules.filter(
-        (rule) => rule.type === "PlayerPoints"
+        (rule) => rule.type === "PlayerPoints",
       );
     },
     teamPointsRules() {
       return this.currentFixture.rules.filter(
-        (rule) => rule.type === "TeamPoints"
+        (rule) => rule.type === "TeamPoints",
       );
     },
     rules() {
@@ -379,8 +334,8 @@ h2 {
   height: 20vh;
   background-image: linear-gradient(
     to right,
-    var(--DARK-YELLOW) 50%,
-    var(--LIGHT-YELLOW)
+    var(--BACKGROUND-DARK) 50%,
+    var(--BACKGROUND-LIGHTER)
   );
 }
 
@@ -451,6 +406,7 @@ h2 {
   font-weight: bold;
 }
 .game-tabs {
+  padding-top: 10px;
   display: flex;
   margin-bottom: 20px;
   color: white;
@@ -535,5 +491,199 @@ p {
   padding-right: 5px;
   text-align: left;
   color: white;
+}
+/* Fixture Info */
+.rules-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 900px;
+  margin: 0 auto;
+  margin-bottom: 20px;
+}
+
+.fixture-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--GREY-DARKER);
+}
+
+.eyebrow {
+  margin: 0 0 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--PRIMARY);
+}
+
+.fixture-name {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--GREY-LIGHT);
+}
+
+.deadline-block {
+  text-align: right;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: var(--SECONDARY);
+  border: 1px solid var(--GREY-DARKER);
+}
+
+.deadline-block.text-danger {
+  border-color: var(--ERROR);
+  background: rgba(244, 67, 54, 0.08);
+}
+
+.deadline-block.text-warning {
+  border-color: var(--WARNING);
+  background: rgba(255, 152, 0, 0.08);
+}
+
+.deadline-label {
+  margin: 0 0 2px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--GREY-DARKER);
+}
+
+.deadline-value {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--GREY-LIGHT);
+}
+
+.deadline-block.text-danger .deadline-value {
+  color: var(--ERROR);
+}
+.deadline-block.text-warning .deadline-value {
+  color: var(--WARNING);
+}
+
+/* Quick Rules */
+.quick-rules {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.quick-rule-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--SECONDARY);
+  border: 1px solid var(--GREY-DARKER);
+  border-radius: 8px;
+}
+
+.quick-rule-name {
+  font-size: 12px;
+  color: var(--GREY-LIGHT);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.quick-rule-value {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--PRIMARY-LIGHTER);
+}
+
+/* Points Grid */
+.points-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .points-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.points-card {
+  background: var(--SECONDARY);
+  border: 1px solid var(--GREY-DARKER);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.points-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  background: var(--BACKGROUND-DARK);
+  border-bottom: 1px solid var(--GREY-DARKER);
+}
+
+.points-card-icon {
+  font-size: 16px;
+}
+
+.points-card-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--GREY-LIGHT);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.points-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.points-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--GREY-DARKER);
+  transition: background 0.15s;
+}
+
+.points-row:last-child {
+  border-bottom: none;
+}
+
+.points-row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.points-negative {
+  opacity: 0.75;
+}
+
+.points-event {
+  font-size: 13px;
+  color: var(--GREY);
+  font-weight: 500;
+}
+
+.points-value {
+  font-size: 14px;
+  font-weight: 800;
+  min-width: 40px;
+  text-align: right;
+}
+
+.value-positive {
+  color: var(--GREEN-LIGHT);
+}
+
+.value-negative {
+  color: var(--ERROR);
 }
 </style>

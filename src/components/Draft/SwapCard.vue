@@ -292,7 +292,7 @@ export default {
   justify-content: end !important;
 }
 </style>
-<style>
+<!-- <style>
 .modal-details {
   background-color: none;
   background: linear-gradient(
@@ -301,4 +301,4 @@ export default {
     var(--TABLE-ROW-MAIN)
   );
 }
-</style>
+</style> -->

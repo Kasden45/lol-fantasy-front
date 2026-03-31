@@ -4,9 +4,10 @@
       this.$store.getters.getProfileId == null ||
       this.$store.getters.getProfileId == ''
     "
+    :bg-color="'var(--PRIMARY)'"
     :openModal="this.openModal"
     @closeModal="closeDetailsModal"
-    :title="''"
+    :title="'Login'"
   >
     <login-panel />
   </MyModal>
