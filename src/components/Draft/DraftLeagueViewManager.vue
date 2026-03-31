@@ -1,4 +1,10 @@
 <template>
+  <div v-if="swapNotification" class="swap-notification">
+    <span>You have a new swap request!</span>
+    <button class="notification-dismiss" @click="swapNotification = false">
+      ✕
+    </button>
+  </div>
   <div class="tab-navigation">
     <button
       class="tab-btn"
@@ -25,6 +31,7 @@
     </button>
   </div>
   <DraftSwapMain
+    ref="swapMain"
     v-if="activeTab == 'swaps' && selectedUserTeam && realLeagueId"
     :selected-team="selectedUserTeam"
     :other-teams="otherFinishedTeams"
@@ -148,7 +155,6 @@
           :teams="availableTeams"
           v-if="availablePlayers.length > 0 && availableTeams.length > 0"
         />
-        <!-- <PlayersList :userTeam="pickedPlayersIds" :nextFixture="null" :teamsPlayingNextFixture="teamsPlayingInNextFixture" @rangeChange="()=>{}" @playerSelect="playerSelected" :selectedRole='roleToAddPlayer' :players="availablePlayers" v-if="availablePlayers.length > 0"/> -->
       </div>
       <h3>Other Teams</h3>
       <div class="accordion" id="otherTeamsAccordion">
@@ -201,28 +207,13 @@
           </div>
         </div>
       </div>
-      <!-- <div v-for="(team, clientId) in otherTeams" :key="clientId">
-            <TeamRoster class="players-list-container rival-team col-12"
-              :selected-team="team"
-              :profile-id="clientId"
-              :own-team="false"
-              @choose-role=""
-              @remove-player=""
-            />
-          </div> -->
     </div>
-    <!-- <div>
-      <button class="btn btn-success" @click="finishDraft()">
-        Finish draft
-      </button>
-    </div> -->
   </div>
 </template>
 
 <script>
 import socket from "@/socket.js";
 import DraftOrderBar from "@/components/Draft/DraftOrderBar.vue";
-import PlayersList from "@/components/Players/AllPlayersList.vue";
 import PlayersListDraft from "@/components/Draft/PlayersListDraft.vue";
 import TeamRoster from "@/components/Draft/TeamDisplayDraft.vue";
 import DraftSwapMain from "@/components/Draft/DraftSwapMain.vue";
@@ -234,7 +225,6 @@ export default {
   },
   components: {
     DraftOrderBar,
-    PlayersList,
     PlayersListDraft,
     TeamRoster,
     DraftSwapMain,
@@ -242,11 +232,11 @@ export default {
   },
   data() {
     return {
+      swapNotification: false,
       loader: false,
       name: "DraftLeagueViewManager",
       activeTab: "results",
       realLeagueId: null,
-      showSwap: null,
       currentLeague: null,
       roleToAddPlayer: "",
       availablePlayers: [],
@@ -487,6 +477,19 @@ export default {
       }
     });
 
+    socket.on("swapProposed", ({ leagueId, receiverUserId }) => {
+      const myTeamId = this.selectedUserTeam.userTeamId;
+      if (receiverUserId === myTeamId) {
+        // trigger fetchSwaps on the DraftSwapMain child
+        this.$refs.swapMain?.fetchSwaps();
+        this.swapNotification = true;
+
+        setTimeout(() => {
+          this.swapNotification = false;
+        }, 6000);
+      }
+    });
+
     socket.on("currentDrafter", (currentDrafter) => {
       this.currentDrafter = currentDrafter;
     });
@@ -609,17 +612,10 @@ export default {
         ];
 
         console.log("loaded players", this.loadedPlayers);
-        this.showSwap = true;
         // this.sortedPlayers = this.players;
       } catch (error) {
-        this.showSwap = false;
         console.error("Error fetching player team:", error);
       }
-    },
-    finishDraft() {
-      console.log(this.leagueId);
-      return;
-      socket.emit("finishDraft", this.leagueId);
     },
     choseRole(role) {
       console.log(role);
@@ -658,15 +654,6 @@ export default {
               this.teamsPlayingInNextFixture,
             );
           }
-
-          this.lastPlayedFixture = this.matchesByFixture
-            .filter((m) => new Date(m.fixture.deadlineDate) <= new Date())
-            .sort(function (a, b) {
-              return (
-                new Date(b.fixture.deadlineDate) -
-                new Date(a.fixture.deadlineDate)
-              );
-            })[0];
         })
         .catch((error) => {
           console.log(error.response);
@@ -752,7 +739,6 @@ export default {
         player.role == this.roleToAddPlayer ||
         this.roleToAddPlayer == "sub"
       ) {
-        // this.addToRole(player, this.roleToAddPlayer);
         this.selectPlayer(player);
         this.roleToAddPlayer = ""; // Reset the selected role after adding the player
       } else console.log("WRONG ROLE");
@@ -769,9 +755,7 @@ export default {
         player.role == this.roleToAddPlayer ||
         this.roleToAddPlayer == "sub"
       ) {
-        // this.addToRole(player, this.roleToAddPlayer);
         this.selectedFromUnusedPlayers = player;
-        // this.roleToAddPlayer = "";
       } else console.log("WRONG ROLE");
     },
     teamSelected(team) {
@@ -783,7 +767,6 @@ export default {
       );
 
       if (this.roleToAddPlayer == "team") {
-        // this.addToRole(player, this.roleToAddPlayer);
         this.selectTeam(team);
         this.roleToAddPlayer = ""; // Reset the selected role after adding the player
       } else console.log("WRONG ROLE");
@@ -797,31 +780,8 @@ export default {
       );
 
       if (this.roleToAddPlayer == "team") {
-        // this.addToRole(player, this.roleToAddPlayer);
         this.selectedFromUnusedPlayers = team;
       } else console.log("WRONG ROLE");
-    },
-    addToRole(player, role) {
-      var teamPlayer = this.selectPlayerByRole(role);
-      if (teamPlayer != null) {
-        console.log("mamy to, dodaje", player, "do", teamPlayer);
-        this.selectedUserTeam[teamPlayer].player = player;
-        this.roleToAddPlayer = "";
-      }
-    },
-    selectPlayerByRole(role) {
-      console.log("rola", role);
-      for (const key in this.selectedUserTeam) {
-        if (
-          this.selectedUserTeam[key].role === role &&
-          this.selectedUserTeam[key].player === null
-        ) {
-          console.log("taki player", this.selectedUserTeam[key].player);
-          return key;
-        }
-      }
-      console.log("nope");
-      return null; // Return null if no player with the specified role is found
     },
     fillLeagueDetails(league) {
       console.log("get league details", this.currentLeague);
@@ -989,5 +949,50 @@ li:hover {
   padding: 4px 8px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 4px;
+}
+
+.swap-notification {
+  position: relative;
+  left: 50%;
+  width: 50vw;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 24px;
+  background: var(--SECONDARY);
+  border: 1px solid var(--PRIMARY);
+  border-radius: 10px;
+  color: var(--GREY-LIGHT);
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 4px 24px rgba(166, 58, 159, 0.3);
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.notification-dismiss {
+  background: none;
+  border: none;
+  color: var(--ERROR);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.notification-dismiss:hover {
+  color: var(--GREY-LIGHT);
 }
 </style>

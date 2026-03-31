@@ -31,6 +31,18 @@ io.on("connection", (socket) => {
     io.emit("message", { clientId, message });
   });
 
+  socket.on("swapProposed", ({ leagueId, receiverUserId }) => {
+    console.log(
+      `Swap proposed in league ${leagueId} to user ${receiverUserId}`,
+    );
+
+    // Broadcast to everyone in the league except the sender
+    socket.broadcast.emit("swapProposed", {
+      leagueId,
+      receiverUserId,
+    });
+  });
+
   socket.on("startDraft", (invitationCode, leagueId, tournamentId) => {
     if (invitationCode in allDrafts) {
       draft = allDrafts[invitationCode];
