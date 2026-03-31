@@ -84,6 +84,16 @@
           }}</span>
           <span class="stat-label">Pts</span>
         </div>
+        <div class="stat-mini">
+          <span class="stat-value">{{
+            position.player.gamesPlayed === 0
+              ? "-"
+              : (position.player.points / position.player.gamesPlayed).toFixed(
+                  1,
+                )
+          }}</span>
+          <span class="stat-label">Pts/G</span>
+        </div>
       </div>
     </template>
     <template v-if="position.team">
@@ -137,6 +147,14 @@
             position.team.points?.toFixed(0) || 0
           }}</span>
           <span class="stat-label">Pts</span>
+        </div>
+        <div class="stat-mini">
+          <span class="stat-value">{{
+            position.team.gamesPlayed === 0
+              ? "-"
+              : (position.team.points / position.team.gamesPlayed).toFixed(1)
+          }}</span>
+          <span class="stat-label">Pts/G</span>
         </div>
       </div>
     </template>
