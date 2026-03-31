@@ -1,24 +1,39 @@
-<!-- TeamSelection.vue -->
 <template>
-  <div class="w-50 mx-auto">
-    <div class="game-tabs ms-2 justify-content-md-center">
-      <div
-        v-for="(fixture, index) in tabs"
-        :key="fixture.order"
-        @click="selectTab(fixture.order, fixture.id)"
-        :class="{ active: selectedTabIndex === fixture.order }"
-      >
-        {{ fixture.title }}
+  <div class="stats-page">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="header-accent" />
+      <div>
+        <p class="eyebrow">LCK Fantasy</p>
+        <h1 class="page-title">Statistics</h1>
       </div>
     </div>
-    <div v-if="'isTotal' in playersSummary">
-      <h1>Players stats</h1>
-      <div
-        class="stats-tables-row"
-        style="display: flex; flex-wrap: wrap; gap: 16px"
-      >
+
+    <!-- Tabs -->
+    <div class="tabs-wrapper">
+      <div class="tabs">
         <div
-          v-for="(stat, idx) in [
+          v-for="fixture in tabs"
+          :key="fixture.order"
+          class="tab"
+          :class="{ active: selectedTabIndex === fixture.order }"
+          @click="selectTab(fixture.order, fixture.id)"
+        >
+          {{ fixture.title }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Player Stats -->
+    <div v-if="'isTotal' in playersSummary" class="section">
+      <div class="section-header">
+        <div class="section-accent" />
+        <h2 class="section-title">Player Stats</h2>
+      </div>
+
+      <div class="tables-grid">
+        <div
+          v-for="stat in [
             'kills',
             'deaths',
             'assists',
@@ -31,65 +46,70 @@
             'pointsMatchMoney',
           ]"
           :key="stat"
-          class="mb-2 stats-table"
-          style="flex: 1 1 30%; min-width: 260px; max-width: 32%"
+          class="stat-card"
         >
-          <h3 class="mt-1 text-capitalize" style="font-size: 1.1rem">
+          <div class="stat-card-header">
             {{ displayName[stat] }}
-          </h3>
-          <table
-            class="table table-sm table-striped table-bordered"
-            style="font-size: 0.85rem"
-          >
+          </div>
+          <table class="stat-table">
             <thead>
               <tr>
+                <th>#</th>
                 <th>Player</th>
                 <th>Role</th>
                 <th>Team</th>
-                <th>Price</th>
+                <th>$</th>
                 <th>Value</th>
               </tr>
             </thead>
             <tbody>
               <tr
-                v-for="entry in playersSummary.players[stat]
-                  ?.filter((player) => player.player.matchesPlayed > 0)
+                v-for="(entry, index) in playersSummary.players[stat]
+                  ?.filter((p) => p.player.matchesPlayed > 0)
                   .slice(0, 10)"
-                :key="entry.player?.esportsPlayerId || entry.esportsPlayerId"
+                :key="entry.player?.esportsPlayerId"
+                :class="{
+                  'rank-first': index === 0,
+                  'rank-second': index === 1,
+                  'rank-third': index === 2,
+                }"
               >
-                <td>
+                <td class="rank-cell">{{ index + 1 }}</td>
+                <td class="player-cell">
                   {{ entry.player?.summonerName || "Unknown" }}
                 </td>
                 <td>
-                  {{ entry.player?.role || "Unknown" }}
+                  <span class="role-pill" :class="`role-${entry.player?.role}`">
+                    {{ entry.player?.role?.slice(0, 3).toUpperCase() || "?" }}
+                  </span>
                 </td>
-                <td>
-                  <img
-                    :src="entry.player?.team?.imageUrl"
-                    alt="team"
-                    width="18"
-                    height="18"
-                    style="border-radius: 50%; margin-right: 4px"
-                  />
-                  {{ entry.player?.team?.code || "Unknown" }}
+                <td class="team-cell">
+                  <img :src="entry.player?.team?.imageUrl" class="team-logo" />
+                  {{ entry.player?.team?.code || "?" }}
                 </td>
-                <td>${{ entry.player?.price.toFixed(1) }}</td>
-                <td>{{ formatNumber(stat, entry.value) }}</td>
+                <td class="price-cell">
+                  ${{ entry.player?.price.toFixed(1) }}
+                </td>
+                <td class="value-cell">
+                  {{ formatNumber(stat, entry.value) }}
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
     </div>
+
     <!-- Team Stats -->
-    <div v-if="'isTotal' in teamsSummary">
-      <h1>Teams stats</h1>
-      <div
-        class="stats-tables-row"
-        style="display: flex; flex-wrap: wrap; gap: 16px"
-      >
+    <div v-if="'isTotal' in teamsSummary" class="section">
+      <div class="section-header">
+        <div class="section-accent" />
+        <h2 class="section-title">Team Stats</h2>
+      </div>
+
+      <div class="tables-grid">
         <div
-          v-for="(stat, idx) in [
+          v-for="stat in [
             'dragons',
             'nashors',
             'towers',
@@ -101,53 +121,49 @@
             'pointsMatchMoney',
           ]"
           :key="stat"
-          class="mb-4 stats-table"
-          style="flex: 1 1 30%; min-width: 260px; max-width: 32%"
+          class="stat-card"
         >
-          <h3 class="mt-1 text-capitalize" style="font-size: 1.1rem">
+          <div class="stat-card-header">
             {{ displayTeamName[stat] }}
-          </h3>
-          <table
-            class="table table-sm table-striped table-bordered"
-            style="font-size: 0.85rem"
-          >
+          </div>
+          <table class="stat-table">
             <thead>
               <tr>
+                <th>#</th>
                 <th>Team</th>
                 <th>League</th>
-                <th>Price</th>
+                <th>$</th>
                 <th>Value</th>
               </tr>
             </thead>
             <tbody>
               <tr
-                v-for="entry in teamsSummary.teams[stat]
-                  ?.filter((team) => team.team.matchesPlayed > 0)
+                v-for="(entry, index) in teamsSummary.teams[stat]
+                  ?.filter((t) => t.team.matchesPlayed > 0)
                   .slice(0, 10)"
-                :key="entry.team?.slug || entry.slug"
+                :key="entry.team?.slug"
+                :class="{
+                  'rank-first': index === 0,
+                  'rank-second': index === 1,
+                  'rank-third': index === 2,
+                }"
               >
-                <td>
-                  <img
-                    :src="entry.team?.imageUrl"
-                    alt="player"
-                    width="24"
-                    height="24"
-                    style="border-radius: 50%; margin-right: 6px"
-                  />
-                  {{ entry.team?.code || "Unknown" }}
+                <td class="rank-cell">{{ index + 1 }}</td>
+                <td class="team-cell">
+                  <img :src="entry.team?.imageUrl" class="team-logo" />
+                  {{ entry.team?.code || "?" }}
                 </td>
-                <td>
+                <td class="team-cell">
                   <img
-                    :src="this.$func_global.leagues_icons[entry.team?.league]"
-                    alt="team"
-                    width="18"
-                    height="18"
-                    style="border-radius: 50%; margin-right: 4px"
+                    :src="$func_global.leagues_icons[entry.team?.league]"
+                    class="team-logo"
                   />
-                  {{ entry.team?.league || "Unknown" }}
+                  {{ entry.team?.league || "?" }}
                 </td>
-                <td>${{ entry.team?.price.toFixed(1) }}</td>
-                <td>{{ formatNumberTeam(stat, entry.value) }}</td>
+                <td class="price-cell">${{ entry.team?.price.toFixed(1) }}</td>
+                <td class="value-cell">
+                  {{ formatNumberTeam(stat, entry.value) }}
+                </td>
               </tr>
             </tbody>
           </table>
@@ -218,13 +234,13 @@ export default {
       this.selectedTabIndex = index;
       console.log(this.selectedTabIndex);
       this.currentFixture = this.newRulesData.find(
-        (element) => element.fixture.id == fixture
+        (element) => element.fixture.id == fixture,
       );
       this.getFixturePlayerSummaryStats(
-        this.currentFixture == null ? null : this.currentFixture.fixture.id
+        this.currentFixture == null ? null : this.currentFixture.fixture.id,
       );
       this.getFixtureTeamSummaryStats(
-        this.currentFixture == null ? null : this.currentFixture.fixture.id
+        this.currentFixture == null ? null : this.currentFixture.fixture.id,
       );
     },
     getCurrentFixture() {
@@ -245,7 +261,7 @@ export default {
     async fetchRulesData() {
       try {
         const response = await this.axios.get(
-          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/rules`
+          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/rules`,
         );
         this.newRulesData = response.data;
         this.tabs = response.data
@@ -266,9 +282,9 @@ export default {
         });
         this.selectTab(
           this.tabs.find(
-            (element) => element.id == this.$store.getters.getFixtureId
+            (element) => element.id == this.$store.getters.getFixtureId,
           ).order,
-          this.$store.getters.getFixtureId
+          this.$store.getters.getFixtureId,
         );
         console.log("Fixture ID:", this.$store.getters.getFixtureId);
         this.getFixturePlayerSummaryStats(this.$store.getters.getFixtureId);
@@ -284,13 +300,13 @@ export default {
         .get(url)
         .then((response) => {
           this.matchesByFixture = response.data.fixturesWithMatches.sort(
-            (a, b) => a.fixture.order - b.fixture.order
+            (a, b) => a.fixture.order - b.fixture.order,
           );
           this.selectTab(
             this.tabs.find(
-              (element) => element.id == this.$store.getters.getFixtureId
+              (element) => element.id == this.$store.getters.getFixtureId,
             ).order,
-            this.$store.getters.getFixtureId
+            this.$store.getters.getFixtureId,
           );
           this.getFixturePlayerSummaryStats(this.$store.getters.getFixtureId);
           this.getFixtureTeamSummaryStats(this.$store.getters.getFixtureId);
@@ -303,7 +319,7 @@ export default {
     getTotalSummaryStats() {
       this.axios
         .get(
-          `${this.apiURL}Stats/${this.$store.getters.getCurrentTournamentId}/summary`
+          `${this.apiURL}Stats/${this.$store.getters.getCurrentTournamentId}/summary`,
         )
         .then((response) => {
           console.log("Summary:", response.data);
@@ -320,7 +336,7 @@ export default {
         .get(
           `${this.apiURL}Stats/${
             this.$store.getters.getCurrentTournamentId
-          }/summary/players${fixtureId == null ? "" : "/" + fixtureId}`
+          }/summary/players${fixtureId == null ? "" : "/" + fixtureId}`,
         )
         .then((response) => {
           console.log("Summary:", response.data);
@@ -337,7 +353,7 @@ export default {
         .get(
           `${this.apiURL}Stats/${
             this.$store.getters.getCurrentTournamentId
-          }/summary/teams${fixtureId == null ? "" : "/" + fixtureId}`
+          }/summary/teams${fixtureId == null ? "" : "/" + fixtureId}`,
         )
         .then((response) => {
           console.log("Summary:", response.data);
@@ -358,74 +374,279 @@ export default {
 </script>
 
 <style scoped>
-/* Add custom styles for team and player cards as needed */
-.game-tabs {
+.stats-page {
+  min-height: 100vh;
+  background: var(--BACKGROUND-DARK);
+  padding: 40px 32px;
+  font-family: "DM Sans", sans-serif;
+}
+
+/* Header */
+.page-header {
   display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.header-accent {
+  width: 4px;
+  height: 52px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, var(--PRIMARY), var(--PRIMARY-LIGHTER));
+  flex-shrink: 0;
+}
+
+.eyebrow {
+  margin: 0 0 2px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--PRIMARY);
+}
+
+.page-title {
+  margin: 0;
+  font-family: "Syne", sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--GREY-LIGHT);
+  line-height: 1;
+}
+
+/* Tabs */
+.tabs-wrapper {
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--GREY-DARKER);
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--GREY-DARKER);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.2s, border-color 0.2s;
+  margin-bottom: -1px;
+}
+
+.tab:hover {
+  color: var(--GREY);
+}
+
+.tab.active {
+  color: var(--PRIMARY-LIGHTER);
+  border-bottom-color: var(--PRIMARY);
+}
+
+/* Section */
+.section {
+  margin-bottom: 48px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin-bottom: 20px;
 }
 
-.game-tabs div {
-  cursor: pointer;
-  padding: 10px 20px;
-  border: 1px solid #ccc;
+.section-accent {
+  width: 3px;
+  height: 22px;
   border-radius: 4px;
-  margin-right: 10px;
+  background: var(--PRIMARY);
+  flex-shrink: 0;
 }
 
-.game-tabs .active {
-  background-color: #007bff;
-  color: #fff;
+.section-title {
+  margin: 0;
+  font-family: "Syne", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--GREY-LIGHT);
 }
 
-.summoners-rift {
-  position: relative;
-  width: 960px;
-  height: 720px;
-  background-image: url("https://2.bp.blogspot.com/--A1wNZhS868/U7L4xKhbQTI/AAAAAAAAS04/rfzak1JCZFY/s1600/srdb3-1.jpg"); /* Replace with your Summoner's Rift map image */
-  background-size: cover;
-  image-rendering: -webkit-optimize-contrast;
+/* Grid */
+.tables-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
 }
 
-.player-card {
-  /* background-color: #fde9a8d0; */
-  background-color: #faf3dd75;
-  position: absolute;
-  transform: translate(-50%, -50%);
+@media (max-width: 1100px) {
+  .tables-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
-.player-image {
-  width: 100px; /* Adjust the size of the player image */
-  height: 85px;
+@media (max-width: 700px) {
+  .tables-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Stat Card */
+.stat-card {
+  background: var(--BACKGROUND-LIGHTER);
+  border: 1px solid var(--GREY-DARKER);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.stat-card-header {
+  padding: 10px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--PRIMARY-LIGHTER);
+  background: var(--SECONDARY);
+  border-bottom: 1px solid var(--GREY-DARKER);
+}
+
+/* Table */
+.stat-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.stat-table thead tr {
+  background: var(--BACKGROUND-DARK);
+}
+
+.stat-table th {
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--GREY-DARKER);
+  text-align: left;
+  border-bottom: 1px solid var(--GREY-DARKER);
+}
+
+.stat-table tbody tr {
+  border-bottom: 1px solid var(--GREY-DARKER);
+  transition: background 0.15s;
+}
+
+.stat-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.stat-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.stat-table td {
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--GREY);
+}
+
+/* Rank highlights */
+.rank-first td {
+  background: rgba(248, 194, 32, 0.12) !important;
+}
+
+.rank-first .value-cell {
+  color: var(--GOLDEN-CAPTAIN);
+  font-weight: 800;
+}
+
+.rank-first .rank-cell {
+  color: var(--GOLDEN-CAPTAIN);
+  font-weight: 800;
+}
+
+.rank-second td {
+  background: rgba(192, 192, 192, 0.07) !important;
+}
+
+.rank-third td {
+  background: rgba(205, 127, 50, 0.07) !important;
+}
+
+/* Cell types */
+.rank-cell {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--GREY-DARKER);
+  width: 24px;
+}
+
+.player-cell {
+  font-weight: 600;
+  color: var(--GREY-LIGHT);
+}
+
+.team-cell {
+  align-items: center;
+  gap: 5px;
+}
+
+.team-logo {
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
-.player-info {
-  text-align: center;
+.price-cell {
+  color: var(--GREY-DARKER);
+  font-size: 12px;
 }
 
-.player-name {
-  font-weight: bold;
-  color: white;
+.value-cell {
+  font-weight: 700;
+  color: var(--PRIMARY-LIGHTER);
+  text-align: right;
 }
 
-.player-points {
-  font-weight: bold;
-  color: white;
+/* Role pills */
+.role-pill {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
 }
 
-.player-role {
-  font-style: italic;
-  color: white;
-  text-transform: capitalize;
+.role-top {
+  background: var(--ROLE-TOP);
+  color: var(--GREY-LIGHT);
 }
-/* Alternate row striping for tables */
-.table-striped tbody tr:nth-of-type(odd) td {
-  background-color: var(--TABLE-ROW-SECONDARY) !important;
+.role-jungle {
+  background: var(--ROLE-JUNGLE);
+  color: var(--GREY-LIGHT);
 }
-.table-striped tbody tr:nth-of-type(1) td {
-  background-color: var(--GOLDEN-CAPTAIN) !important;
+.role-mid {
+  background: var(--ROLE-MID);
+  color: var(--GREY-LIGHT);
 }
-.table-striped tbody tr:nth-of-type(even) td {
-  background-color: var(--TABLE-ROW-MAIN) !important;
+.role-bottom {
+  background: var(--ROLE-BOTTOM);
+  color: var(--GREY-LIGHT);
+}
+.role-support {
+  background: var(--ROLE-SUPPORT);
+  color: var(--GREY-LIGHT);
 }
 </style>
