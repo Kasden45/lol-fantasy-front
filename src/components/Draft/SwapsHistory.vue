@@ -165,6 +165,7 @@ export default {
         );
         console.log("Swap accepted", response.data);
         this.$emit("refresh-swaps");
+        this.$emit("refresh-teams");
       } catch (error) {
         console.error("Error swapping", error);
       }
