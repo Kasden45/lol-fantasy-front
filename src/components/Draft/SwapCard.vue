@@ -118,6 +118,7 @@
     :openModal="this.openModal"
     @closeModal="closeDetailsModal"
     :title="''"
+    :bg-color="'var(--BACKGROUND-LIGHTER)'"
   >
     <ComparePlayers class="modal-compare" :swap="currentSwap" />
   </MyModal>

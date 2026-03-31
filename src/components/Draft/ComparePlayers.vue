@@ -1,49 +1,73 @@
 <template>
   <div class="comparison-container">
-    <div class="players" v-if="swap.playerInitiator">
+    <!-- Player/Team Header -->
+    <div class="players" v-if="swap.playerInitiator || swap.teamInitiator">
+      <!-- Left -->
       <div class="player-card">
-        <div class="name">{{ swap.tradeInitiatorUserTeam.userLogin }}</div>
-        <img :src="swap.playerInitiator.imageUrl" />
-        <div class="name">{{ swap.playerInitiator.summonerName }}</div>
-        <div class="team">{{ swap.playerInitiator.team.code }}</div>
+        <p class="owner-name">{{ swap.tradeInitiatorUserTeam.userLogin }}</p>
+        <img
+          :src="
+            swap.playerInitiator
+              ? swap.playerInitiator.imageUrl
+              : swap.teamInitiator.imageUrl
+          "
+          class="player-img"
+        />
+        <p class="summoner-name">
+          {{
+            swap.playerInitiator
+              ? swap.playerInitiator.summonerName
+              : swap.teamInitiator.name
+          }}
+        </p>
+        <span class="team-badge">{{
+          swap.playerInitiator
+            ? swap.playerInitiator.team.code
+            : swap.teamInitiator.code
+        }}</span>
       </div>
-      <div class="player-card"><div class="vs">VS</div></div>
 
-      <div class="player-card">
-        <div class="name">{{ swap.tradeReceiverUserTeam.userLogin }}</div>
-        <img :src="swap.playerReceiver.imageUrl" />
-        <div class="name">{{ swap.playerReceiver.summonerName }}</div>
-        <div class="team">{{ swap.playerReceiver.team.code }}</div>
+      <!-- VS -->
+      <div class="vs-col">
+        <span class="vs-text">VS</span>
       </div>
-    </div>
-    <div class="players" v-if="swap.teamInitiator">
-      <div class="player-card">
-        <div class="name">{{ swap.tradeInitiatorUserTeam.userLogin }}</div>
-        <img :src="swap.teamInitiator.imageUrl" />
-        <div class="name">{{ swap.teamInitiator.name }}</div>
-        <div class="team">{{ swap.teamInitiator.code }}</div>
-      </div>
-      <div class="player-card"><div class="vs">VS</div></div>
 
+      <!-- Right -->
       <div class="player-card">
-        <div class="name">{{ swap.tradeReceiverUserTeam.userLogin }}</div>
-        <img :src="swap.teamReceiver.imageUrl" />
-        <div class="name">{{ swap.teamReceiver.name }}</div>
-        <div class="team">{{ swap.teamReceiver.code }}</div>
+        <p class="owner-name">{{ swap.tradeReceiverUserTeam.userLogin }}</p>
+        <img
+          :src="
+            swap.playerReceiver
+              ? swap.playerReceiver.imageUrl
+              : swap.teamReceiver.imageUrl
+          "
+          class="player-img"
+        />
+        <p class="summoner-name">
+          {{
+            swap.playerReceiver
+              ? swap.playerReceiver.summonerName
+              : swap.teamReceiver.name
+          }}
+        </p>
+        <span class="team-badge">{{
+          swap.playerReceiver
+            ? swap.playerReceiver.team.code
+            : swap.teamReceiver.code
+        }}</span>
       </div>
     </div>
 
     <!-- Stats -->
-    <div class="stats">
+    <div class="stats-block">
       <div v-for="stat in stats" :key="stat.label" class="stat-row">
-        <div class="stat" :class="getClass(stat.left, stat.right)">
+        <span class="stat-value" :class="getClass(stat.left, stat.right)">
           {{ stat.left }}
-        </div>
-
-        <div class="stat label">{{ stat.label }}</div>
-        <div class="stat" :class="getClass(stat.right, stat.left)">
+        </span>
+        <span class="stat-label">{{ stat.label }}</span>
+        <span class="stat-value" :class="getClass(stat.right, stat.left)">
           {{ stat.right }}
-        </div>
+        </span>
       </div>
     </div>
   </div>
@@ -128,81 +152,123 @@ export default {
 </script>
 <style scoped>
 .comparison-container {
-  color: white;
-  padding: 16px;
-}
-
-/* Header */
-.header {
+  padding: 8px 4px;
   display: flex;
-  justify-content: space-between;
-  font-weight: bold;
-  margin-bottom: 16px;
-  color: var(--PRIMARY);
-}
-
-.vs {
-  opacity: 0.6;
-  height: 100%;
-  font-size: x-large;
-  align-content: center;
+  flex-direction: column;
+  gap: 24px;
 }
 
 /* Players */
 .players {
-  color: var(--PRIMARY);
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  gap: 12px;
 }
 
 .player-card {
-  text-align: center;
-  width: 45%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
 }
 
-.player-card img {
-  width: auto;
-  height: 10vh;
-  border-radius: 10%;
+.owner-name {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--PRIMARY-LIGHTER);
 }
 
-.name {
-  margin-top: 6px;
-  font-weight: bold;
+.player-img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 2px solid var(--GREY-DARKER);
 }
 
-.team {
-  font-size: 0.85rem;
-  opacity: 0.7;
+.summoner-name {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--GREY-LIGHT);
+}
+
+.team-badge {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--GREY-DARKER);
+  background: var(--BACKGROUND-DARK);
+  border: 1px solid var(--GREY-DARKER);
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+
+/* VS */
+.vs-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.vs-text {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--GREY-LIGHT);
 }
 
 /* Stats */
-.stats {
-  font-size: x-large;
+.stats-block {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  border: 1px solid var(--GREY-DARKER);
+  border-radius: 10px;
+  overflow: hidden;
 }
+
 .stat-row {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--GREY-DARKER);
+  background: var(--SECONDARY);
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-row:nth-child(even) {
+  background: var(--BACKGROUND-DARK);
+}
+
+.stat-value {
+  font-size: 16px;
+  font-weight: 800;
   text-align: center;
 }
-.stat {
+
+.stat-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--GREY-LIGHT);
   text-align: center;
-  min-width: 10vw;
-}
-.label {
-  opacity: 0.6;
-  color: var(--PRIMARY);
+  min-width: 90px;
 }
 
 /* Highlighting */
 .better {
-  color: var(--GREEN-DARK);
-  font-weight: bold;
+  color: var(--GREEN-LIGHT);
 }
 
 .worse {
@@ -210,7 +276,6 @@ export default {
 }
 
 .equal {
-  opacity: 0.7;
   color: var(--WARNING);
 }
 </style>
