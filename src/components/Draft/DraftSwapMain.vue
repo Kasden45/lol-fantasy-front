@@ -488,6 +488,10 @@ export default {
         );
         console.log("Swap created", response.data);
         this.fetchSwaps();
+        socket.emit("swapProposed", {
+          leagueId: this.leagueId,
+          receiverUserId: this.rivalUserTeamId,
+        });
         this.selectedFromYourTeam = null;
         this.selectedFromTargetTeam = null;
         this.selectedTeamId = null;
@@ -496,14 +500,6 @@ export default {
         this.swapLoading = false;
         console.error("Error swapping", error);
       }
-    },
-    cancelSwap(index) {
-      const swap = this.pendingSwaps[index];
-      socket.emit("cancelSwap", {
-        swapId: index,
-        leagueId: this.leagueId,
-      });
-      this.pendingSwaps.splice(index, 1);
     },
   },
   created() {
