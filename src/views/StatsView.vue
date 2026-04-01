@@ -48,6 +48,28 @@
           :key="stat"
           class="stat-card"
         >
+          <div class="role-filters">
+            <button
+              class="role-filter-btn"
+              :class="{ active: selectedRole[stat] === 'all' }"
+              @click="selectedRole[stat] = 'all'"
+            >
+              All
+            </button>
+            <button
+              v-for="role in ['top', 'jungle', 'mid', 'bottom', 'support']"
+              :key="role"
+              class="role-filter-btn"
+              :class="{ active: selectedRole[stat] === role }"
+              @click="selectedRole[stat] = role"
+            >
+              <img
+                :src="$func_global.role_images[role]"
+                class="role-filter-icon"
+              />
+              {{ role }}
+            </button>
+          </div>
           <div class="stat-card-header">
             {{ displayName[stat] }}
           </div>
@@ -66,6 +88,11 @@
               <tr
                 v-for="(entry, index) in playersSummary.players[stat]
                   ?.filter((p) => p.player.matchesPlayed > 0)
+                  .filter(
+                    (p) =>
+                      selectedRole[stat] === 'all' ||
+                      p.player.role === selectedRole[stat],
+                  )
                   .slice(0, 10)"
                 :key="entry.player?.esportsPlayerId"
                 :class="{
@@ -177,6 +204,18 @@
 export default {
   data() {
     return {
+      selectedRole: {
+        kills: "all",
+        deaths: "all",
+        assists: "all",
+        cs: "all",
+        fb: "all",
+        tripleKills: "all",
+        quadraKills: "all",
+        pentaKills: "all",
+        pointsMatch: "all",
+        pointsMatchMoney: "all",
+      },
       selectedTabIndex: 0,
       playersSummary: {},
       teamsSummary: {},
@@ -648,5 +687,54 @@ export default {
 .role-support {
   background: var(--ROLE-SUPPORT);
   color: var(--GREY-LIGHT);
+}
+.role-filters {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+}
+
+.role-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--SECONDARY);
+  border: 1px solid var(--GREY-DARKER);
+  border-radius: 8px;
+  color: var(--GREY);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.role-filter-btn:hover {
+  border-color: var(--PRIMARY-DARKER);
+  color: var(--GREY-LIGHT);
+}
+
+.role-filter-btn.active {
+  border-color: var(--PRIMARY);
+  color: var(--PRIMARY-LIGHTER);
+  background: rgba(166, 58, 159, 0.08);
+}
+
+.role-filter-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.8;
+}
+
+.role-filter-btn.active .role-filter-icon {
+  filter: none;
+  opacity: 1;
 }
 </style>
