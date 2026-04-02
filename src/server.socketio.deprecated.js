@@ -1,7 +1,14 @@
+/**
+ * @deprecated This file is OBSOLETE
+ * Migrated to: src/socket.js (Ably) + src/draft-logic.js (business logic)
+ * Last used: Socket.io version
+ * Removal date: TBD (after confirming Ably works in production)
+ */
 const port = process.env.PORT || 8080;
 const team_size = 7;
 // const apiURL = "https://worlds-fantasy-5b89dfe65b80.herokuapp.com/";
-const apiURL = import.meta.env.VITE_API_BASE_URL || "https://api.lolfantasy.pl";
+const apiURL =
+  import.meta.env.VUE_APP_VITE_API_BASE_URL || "https://api.lolfantasy.pl";
 // const apiURL = "https://localhost:7061/";
 // wire up the module
 const express = require("express");

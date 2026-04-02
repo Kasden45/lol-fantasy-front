@@ -49,6 +49,11 @@ const routes = [
     path: "/points/team/:teamSlug/game/:gameId",
     component: GamePointsView,
   },
+  {
+    path: "/test-ably",
+    name: "TestAbly",
+    component: () => import("@/TestAbly.vue"),
+  },
   // Define more routes as needed
 ];
 

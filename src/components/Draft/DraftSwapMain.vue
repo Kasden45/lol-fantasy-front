@@ -173,7 +173,12 @@
 </template>
 
 <script>
-import socket from "@/socket.js";
+import {
+  proposeSwap as ablyProposeSwap,
+  onDraftEvent,
+  offDraftEvent,
+  DRAFT_EVENTS,
+} from "@/socket.js";
 import TeamRoster from "@/components/Draft/TeamDisplayDraft.vue";
 import MyModal from "../MyModal.vue";
 import ComparePlayers from "./ComparePlayers.vue";
@@ -242,6 +247,7 @@ export default {
       timeToDeadline: "",
       currentSwap: null,
       errorMessage: "",
+      _unsubscribeFunctions: [],
     };
   },
   computed: {
@@ -332,6 +338,18 @@ export default {
     },
   },
   methods: {
+    setupAblyListeners() {
+      console.log("🔔 [SwapComponent] Setting up Ably listeners...");
+      var self = this;
+
+      // Listen for swap proposals FROM OTHER USERS
+      var unsubSwap = onDraftEvent(DRAFT_EVENTS.SWAP_PROPOSED, function (data) {
+        self.handleIncomingSwapProposal(data);
+      });
+
+      this._unsubscribeFunctions.push(unsubSwap);
+      console.log("✅ [SwapComponent] Listening for swap proposals");
+    },
     refreshTeams() {
       console.log("forcing refetch");
       this.$emit("refetch-teams");
@@ -488,10 +506,7 @@ export default {
         );
         console.log("Swap created", response.data);
         this.fetchSwaps();
-        socket.emit("swapProposed", {
-          leagueId: this.leagueId,
-          receiverUserId: this.rivalUserTeamId,
-        });
+        ablyProposeSwap(this.leagueId, this.rivalUserTeamId);
         this.selectedFromYourTeam = null;
         this.selectedFromTargetTeam = null;
         this.selectedTeamId = null;
@@ -504,8 +519,14 @@ export default {
   },
   created() {
     this.fetchSwaps();
+    this.setupAblyListeners();
   },
-  beforeDestroy() {},
+  beforeDestroy() {
+    console.log("🗑️  [SwapComponent] Destroying - cleaning up...");
+
+    // CRITICAL: Cleanup Ably listeners to prevent memory leaks!
+    this.cleanupAblyListeners();
+  },
 };
 </script>
 

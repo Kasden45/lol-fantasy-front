@@ -12,11 +12,15 @@ import "@fortawesome/fontawesome-free/css/all.css";
 // Create a Vue app instance
 const app = createApp(App);
 
+console.log("🚀 Starting app with API URL:", process.env.VUE_APP_API_BASE_URL);
 app.config.globalProperties.apiURL =
-  "https://worlds-fantasy-5b89dfe65b80.herokuapp.com/";
-app.config.globalProperties.apiURL = "https://localhost:7061/";
-app.config.globalProperties.apiURL =
-  import.meta.env.VITE_API_BASE_URL || "https://api.lolfantasy.pl";
+  process.env.VUE_APP_API_BASE_URL || "https://api.lolfantasy.pl/";
+
+// app.config.globalProperties.apiURL =
+//   "https://worlds-fantasy-5b89dfe65b80.herokuapp.com/";
+// app.config.globalProperties.apiURL = "https://localhost:7061/";
+// app.config.globalProperties.apiURL =
+//   import.meta.env.VITE_API_BASE_URL || "https://api.lolfantasy.pl";
 app.config.globalProperties.currentTournament = "112966669920590211";
 app.config.globalProperties.worlds_2023 = "110852926142971547";
 app.config.globalProperties.msi_2024 = "112099354464733424";
