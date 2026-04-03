@@ -14,17 +14,17 @@
           </MyModal>
         </div>
       </div>
-      <div class="row justify-content-center">
+      <div class="row m-0">
         <div id="intro" class="home">
-          <div class="mask" id="bg">
+          <div class="mask p-0" id="bg">
             <div class="container">
-              <div class="row">
+              <div class="row step pt-4">
                 <p id="photo-text">
                   Welcome to<br />
                   <span class="highlight">2KPI LoL Fantasy Game</span>
                 </p>
               </div>
-              <div class="row step justify-content-center mw-100">
+              <div class="row step pb-4">
                 <div class="col-md-3 line">
                   <img
                     src="../assets/number1.png"
@@ -81,17 +81,37 @@
 
         <!-- Replace the entire rules/points section inside the overlay div -->
         <div v-if="currentFixture != null" class="rules-section">
-          <div class="game-tabs ms-2 justify-content-md-center fs-6">
-            <div
-              v-for="(fixture, index) in tabs"
-              :key="fixture.order"
-              @click="selectTab(fixture.order, fixture.id)"
-              :class="{ active: selectedTabIndex === fixture.order }"
+          <div class="navbar navbar-expand-md navbar-light">
+            <button
+              class="navbar-toggler"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#gameTabs"
+              aria-controls="gameTabs"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
             >
-              <!-- {{ fixture != 0 ? fixture : 'General' }}  -->
-              {{ fixture.title }}
+              <span class="navbar-toggler-icon button-rules"></span>
+            </button>
+            <div
+              class="justify-content-center game-points collapse navbar-collapse"
+              id="gameTabs"
+            >
+              <div class="game-tabs navbar-nav ms-2 justify-content-md-center">
+                <div
+                  v-for="(fixture, index) in tabs"
+                  :key="fixture.order"
+                  @click="selectTab(fixture.order, fixture.id)"
+                  :class="{ active: selectedTabIndex === fixture.order }"
+                  class="navbar-item"
+                >
+                  {{ fixture.title }}
+                  <!-- {{ fixture != 0 ? fixture : 'General' }} -->
+                </div>
+              </div>
             </div>
           </div>
+
           <!-- Fixture Info -->
           <div class="fixture-info" v-if="currentFixture.fixture.id != null">
             <div class="fixture-info-left">
@@ -308,7 +328,8 @@ export default {
 }
 
 #intro {
-  height: 80vh;
+  height: inherit;
+  padding: 0%;
   width: 100%;
   background: url("../assets/lolevent.jpg") no-repeat center center fixed;
   background-color: rgba(143, 2, 2, 0.8);
@@ -320,7 +341,7 @@ export default {
 }
 
 #bg {
-  height: 80vh;
+  height: inherit;
   width: 100%;
   background: linear-gradient(150deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5) 50%);
 }
@@ -386,19 +407,16 @@ h2 {
   z-index: 2;
 }
 #photo-text {
-  position: absolute;
-  width: 80%;
-  bottom: 55%;
   left: 10%;
   padding: 10px;
   font-weight: bold;
   font-size: 400%;
 }
 .step {
-  position: absolute;
-  bottom: 20%;
-  left: 0;
+  height: inherit;
   text-align: center;
+  align-content: center;
+  justify-content: center;
 }
 
 .step-title {
@@ -428,7 +446,9 @@ h2 {
   justify-content: top;
   color: white;
 }
-
+.container {
+  height: inherit;
+}
 .overlay {
   background: var(--SECONDARY);
   padding: 3rem;
@@ -457,7 +477,6 @@ p {
   margin-bottom: 1rem;
   line-height: 1.6;
 }
-
 .cta-btn {
   margin-top: 2rem;
   /* width: 0.7vw; */
@@ -685,5 +704,8 @@ p {
 
 .value-negative {
   color: var(--ERROR);
+}
+.navbar-toggler-icon.button-rules {
+  filter: invert(100%) sepia(100%) grayscale(100%) brightness(200%);
 }
 </style>

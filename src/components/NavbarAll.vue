@@ -166,12 +166,9 @@
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  Stats<span class="inform"> NEW</span>
+                  Stats
                 </button>
-                <ul
-                  class="dropdown-menu dropdown-menu-end"
-                  aria-labelledby="dropdownMenuStats"
-                >
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuStats">
                   <li>
                     <a
                       @click="this.$router.push({ name: 'DreamTeamView' })"
@@ -179,7 +176,6 @@
                       href="#"
                     >
                       <span>Dream teams</span>
-                      <span class="inform"> NEW</span>
                     </a>
                   </li>
                   <li>
@@ -189,45 +185,11 @@
                       href="#"
                     >
                       <span>Player stats</span>
-                      <span class="inform"> NEW</span>
                     </a>
                   </li>
                 </ul>
               </div>
             </li>
-            <!-- <li class="nav-item pe-3">
-              <div class="dropdown">
-                <button
-                  class="nav-link"
-                  id="dropdownMenuLeagues"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  Leagues
-                </button>
-                <ul
-                  class="dropdown-menu dropdown-menu-end"
-                  aria-labelledby="dropdownMenuLeagues"
-                >
-                  <li>
-                    <a @click="this.$router.push({ name: 'LeaguesView' })"
-                    class="dropdown-item"
-                    href="#">
-                      <span>Regular</span>
-                      <span class="inform"> NEW</span>
-                  </a>
-                  </li>
-                  <li>
-                    <a @click="this.$router.push({ name: 'DraftView' })"
-                    class="dropdown-item"
-                    href="#">
-                      <span>Draft</span>
-                      <span class="inform"> NEW</span>
-                  </a>
-                  </li>
-                </ul>
-              </div>
-            </li> -->
             <li class="nav-item pe-3">
               <div class="dropdown">
                 <button
@@ -242,6 +204,14 @@
                     class=""
                     >{{ this.$store.getters.getLogin[0] }}</span
                   >
+                  <span
+                    v-if="
+                      this.$store.getters.getLogin == null ||
+                      this.$store.getters.getLogin.length == 0
+                    "
+                    class=""
+                    ><i class="fa-solid fa-user-gear"></i
+                  ></span>
                 </button>
                 <ul
                   class="dropdown-menu dropdown-menu-end"
@@ -255,7 +225,6 @@
                   >
                     <a @click="openDetailsModal" class="dropdown-item" href="#">
                       <span>Login</span>
-                      <span class="inform"> NEW</span>
                     </a>
                   </li>
                   <li>
@@ -265,7 +234,6 @@
                       href="#"
                     >
                       <span>Settings</span>
-                      <span class="inform"> NEW</span>
                     </a>
                   </li>
                   <!-- <li>
@@ -398,6 +366,7 @@ export default {
     },
     logout() {
       this.$store.commit("setProfileId", "");
+      this.$store.commit("setLogin", "");
       this.$router.push({ name: "Home" });
     },
     switchTournament(tournamentId) {
@@ -487,7 +456,15 @@ export default {
   border: none;
   overflow: hidden;
 }
+.navbar {
+  overflow: visible !important; /* override any Bootstrap overflow hiding */
+}
 
+.dropdown-menu {
+  position: absolute !important;
+  z-index: 9999;
+  margin-top: 0;
+}
 .dropdown-item {
   padding: 0.75rem 1rem;
 }
@@ -522,17 +499,81 @@ export default {
   /* filter: invert(100%); */
 }
 .deadline-banner {
-  color: white;
   background-color: var(--PRIMARY);
 }
 
 .deadline-banner-danger {
-  color: white;
   background-color: var(--ERROR);
 }
 
 .deadline-banner-warning {
-  color: white;
   background-color: var(--WARNING);
+}
+
+/* Add to scoped styles */
+
+/* Prevent the whole navbar from overflowing */
+.navbar-expand-md {
+  max-width: 100vw;
+  position: relative;
+}
+
+/* Constrain the deadline banner */
+.deadline-banner,
+.deadline-banner-danger,
+.deadline-banner-warning {
+  color: white;
+  text-align: center;
+  font-size: 14px;
+  padding: 6px 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Prevent brand from pushing nav off screen */
+.navbar-brand {
+  font-size: clamp(12px, 3vw, 18px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 45vw;
+}
+
+/* Constrain flag size on mobile */
+.flag {
+  height: 4vh;
+  max-height: 30px;
+}
+
+@media (max-width: 768px) {
+  .navbar-brand {
+    max-width: 60vw;
+    font-size: 13px;
+  }
+
+  .flag {
+    height: 24px;
+  }
+
+  /* Collapsed menu should not overflow */
+  .navbar-collapse {
+    max-width: 100%;
+    /* overflow-x: hidden; */
+  }
+
+  .navbar-nav {
+    width: 100%;
+  }
+
+  .nav-item {
+    width: 100%;
+  }
+  .dropdown-menu-end {
+    right: auto;
+    left: auto;
+  }
 }
 </style>

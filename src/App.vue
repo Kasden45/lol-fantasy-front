@@ -136,6 +136,7 @@ router-link {
   );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  text-wrap: auto;
   font-weight: bold;
   font-size: 2rem;
 }
