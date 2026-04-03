@@ -1470,6 +1470,32 @@ export default {
                 username: participant.userLogin,
               },
             };
+            Object.values(acc[participant.userId].team)
+              .filter((entry) => entry && (entry.player || entry.team))
+              .forEach((playerEntry) => {
+                const player = playerEntry.player;
+                const team = playerEntry.team;
+                if (player?.esportsPlayerId) {
+                  const found = this.availablePlayers.find(
+                    (p) => p.esportsPlayerId == player.esportsPlayerId,
+                  );
+                  if (found) {
+                    player.points = found.points;
+                    player.gamesPlayed = found.gamesPlayed;
+                    player.matchesPlayed = found.matchesPlayed;
+                  }
+                }
+                if (team?.esportsTeamId) {
+                  const found = this.availableTeams.find(
+                    (t) => t.esportsTeamId == team.esportsTeamId,
+                  );
+                  if (found) {
+                    team.points = found.points;
+                    team.gamesPlayed = found.gamesPlayed;
+                    team.matchesPlayed = found.matchesPlayed;
+                  }
+                }
+              });
           }
           return acc;
         }, {});

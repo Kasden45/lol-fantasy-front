@@ -90,8 +90,8 @@
             "
           >
             <option value="points">Points</option>
-            <option value="pointsGame">Pts/game</option>
-            <option value="pointsGamePrice">Pts/game/$</option>
+            <option value="pointsMatch">Pts/match</option>
+            <option value="pointsMatchPrice">Pts/match/$</option>
             <option value="priceAsc">Price (Low)</option>
             <option value="priceDesc">Price (High)</option>
             <option v-if="selectedFilter !== 'team'" value="summonerName">
@@ -180,7 +180,7 @@ export default {
   data() {
     return {
       hideInactive: true,
-      selectedSorting: "priceDesc",
+      selectedSorting: "pointsMatch",
       selectedFilter: "any",
       selectedTeamFilter: "all",
       sortedPlayers: [],
@@ -256,22 +256,22 @@ export default {
       if (option === "points") {
         this.sortedPlayers.sort((a, b) => b.points - a.points);
       }
-      if (option === "pointsGame") {
+      if (option === "pointsMatch") {
         this.sortedPlayers.sort((a, b) => {
-          if (a.gamesPlayed === 0 && b.gamesPlayed === 0) return 0;
-          if (a.gamesPlayed === 0) return 1;
-          if (b.gamesPlayed === 0) return -1;
-          return b.points / b.gamesPlayed - a.points / a.gamesPlayed;
+          if (a.matchesPlayed === 0 && b.matchesPlayed === 0) return 0;
+          if (a.matchesPlayed === 0) return 1;
+          if (b.matchesPlayed === 0) return -1;
+          return b.points / b.matchesPlayed - a.points / a.matchesPlayed;
         });
       }
-      if (option === "pointsGamePrice") {
+      if (option === "pointsMatchPrice") {
         this.sortedPlayers.sort((a, b) => {
-          if (a.gamesPlayed === 0 && b.gamesPlayed === 0) return 0;
-          if (a.gamesPlayed === 0) return 1;
-          if (b.gamesPlayed === 0) return -1;
+          if (a.matchesPlayed === 0 && b.matchesPlayed === 0) return 0;
+          if (a.matchesPlayed === 0) return 1;
+          if (b.matchesPlayed === 0) return -1;
           return (
-            b.points / b.gamesPlayed / b.price -
-            a.points / a.gamesPlayed / a.price
+            b.points / b.matchesPlayed / b.price -
+            a.points / a.matchesPlayed / a.price
           );
         });
       }
@@ -299,22 +299,22 @@ export default {
       if (option === "points") {
         this.sortedTeams.sort((a, b) => b.points - a.points);
       }
-      if (option === "pointsGame") {
+      if (option === "pointsMatch") {
         this.sortedTeams.sort((a, b) => {
-          if (a.gamesPlayed === 0 && b.gamesPlayed === 0) return 0;
-          if (a.gamesPlayed === 0) return 1;
-          if (b.gamesPlayed === 0) return -1;
-          return b.points / b.gamesPlayed - a.points / a.gamesPlayed;
+          if (a.matchesPlayed === 0 && b.matchesPlayed === 0) return 0;
+          if (a.matchesPlayed === 0) return 1;
+          if (b.matchesPlayed === 0) return -1;
+          return b.points / b.matchesPlayed - a.points / a.matchesPlayed;
         });
       }
-      if (option === "pointsGamePrice") {
+      if (option === "pointsMatchPrice") {
         this.sortedTeams.sort((a, b) => {
-          if (a.gamesPlayed === 0 && b.gamesPlayed === 0) return 0;
-          if (a.gamesPlayed === 0) return 1;
-          if (b.gamesPlayed === 0) return -1;
+          if (a.matchesPlayed === 0 && b.matchesPlayed === 0) return 0;
+          if (a.matchesPlayed === 0) return 1;
+          if (b.matchesPlayed === 0) return -1;
           return (
-            b.points / b.gamesPlayed / b.price -
-            a.points / a.gamesPlayed / a.price
+            b.points / b.matchesPlayed / b.price -
+            a.points / a.matchesPlayed / a.price
           );
         });
       }
