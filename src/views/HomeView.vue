@@ -410,7 +410,8 @@ h2 {
   left: 10%;
   padding: 10px;
   font-weight: bold;
-  font-size: 400%;
+  font-size: 30px;
+  /* font-size: 400%; */
 }
 .step {
   height: inherit;
