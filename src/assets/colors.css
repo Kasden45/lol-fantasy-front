@@ -31,6 +31,12 @@
   --GREEN-DARK: #388e3c;
   --GREEN-LIGHT: #4caf50;
 
+  --YELLOW-DARK: #fbc02d;
+  --YELLOW-LIGHT: #ffeb3b;
+
+  --RED-DARK: #d32f2f;
+  --RED-LIGHT: #f44336;
+
   --ROLE-TOP: rgba(59, 130, 246, 0.4);
   --ROLE-JUNGLE: rgba(34, 197, 94, 0.4);
   --ROLE-MID: rgba(249, 115, 22, 0.4);

@@ -66,6 +66,22 @@
     <!-- Bottom Info: Price and Points -->
     <div class="tile-footer" v-if="teamPlayer && !details">
       <div class="price ps-2">{{ teamPlayer?.price?.toFixed(1) }}$</div>
+      <div class="points">
+        <span v-for="match in uniqueMatchesThisFixture" :key="match.matchId">
+          <i
+            class="fa-solid fa-circle"
+            :style="{
+              color:
+                matchStatuses[match] === 'FINISHED'
+                  ? 'var(--GREEN-LIGHT)'
+                  : matchStatuses[match] === 'STARTED'
+                  ? 'var(--YELLOW-LIGHT)'
+                  : 'var(--GREY-DARKER)',
+              marginLeft: '0.2rem',
+            }"
+          />
+        </span>
+      </div>
       <div
         class="points pe-2"
         :class="{
@@ -100,6 +116,7 @@ import PlayerTileV2 from "@/components/TeamSelection-v2/PlayerTile-v2.vue";
 export default {
   name: "PlayerPoints",
   props: {
+    matchesThisFixture: Array,
     img_url: String,
     roles_img_url: Object,
     teamPlayer: Object,
@@ -130,6 +147,15 @@ export default {
     },
   },
   computed: {
+    matchStatuses() {
+      return this.playerPoints.gamesPointsDetails.reduce((acc, game) => {
+        acc[game.matchId] = game.match.state;
+        return acc;
+      }, {});
+    },
+    uniqueMatchesThisFixture() {
+      return [...new Set(this.matchesThisFixture.map((item) => item.matchId))];
+    },
     displayedPoints() {
       if (this.isTriple && this.isCaptain) {
         return this.points
@@ -247,8 +273,11 @@ export default {
 }
 
 .tile-footer {
-  display: flex;
+  display: grid;
+
+  grid-template-columns: 1fr auto 1fr;
   justify-content: space-between;
+  /* justify-content: space-between; */
   font-size: 0.8rem;
   font-weight: 600;
   padding-top: 0.3rem;

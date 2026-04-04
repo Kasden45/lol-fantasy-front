@@ -6,6 +6,9 @@
         :is-captain="participantData.userTeam.captain == 1"
         @showDetails="showDetailsModal"
         :playerPoints="participantData.userTeam.topPlayerPoints"
+        :matchesThisFixture="
+          playerMatchesFixture(participantData.userTeam.topPlayerPoints.player)
+        "
         @captainPick="pickCaptain"
         v-if="participantData.userTeam != null"
         :role="'top'"
@@ -20,6 +23,11 @@
         :is-captain="participantData.userTeam.captain == 2"
         @showDetails="showDetailsModal"
         :playerPoints="participantData.userTeam.junglePlayerPoints"
+        :matchesThisFixture="
+          playerMatchesFixture(
+            participantData.userTeam.junglePlayerPoints.player,
+          )
+        "
         @captainPick="pickCaptain"
         v-if="participantData.userTeam != null"
         :role="'jungle'"
@@ -34,6 +42,9 @@
         :is-captain="participantData.userTeam.captain == 3"
         @showDetails="showDetailsModal"
         :playerPoints="participantData.userTeam.midPlayerPoints"
+        :matchesThisFixture="
+          playerMatchesFixture(participantData.userTeam.midPlayerPoints.player)
+        "
         v-if="participantData.userTeam != null"
         :role="'mid'"
         :teamPlayer="participantData.userTeam.midPlayerPoints.player"
@@ -50,6 +61,11 @@
         :is-captain="participantData.userTeam.captain == 4"
         @showDetails="showDetailsModal"
         :playerPoints="participantData.userTeam.bottomPlayerPoints"
+        :matchesThisFixture="
+          playerMatchesFixture(
+            participantData.userTeam.bottomPlayerPoints.player,
+          )
+        "
         v-if="participantData.userTeam != null"
         :role="'bottom'"
         :teamPlayer="participantData.userTeam.bottomPlayerPoints.player"
@@ -64,6 +80,11 @@
         :is-captain="participantData.userTeam.captain == 5"
         @showDetails="showDetailsModal"
         :playerPoints="participantData.userTeam.supportPlayerPoints"
+        :matchesThisFixture="
+          playerMatchesFixture(
+            participantData.userTeam.supportPlayerPoints.player,
+          )
+        "
         v-if="participantData.userTeam != null"
         :role="'support'"
         :teamPlayer="participantData.userTeam.supportPlayerPoints.player"
@@ -78,6 +99,9 @@
         :role="'team'"
         @showDetails="showDetailsModal"
         :teamTeam="participantData.userTeam.teamPoints.team"
+        :matchesThisFixture="
+          playerMatchesFixture(participantData.userTeam.teamPoints.team)
+        "
         :teamPoints="participantData.userTeam.teamPoints"
         :img_url="role_images['team']"
         :roles_img_url="role_images"
@@ -87,6 +111,9 @@
       <PlayerPoints
         @showDetails="showDetailsModal"
         :playerPoints="participantData.userTeam.subPlayerPoints"
+        :matchesThisFixture="
+          playerMatchesFixture(participantData.userTeam.subPlayerPoints.player)
+        "
         :isbenchboost="participantData.userTeam.chipUsed == 4"
         v-if="participantData.userTeam != null"
         :role="'sub'"
@@ -201,6 +228,22 @@ export default {
     },
   },
   methods: {
+    playerMatchesFixture(entity) {
+      return this.fixtureGames.filter((game) => {
+        if (entity.code) {
+          return (
+            game.fixtureId == this.fixture.id &&
+            (game.gameTeam1 == entity.code || game.gameTeam2 == entity.code)
+          );
+        } else if (entity.team.code) {
+          return (
+            game.fixtureId == this.fixture.id &&
+            (game.gameTeam1 == entity.team.code ||
+              game.gameTeam2 == entity.team.code)
+          );
+        }
+      });
+    },
     showDetailsModal(detailsData) {
       console.log("details");
       console.log(detailsData);
