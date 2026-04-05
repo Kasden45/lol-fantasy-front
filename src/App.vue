@@ -1,4 +1,6 @@
 <template>
+  <SpeedInsights />
+  <Analytics />
   <layout>
     <!-- Router view displays the selected route's component -->
     <router-view></router-view>
@@ -7,7 +9,8 @@
 
 <script>
 import Layout from "@/components/Layout";
-
+import { SpeedInsights } from "@vercel/speed-insights/vue";
+import { Analytics } from "@vercel/analytics/vue";
 export default {
   name: "App",
   components: {
