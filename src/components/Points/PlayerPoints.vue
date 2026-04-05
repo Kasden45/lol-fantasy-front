@@ -71,6 +71,7 @@
           <i
             class="fa-solid fa-circle"
             :style="{
+              opacity: role == 'sub' ? 0.5 : 1,
               color:
                 matchStatuses[match] === 'FINISHED'
                   ? 'var(--GREEN-LIGHT)'

@@ -208,6 +208,85 @@ export default {
       showTeamDetailsModal: false,
     };
   },
+  computed: {
+    matchStatus() {
+      if (
+        !this.participantData?.userTeam ||
+        !this.fixtureGames ||
+        !this.fixture
+      ) {
+        return { planned: 0, playing: 0, finished: 0 };
+      }
+
+      const fixtureId = this.fixture.id;
+      const userTeam = this.participantData.userTeam;
+
+      // Collect all gamesPointsDetails across all slots (excluding sub)
+      const slots = [
+        {
+          points: userTeam.topPlayerPoints,
+          code: userTeam.topPlayerPoints?.player?.team?.code,
+        },
+        {
+          points: userTeam.junglePlayerPoints,
+          code: userTeam.junglePlayerPoints?.player?.team?.code,
+        },
+        {
+          points: userTeam.midPlayerPoints,
+          code: userTeam.midPlayerPoints?.player?.team?.code,
+        },
+        {
+          points: userTeam.bottomPlayerPoints,
+          code: userTeam.bottomPlayerPoints?.player?.team?.code,
+        },
+        {
+          points: userTeam.supportPlayerPoints,
+          code: userTeam.supportPlayerPoints?.player?.team?.code,
+        },
+        { points: userTeam.teamPoints, code: userTeam.teamPoints?.team?.code },
+      ];
+
+      let planned = 0,
+        playing = 0,
+        finished = 0;
+
+      for (const slot of slots) {
+        if (!slot.code || !slot.points) continue;
+
+        // Find this slot's scheduled matches in this fixture
+        const scheduledMatchIds = [
+          ...new Set(
+            this.fixtureGames
+              .filter(
+                (g) =>
+                  g.fixtureId === fixtureId &&
+                  (g.gameTeam1 === slot.code || g.gameTeam2 === slot.code),
+              )
+              .map((g) => g.matchId),
+          ),
+        ];
+
+        // Find match states from gamesPointsDetails
+        const playedGames = slot.points.gamesPointsDetails ?? [];
+
+        for (const matchId of scheduledMatchIds) {
+          const foundGame = playedGames.find((g) => g.matchId === matchId);
+
+          if (!foundGame) {
+            planned++;
+          } else if (foundGame.match?.state === "FINISHED") {
+            finished++;
+          } else if (foundGame.match?.state === "STARTED") {
+            playing++;
+          } else {
+            planned++;
+          }
+        }
+      }
+
+      return { planned, playing, finished };
+    },
+  },
   mounted() {
     console.log(this.participantData);
     console.log(this.participant);
@@ -225,6 +304,16 @@ export default {
         this.correctEmptyPlayers();
       },
       immediate: true,
+    },
+    matchStatus: {
+      handler(val) {
+        this.$emit("match-status-update", {
+          userId: this.participantData.userId,
+          ...val,
+        });
+      },
+      immediate: true,
+      deep: true,
     },
   },
   methods: {

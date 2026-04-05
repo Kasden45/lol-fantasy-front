@@ -39,6 +39,20 @@
     :class="{ 'showing-details': showDetails }"
     v-if="participantData != null"
   >
+    <div
+      class="match-status-summary"
+      v-if="matchStatuses && participantData.points == null"
+    >
+      <span class="status-badge status-finished"
+        >✓ {{ matchStatuses.finished }}</span
+      >
+      <span class="status-badge status-playing"
+        ><span class="live-dot"></span>{{ matchStatuses.playing }}</span
+      >
+      <span class="status-badge status-planned"
+        >○ {{ matchStatuses.planned }}</span
+      >
+    </div>
     <div v-if="!showDetails">
       {{
         participantData.userTeam
@@ -62,6 +76,7 @@ export default {
     TeamPointsGamesCard,
   },
   props: {
+    matchStatuses: Object,
     participant: Object, // Pass the participant data as a prop
     fixtureGames: Array,
   },
@@ -269,5 +284,59 @@ p.has-error {
   font-weight: 800;
   color: white;
   border: none;
+}
+.match-status-summary {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.status-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 4px;
+  border-radius: 999px;
+}
+
+.status-finished {
+  background: rgba(76, 175, 80, 0.15);
+  color: var(--GREEN-LIGHT);
+  border: 1px solid var(--GREEN-LIGHT);
+}
+
+.status-playing {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(244, 67, 54, 0.1);
+  color: var(--RED-LIGHT);
+  border: 1px solid var(--RED-LIGHT);
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--RED-LIGHT);
+  flex-shrink: 0;
+  animation: live-pulse 1.5s ease-in-out infinite;
+}
+
+.status-planned {
+  background: rgba(69, 70, 75, 0.3);
+  color: var(--GREY-DARKER);
+  border: 1px solid var(--GREY-DARKER);
+}
+
+@keyframes live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.75);
+  }
 }
 </style>
