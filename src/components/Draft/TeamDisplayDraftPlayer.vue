@@ -86,13 +86,13 @@
         </div>
         <div class="stat-mini">
           <span class="stat-value">{{
-            position.player.gamesPlayed === 0
+            position.player.matchesPlayed === 0
               ? "-"
-              : (position.player.points / position.player.gamesPlayed).toFixed(
-                  1,
-                )
+              : (
+                  position.player.points / position.player.matchesPlayed
+                ).toFixed(1)
           }}</span>
-          <span class="stat-label">Pts/G</span>
+          <span class="stat-label">Pts/M</span>
         </div>
       </div>
     </template>
@@ -150,11 +150,11 @@
         </div>
         <div class="stat-mini">
           <span class="stat-value">{{
-            position.team.gamesPlayed === 0
+            position.team.matchesPlayed === 0
               ? "-"
-              : (position.team.points / position.team.gamesPlayed).toFixed(1)
+              : (position.team.points / position.team.matchesPlayed).toFixed(1)
           }}</span>
-          <span class="stat-label">Pts/G</span>
+          <span class="stat-label">Pts/M</span>
         </div>
       </div>
     </template>

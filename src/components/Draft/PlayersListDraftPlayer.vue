@@ -69,12 +69,12 @@
       <div class="stat">
         <div class="stat-value">
           {{
-            player.gamesPlayed === 0
+            player.matchesPlayed === 0
               ? "-"
-              : (player.points / player.gamesPlayed).toFixed(1)
+              : (player.points / player.matchesPlayed).toFixed(1)
           }}
         </div>
-        <div class="stat-label">Pts/G</div>
+        <div class="stat-label">Pts/M</div>
       </div>
     </div>
 

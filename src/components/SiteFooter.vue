@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="row gy-3">
+    <div class="row">
       <div class="col-12 col-sm-6 col-md-3 text-sm-start">
         <h5 class="mb-2 mb-sm-4 fw-bolder">Our company</h5>
         <ul>

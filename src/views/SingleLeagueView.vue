@@ -80,6 +80,7 @@
                 <td>{{ index + 1 }}.</td>
                 <ParticipantDetails
                   @setActive="setActiveUserTeam"
+                  :matchStatuses="matchStatuses[participant.userId]"
                   :participant="participant"
                   :fixtureGames="this.fixtureGames"
                 />
@@ -102,6 +103,7 @@
                 calculatePosition,
               )"
               :key="participant.userId"
+              @match-status-update="onMatchStatusUpdate"
               v-if="tabs.length > 0"
               :participant="participant"
               :fixtureGames="this.fixtureGames"
@@ -146,9 +148,13 @@ export default {
       realLeagueId: null,
       fixtureGames: [],
       openModal: false,
+      matchStatuses: {}, // userId -> { planned, playing, finished }
     };
   },
   methods: {
+    onMatchStatusUpdate({ userId, planned, playing, finished }) {
+      this.matchStatuses[userId] = { planned, playing, finished };
+    },
     onWheel(event) {
       const el = this.$refs.scrollContainer;
       el.scrollLeft += event.deltaY;
