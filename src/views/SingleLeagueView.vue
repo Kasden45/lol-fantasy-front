@@ -1,8 +1,12 @@
 <template>
-  <div v-if="currentLeague != null">
-    <h2 class="header-name">
-      {{ currentLeague.name }} - {{ fixturesData.mode }} mode
-    </h2>
+  <div v-if="currentLeague != null" class="league-view">
+    <div class="page-header">
+      <div class="header-accent" />
+      <div>
+        <p class="eyebrow">{{ fixturesData.mode }} mode</p>
+        <h1 class="page-title">{{ currentLeague.name }}</h1>
+      </div>
+    </div>
     <div class="row w-80 m-auto">
       <DraftView
         v-if="fixturesData && fixturesData.mode == 'Draft'"
@@ -59,16 +63,21 @@
       </div>
     </div>
     <div class="container game-points">
-      <div class="row league-row justify-content-md-start" v-if="currentLeague">
-        <div class="col-md-3">
-          <table class="table table-striped px-2">
-            <!-- <thead>
-                <tr>
-                    <th>Lp</th>
-                    <th>User</th>
-                    <th>Points</th>
-                </tr>
-                </thead> -->
+      <div
+        class="row league-row justify-content-md-center"
+        :class="{
+          'fixture-view': this.selectedTabIndex > 0,
+        }"
+        v-if="currentLeague"
+      >
+        <div
+          :class="{
+            'fixture-view': this.selectedTabIndex > 0,
+            'col-md-9': this.selectedTabIndex === 0,
+            'col-md-4': this.selectedTabIndex > 0,
+          }"
+        >
+          <table class="participants-table px-2">
             <tbody>
               <tr
                 class="table-row-participants"
@@ -88,7 +97,7 @@
             </tbody>
           </table>
         </div>
-        <div class="col-md-9">
+        <div class="col-md-8" v-if="this.selectedTabIndex > 0">
           <div
             ref="scrollContainer"
             class="container participants-container"
@@ -308,13 +317,44 @@ export default {
 }
 
 .league-row {
+  padding-bottom: 20px;
   display: flex;
   flex-wrap: nowrap;
-  overflow-x: scroll;
   justify-content: space-between;
+}
+.league-row.fixture-view {
+  padding-bottom: 0px;
+  overflow-x: scroll;
+}
+.participants-table {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--GREY-DARKER);
+  background: var(--BACKGROUND-LIGHTER);
 }
 .table-row-participants {
   height: 10vh !important;
+}
+.participants-table tr {
+  /* background-color: var(--BACKGROUND-DARK); */
+  color: white;
+}
+.table-row-participants {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 20px;
+  border-bottom: 1px solid var(--GREY-DARKER);
+  transition: background 0.15s;
+}
+
+.table-row-participants:last-child {
+  border-bottom: none;
+}
+
+.table-row-participants:hover {
+  background: var(--SECONDARY);
 }
 .participants-container {
   flex-wrap: nowrap;
@@ -322,6 +362,7 @@ export default {
   scroll-behavior: smooth;
 }
 .game-tabs {
+  color: var(--TABLE-ROW-SECONDARY);
   display: flex;
   margin-bottom: 20px;
 }
@@ -341,5 +382,11 @@ export default {
 .inform {
   color: var(--ERROR);
   font-size: x-small;
+}
+.league-view {
+  /* background-color: var(--BACKGROUND-DARK); */
+  background: var(--BACKGROUND-DARK);
+  padding: 40px 32px;
+  font-family: "DM Sans", sans-serif;
 }
 </style>

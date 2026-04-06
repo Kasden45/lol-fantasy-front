@@ -1,20 +1,8 @@
 <template>
-  <td v-if="participantData != null">
-    <p class="mb-0">{{ participantData.userLogin }}</p>
-    <p v-if="participantData.userChips !== null">
-      <span v-for="chip in participantData.userChips" :key="chip.id">
-        <i
-          class="fa-solid"
-          :class="{
-            'fa-star': chip.id == 1,
-            'fa-dollar-sign': chip.id == 2,
-            'fa-infinity': chip.id == 3,
-            'fa-chair': chip.id == 4,
-            'chip-used': chip.userStatus == 3,
-            'chip-active': chip.userStatus == 2,
-            'chip-available': chip.userStatus == 0 || chip.userStatus == 1,
-          }"
-        ></i>
+  <td v-if="participantData != null" class="w-100">
+    <p class="mb-0">
+      <span>
+        {{ participantData.userLogin }}
       </span>
     </p>
 
@@ -37,6 +25,7 @@
   </td>
   <td
     :class="{ 'showing-details': showDetails }"
+    class="w-100 text-end"
     v-if="participantData != null"
   >
     <div
@@ -53,7 +42,25 @@
         >○ {{ matchStatuses.planned }}</span
       >
     </div>
-    <div v-if="!showDetails">
+    <span
+      v-if="participantData.userChips !== null"
+      v-for="chip in participantData.userChips"
+      :key="chip.id"
+    >
+      <i
+        class="fa-solid"
+        :class="{
+          'fa-star': chip.id == 1,
+          'fa-dollar-sign': chip.id == 2,
+          'fa-infinity': chip.id == 3,
+          'fa-chair': chip.id == 4,
+          'chip-used': chip.userStatus == 3,
+          'chip-active': chip.userStatus == 2,
+          'chip-available': chip.userStatus == 0 || chip.userStatus == 1,
+        }"
+      ></i>
+    </span>
+    <span v-if="!showDetails">
       {{
         participantData.userTeam
           ? participantData.userTeam.totalPoints
@@ -62,7 +69,7 @@
           : 0
       }}
       pts
-    </div>
+    </span>
   </td>
 </template>
 
@@ -190,11 +197,6 @@ export default {
 };
 </script>
 <style scoped>
-.fill-height {
-  height: 100%;
-  display: flex;
-  align-items: center;
-}
 .team-points {
   display: flex;
   max-width: 700px;
@@ -292,6 +294,7 @@ p.has-error {
 }
 
 .status-badge {
+  text-align: center;
   font-size: 11px;
   font-weight: 700;
   padding: 2px 4px;
