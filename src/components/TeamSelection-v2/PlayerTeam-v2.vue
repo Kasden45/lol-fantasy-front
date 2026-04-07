@@ -60,8 +60,8 @@
         @useChip="chipUsed"
         /> -->
     </div>
-    <div class="row justify-content-center mb-3">
-      <div class="col-xl-3 col-sm-4 col-sm-4 align-content-center">
+    <div class="row justify-content-center">
+      <div class="col-xl-3 col-sm-4 col-sm-4 align-content-center mb-3">
         <PlayerTeamTileV2
           :draftLeague="draftLeague"
           :is-captain="captain == 1"
@@ -85,7 +85,7 @@
           "
         />
       </div>
-      <div class="col-xl-3 col-sm-4 col-sm-4 align-content-center">
+      <div class="col-xl-3 col-sm-4 col-sm-4 align-content-center mb-3">
         <PlayerTeamTileV2
           :draftLeague="draftLeague"
           :is-captain="captain == 2"
@@ -109,7 +109,7 @@
           "
         />
       </div>
-      <div class="col-xl-3 col-sm-4 align-content-center">
+      <div class="col-xl-3 col-sm-4 align-content-center mb-3">
         <PlayerTeamTileV2
           :draftLeague="draftLeague"
           :is-captain="captain == 3"
@@ -134,8 +134,8 @@
         />
       </div>
     </div>
-    <div class="row justify-content-center mb-3">
-      <div class="col-xl-3 col-sm-4 align-content-center">
+    <div class="row justify-content-center">
+      <div class="col-xl-3 col-sm-4 align-content-center mb-3">
         <PlayerTeamTileV2
           :draftLeague="draftLeague"
           :is-captain="captain == 4"
@@ -159,7 +159,7 @@
           "
         />
       </div>
-      <div class="col-xl-3 col-sm-4 align-content-center">
+      <div class="col-xl-3 col-sm-4 align-content-center mb-3">
         <PlayerTeamTileV2
           :is-captain="captain == 5"
           :currently-picked="this.currentlyPicked"
@@ -184,8 +184,8 @@
         />
       </div>
     </div>
-    <div class="row justify-content-center mb-3">
-      <div class="col-xl-3 col-sm-4 align-content-center">
+    <div class="row justify-content-center">
+      <div class="col-xl-3 col-sm-4 align-content-center mb-3">
         <PlayerTeamTileV2
           :draftLeague="draftLeague"
           :currently-picked="this.currentlyPicked"
@@ -208,7 +208,7 @@
         />
       </div>
 
-      <div class="col-xl-3 col-sm-4 align-content-center">
+      <div class="col-xl-3 col-sm-4 align-content-center mb-3">
         <TeamTeamTileV2
           :draftLeague="draftLeague"
           :currently-picked="this.currentlyPicked"
