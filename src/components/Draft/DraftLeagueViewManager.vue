@@ -14,7 +14,7 @@
       Standings
     </button>
     <button
-      v-if="this.currentLeague?.isDrafted == false"
+      v-if="currentLeague?.isDrafted == false"
       class="tab-btn"
       :class="{ active: activeTab === 'draft' }"
       @click="activeTab = 'draft'"
@@ -22,12 +22,13 @@
       Draft teams
     </button>
     <button
-      v-if="this.currentLeague?.isDrafted == true"
+      v-if="currentLeague?.isDrafted == true"
       class="tab-btn"
       :class="{ active: activeTab === 'swaps' }"
       @click="activeTab = 'swaps'"
     >
       Swap players
+      <span v-if="unansweredSwaps" class="badge">{{ unansweredSwaps }}</span>
     </button>
   </div>
   <DraftSwapMain
@@ -42,7 +43,9 @@
     :real-league-id="realLeagueId"
     :selectedFromUnusedPlayers="selectedFromUnusedPlayers"
     :fixtures="fixtures"
+    :pending-swaps="swaps"
     @refetch-teams="refetchTeams"
+    @refetch-swaps="fetchSwaps"
     @choose-role="choseRole"
   >
     <PlayersListDraft
@@ -296,7 +299,8 @@ export default {
 
       // Swap mode
       selectedFromUnusedPlayers: null,
-
+      unansweredSwaps: 0,
+      swaps: [],
       // Fixture data
       teamsPlayingInNextFixture: [],
       matchesByFixture: null,
@@ -419,14 +423,41 @@ export default {
       await this.getFixtures();
       await this.getLeagueDetails(this.leagueId);
       await this.fetchUserTeam();
-
+      await this.fetchSwaps();
       // Initialize Ably AFTER data loaded
       await this.initializeRealtime();
     } catch (error) {
       console.error("❌ [DraftComponent] Initialization failed:", error);
     }
   },
+  watch: {
+    // Watch for changes in the 'playerDetails' prop
+
+    unansweredSwaps: {
+      handler(val) {
+        this.$emit("swaps-status-update", val);
+      },
+      immediate: true,
+      deep: true,
+    },
+  },
   methods: {
+    async fetchSwaps() {
+      try {
+        const response = await this.axios.get(
+          `${this.apiURL}Draft/${this.$store.getters.getCurrentTournamentId}/trades/${this.realLeagueId}`,
+        );
+        this.swaps = response.data.draftTrades;
+        this.unansweredSwaps = this.swaps.filter(
+          (s) =>
+            s.tradeReceiverUserTeam?.userId ===
+              this.$store.getters.getProfileId && s.status == 0,
+        ).length;
+        // this.sortedPlayers = this.players;
+      } catch (error) {
+        console.error("Error fetching swaps:", error);
+      }
+    },
     /**
      * Initialize Ably real-time connection and subscribe to all events
      */
@@ -1617,6 +1648,25 @@ li:hover {
   color: var(--PRIMARY-DARKER, #00d9ff);
   border-radius: 10%;
   border-color: var(--PRIMARY-DARKER, #00d9ff);
+}
+
+.badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background-color: var(--RED-DARK);
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  line-height: 1;
+  pointer-events: none;
 }
 .waiting-label {
   font-size: 12px;

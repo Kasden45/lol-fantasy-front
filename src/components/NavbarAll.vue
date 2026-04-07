@@ -4,7 +4,7 @@
       this.$store.getters.getProfileId == null ||
       this.$store.getters.getProfileId == ''
     "
-    :bg-color="'var(--PRIMARY)'"
+    :bg-color="'white'"
     :openModal="this.openModal"
     @closeModal="closeDetailsModal"
     :title="'Login'"
