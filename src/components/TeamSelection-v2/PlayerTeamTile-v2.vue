@@ -32,7 +32,7 @@
         </div>
         <div
           v-if="teamPlayer && draftLeague"
-          class="action-button swap-button"
+          class="action-button swap-button d-none d-sm-block"
           :class="{ 'disabled-swap': !canSub }"
           @click="swapWithSub(teamPlayer)"
         >
@@ -103,6 +103,29 @@
     <div class="tile-footer second" v-if="teamPlayer">
       <div></div>
       <!-- <div class="points pe-2">{{ (teamPlayer?.points/teamPlayer?.gamesPlayed).toFixed(0) }}pts/g</div> -->
+    </div>
+    <div class="tile-footer mobile-actions d-sm-none">
+      <div class="half d-sm-none">
+        <span
+          class="swap-button d-block"
+          v-if="teamPlayer && draftLeague"
+          :class="{ 'disabled-swap': !canSub }"
+          @click="swapWithSub(teamPlayer)"
+        >
+          <i class="fas fa-arrow-right-arrow-left fa-xl sub"></i>
+        </span>
+      </div>
+
+      <div class="half">
+        <span
+          v-if="teamPlayer && role != 'sub'"
+          class="d-block"
+          :class="{ 'captain-letter': isCaptain }"
+          @click="setCaptain(role)"
+        >
+          <i class="fa-sharp fa-solid fa-star fa-xl"></i>
+        </span>
+      </div>
     </div>
 
     <!-- Add/Remove Button -->
@@ -288,7 +311,7 @@ export default {
   justify-content: space-between;
   font-size: 0.8rem;
   font-weight: 600;
-  border-top: none;
+  border-top: none !important;
   /* margin-top: 0.4rem; */
   padding-top: 0rem;
 }
@@ -321,6 +344,9 @@ export default {
   font-size: xx-large;
   cursor: pointer;
 }
+.sub {
+  font-size: x-large;
+}
 .remove-button {
   color: #ff4d4f;
 }
@@ -335,5 +361,27 @@ export default {
 }
 .border-bot {
   border-right: 2px solid black;
+}
+.mobile-actions {
+  display: flex;
+  height: 10vh;
+}
+
+.mobile-actions .half {
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.mobile-actions .half span {
+  justify-content: center;
+  align-items: center;
+}
+
+.mobile-actions .half i {
+  font-size: 6vh; /* ~80% of 20vh container */
+}
+.captain-letter {
+  color: var(--GOLDEN-CAPTAIN);
 }
 </style>

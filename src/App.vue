@@ -1,4 +1,6 @@
 <template>
+  <SpeedInsights />
+  <Analytics />
   <layout>
     <!-- Router view displays the selected route's component -->
     <router-view></router-view>
@@ -7,7 +9,8 @@
 
 <script>
 import Layout from "@/components/Layout";
-
+import { SpeedInsights } from "@vercel/speed-insights/vue";
+import { Analytics } from "@vercel/analytics/vue";
 export default {
   name: "App",
   components: {
@@ -18,7 +21,37 @@ export default {
 
 <style>
 @import "./assets/colors.css";
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 36px;
+}
 
+.header-accent {
+  width: 4px;
+  height: 52px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, var(--PRIMARY), var(--PRIMARY-LIGHTER));
+  flex-shrink: 0;
+}
+
+.eyebrow {
+  margin: 0 0 2px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--PRIMARY);
+}
+
+.page-title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--GREY-LIGHT);
+  line-height: 1;
+}
 #app {
   /*font-family: Avenir, Helvetica, Arial, sans-serif;*/
   font-family: "source-sans-pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
