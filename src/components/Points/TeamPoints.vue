@@ -72,7 +72,7 @@ export default {
   computed: {
     matchStatuses() {
       return this.teamPoints.gamesPointsDetails.reduce((acc, game) => {
-        acc[game.matchId] = game.match.state;
+        acc[game.matchId] = game?.match?.state ?? "PLANNED";
         return acc;
       }, {});
     },

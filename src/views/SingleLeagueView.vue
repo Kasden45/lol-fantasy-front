@@ -7,15 +7,16 @@
         <h1 class="page-title">{{ currentLeague.name }}</h1>
       </div>
     </div>
-    <div class="row w-80 m-auto">
-      <DraftView
-        v-if="fixturesData && fixturesData.mode == 'Draft'"
+    <div
+      class="row w-80 m-auto"
+      v-if="fixturesData && fixturesData.mode == 'Draft'"
+    >
+      <DraftLeagueViewManager
+        @swaps-status-update="onSwapsStatusUpdate"
         :leagueId="this.currentLeague.invitationCode"
         :realLeagueId="this.realLeagueId"
       />
     </div>
-    <!-- List of Leagues the User Is In -->
-    <!-- Chart -->
     <button class="btn btn-primary" @click="openModal = !openModal">
       <i class="fa-solid fa-chart-line"></i> See league race Chart
     </button>
@@ -42,7 +43,7 @@
         aria-expanded="false"
         aria-label="Toggle navigation"
       >
-        <span class="navbar-toggler-icon"></span>
+        <span class="navbar-toggler-icon game-points"></span>
       </button>
       <div
         class="justify-content-center game-points collapse navbar-collapse"
@@ -130,7 +131,7 @@
 <script>
 // import PlayerPointsCard from '@/components/PlayerPointsCard.vue';
 // import PlayerPointsGamesCard from '@/components/PlayerPointsGamesCard.vue';
-import DraftView from "@/components/League/DraftView.vue";
+import DraftLeagueViewManager from "@/components/Draft/DraftLeagueViewManager.vue";
 import ParticipantDetails from "@/components/League/ParticipantDetails.vue";
 import ParticipantDetailsV2 from "@/components/League/ParticipantDetailsV2.vue";
 import LeagueTableChart from "@/components/Charts/LeagueTableChart.vue";
@@ -141,7 +142,7 @@ export default {
     // PlayerPointsCard,
     ParticipantDetailsV2,
     ParticipantDetails,
-    DraftView,
+    DraftLeagueViewManager,
     MyModal,
   },
   data() {
@@ -158,11 +159,15 @@ export default {
       fixtureGames: [],
       openModal: false,
       matchStatuses: {}, // userId -> { planned, playing, finished }
+      unansweredSwaps: 0,
     };
   },
   methods: {
     onMatchStatusUpdate({ userId, planned, playing, finished }) {
       this.matchStatuses[userId] = { planned, playing, finished };
+    },
+    onSwapsStatusUpdate(numberOfSwaps) {
+      this.unansweredSwaps = numberOfSwaps;
     },
     onWheel(event) {
       const el = this.$refs.scrollContainer;
@@ -245,7 +250,9 @@ export default {
           `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/matches`,
         )
         .then((response) => {
-          this.fixtureGames = response.data;
+          this.fixtureGames = response.data.sort(
+            (a, b) => new Date(a.startTime) - new Date(b.startTime),
+          );
         })
         .catch((error) => {
           console.error("Error fetching fixture games:", error);
@@ -388,5 +395,8 @@ export default {
   background: var(--BACKGROUND-DARK);
   padding: 40px 32px;
   font-family: "DM Sans", sans-serif;
+}
+.navbar-toggler-icon.game-points {
+  filter: invert(100%) sepia(100%) grayscale(100%) brightness(200%);
 }
 </style>

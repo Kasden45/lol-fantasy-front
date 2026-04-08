@@ -288,18 +288,13 @@ export default {
     },
   },
   mounted() {
-    console.log(this.participantData);
-    console.log(this.participant);
     this.participantData = this.participant;
-    console.log(this.participantData);
-    console.log(this.participant);
     this.correctEmptyPlayers();
   },
   watch: {
     // Watch for changes in the 'playerDetails' prop
     participant: {
       handler(newparticipant, oldparticipant) {
-        console.log(newparticipant, oldparticipant);
         this.participantData = this.participant;
         this.correctEmptyPlayers();
       },
@@ -334,13 +329,10 @@ export default {
       });
     },
     showDetailsModal(detailsData) {
-      console.log("details");
-      console.log(detailsData);
       this.openModal = true;
       this.detailsData = detailsData;
     },
     closeDetailsModal(name) {
-      console.log("details close");
       this.openModal = false;
     },
     scrollRight() {
