@@ -250,7 +250,9 @@ export default {
           `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/matches`,
         )
         .then((response) => {
-          this.fixtureGames = response.data;
+          this.fixtureGames = response.data.sort(
+            (a, b) => new Date(a.startTime) - new Date(b.startTime),
+          );
         })
         .catch((error) => {
           console.error("Error fetching fixture games:", error);

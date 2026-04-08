@@ -41,6 +41,7 @@ var isInitialized = false;
 var debugLog = [];
 
 function logDebug(msg) {
+  return;
   var timestamp = new Date().toISOString().substr(11, 12);
   console.log("[" + timestamp + "] [SOCKET-DEBUG] " + msg);
   debugLog.push({ time: Date.now(), msg: msg });
