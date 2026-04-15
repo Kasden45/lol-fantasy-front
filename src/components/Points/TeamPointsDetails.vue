@@ -140,6 +140,8 @@ export default {
 .image-layer-container {
   position: relative;
   aspect-ratio: 1 / 1;
+  max-height: 30vh;
+  justify-self: center;
 }
 .player-tile-container.sub {
   background: var(--GREY-DARKER) !important;

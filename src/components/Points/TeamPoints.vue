@@ -82,7 +82,11 @@ export default {
   },
   methods: {
     showDetails(teamDetails) {
-      this.$emit("showDetails", teamDetails);
+      this.$emit("showDetails", {
+        playerDetails: teamDetails,
+        isCaptain: false,
+        isTriple: false,
+      });
     },
     removePlayerFromRole(role) {
       // Emit an event to notify the parent component (App) about the selected player

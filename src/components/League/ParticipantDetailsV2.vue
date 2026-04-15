@@ -9,7 +9,6 @@
         :matchesThisFixture="
           playerMatchesFixture(participantData.userTeam.topPlayerPoints.player)
         "
-        @captainPick="pickCaptain"
         v-if="participantData.userTeam != null"
         :role="'top'"
         :teamPlayer="participantData.userTeam.topPlayerPoints.player"
@@ -28,7 +27,6 @@
             participantData.userTeam.junglePlayerPoints.player,
           )
         "
-        @captainPick="pickCaptain"
         v-if="participantData.userTeam != null"
         :role="'jungle'"
         :teamPlayer="participantData.userTeam.junglePlayerPoints.player"
@@ -50,7 +48,6 @@
         :teamPlayer="participantData.userTeam.midPlayerPoints.player"
         :img_url="role_images['mid']"
         :roles_img_url="role_images"
-        @captainPick="pickCaptain"
       />
     </div>
     <div
@@ -71,7 +68,6 @@
         :teamPlayer="participantData.userTeam.bottomPlayerPoints.player"
         :img_url="role_images['bottom']"
         :roles_img_url="role_images"
-        @captainPick="pickCaptain"
       />
     </div>
     <div class="col-xl-3 col-lg-4 col-md-5 col-sm-6 col-8 align-content-center">
@@ -90,7 +86,6 @@
         :teamPlayer="participantData.userTeam.supportPlayerPoints.player"
         :img_url="role_images['support']"
         :roles_img_url="role_images"
-        @captainPick="pickCaptain"
       />
     </div>
     <div class="col-xl-3 col-lg-4 col-md-5 col-sm-6 col-8 align-content-center">
@@ -126,6 +121,7 @@
   <div class="row justify-content-center"></div>
   <div>
     <MyModal
+      :bgColor="'var(--BACKGROUND-LIGHTER)'"
       :openModal="this.openModal"
       @closeModal="closeDetailsModal"
       :title="`${participant.userLogin}'s ${fixture.title} points details`"
@@ -142,7 +138,8 @@
         <PlayerPointsGamesCardV2
           class="team-points-details align-content-center"
           :gamesList="fixtureGames"
-          :isCaptain="participantData.userTeam.captain == 1"
+          :isCaptain="isDetailsCaptain"
+          :isTriple="isDetailsTriple"
           :gamesPointsDetails="detailsData.gamesPointsDetails"
           :totalPointsA="detailsData.totalPoints"
         />
@@ -205,6 +202,8 @@ export default {
       newLeagueName: "",
       invitationCode: "",
       showDetails: false,
+      isDetailsCaptain: false,
+      isDetailsTriple: false,
       showTeamDetailsModal: false,
     };
   },
@@ -287,15 +286,16 @@ export default {
       return { planned, playing, finished };
     },
   },
+  emits: ["match-status-update"],
   mounted() {
-    this.participantData = this.participant;
+    this.participantData = JSON.parse(JSON.stringify(this.participant));
     this.correctEmptyPlayers();
   },
   watch: {
     // Watch for changes in the 'playerDetails' prop
     participant: {
       handler(newparticipant, oldparticipant) {
-        this.participantData = this.participant;
+        this.participantData = JSON.parse(JSON.stringify(this.participant));
         this.correctEmptyPlayers();
       },
       immediate: true,
@@ -328,9 +328,11 @@ export default {
         }
       });
     },
-    showDetailsModal(detailsData) {
+    showDetailsModal({ playerDetails, isCaptain, isTriple }) {
       this.openModal = true;
-      this.detailsData = detailsData;
+      this.detailsData = playerDetails;
+      this.isDetailsCaptain = isCaptain;
+      this.isDetailsTriple = isTriple;
     },
     closeDetailsModal(name) {
       this.openModal = false;
@@ -423,13 +425,12 @@ export default {
 }
 .team-points {
   display: flex;
-  overflow-x: auto;
+  justify-content: center;
 }
 
 .team-points-details {
   flex: 0 0 auto; /* Optional: Add some space between cards */
   height: 50%;
-  max-width: 70vw;
 }
 
 ::-webkit-scrollbar {

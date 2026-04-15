@@ -2,7 +2,6 @@
   <div
     class="player-tile-container align-content-center"
     :class="{
-      'picked-position': currentlyPicked === role,
       'captain-player-tile': isCaptain,
       'bench-boost-tile': isbenchboost,
       sub: role == 'sub',
@@ -138,9 +137,14 @@ export default {
   data() {
     return {};
   },
+  emits: ["showDetails"],
   methods: {
     showDetails(playerDetails) {
-      this.$emit("showDetails", playerDetails);
+      this.$emit("showDetails", {
+        playerDetails: playerDetails,
+        isCaptain: this.isCaptain,
+        isTriple: this.isTriple,
+      });
     },
     getFlag(countryCode) {
       return "https://cdn-icons-png.flaticon.com/512/323/323363.png";
@@ -252,6 +256,7 @@ export default {
 .image-layer-container {
   position: relative;
   aspect-ratio: 1 / 1;
+  justify-content: center;
 }
 
 .role-icon {

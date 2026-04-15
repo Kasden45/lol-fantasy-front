@@ -246,8 +246,8 @@ import DraftLogic from "@/draft-logic.js";
 export default {
   props: {
     leagueId: String,
-    // realLeagueId: Number,
   },
+  emits: ["swaps-status-update"],
   components: {
     DraftOrderBar,
     PlayersListDraft,

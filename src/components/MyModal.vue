@@ -31,13 +31,12 @@ export default {
     openModal: {
       handler(newopenModal, oldopenModal) {
         // React to prop changes here
-        // playerDetails =
-        console.log(newopenModal, oldopenModal);
         this.open = this.openModal;
       },
       immediate: true, // This will trigger the handler immediately when the component is created
     },
   },
+  emits: ["closeModal"],
   methods: {
     closeModal() {
       this.$emit("closeModal", "details");

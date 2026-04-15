@@ -71,7 +71,7 @@ export async function initAbly(apiKey, invitationCode) {
     ablyInstance = new Ably.Realtime({
       key: apiKey,
       clientId: "user-" + Date.now(),
-      logLevel: 4,
+      logLevel: 1,
       echoMessages: false, // Don't receive own messages back
     });
 

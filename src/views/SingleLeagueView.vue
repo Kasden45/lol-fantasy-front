@@ -14,7 +14,6 @@
       <DraftLeagueViewManager
         @swaps-status-update="onSwapsStatusUpdate"
         :leagueId="this.currentLeague.invitationCode"
-        :realLeagueId="this.realLeagueId"
       />
     </div>
     <button class="btn btn-primary" @click="openModal = !openModal">
