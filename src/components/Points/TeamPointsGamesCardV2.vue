@@ -26,7 +26,8 @@
               totalPointsA
                 ? totalPointsA.toFixed(2)
                 : playerPoints?.totalPoints?.toFixed(2) ?? 0
-            }} pts
+            }}
+            pts
           </span>
         </div>
       </div>
@@ -39,8 +40,8 @@
       >
         <div
           class="accordion-header"
-          :class="{ open: expandedMatch === matchId }"
-          @click="expandedMatch = expandedMatch === matchId ? null : matchId"
+          :class="{ open: expandedMatches.includes(matchId) }"
+          @click="toggleMatch(matchId)"
         >
           <div class="accordion-header-left">
             <span class="match-versus"
@@ -57,12 +58,12 @@
               >{{ matchTotal(matchGroup).toFixed(2) }} pts</span
             >
             <span class="accordion-chevron">{{
-              expandedMatch === matchId ? "▲" : "▼"
+              expandedMatches.includes(matchId) ? "▲" : "▼"
             }}</span>
           </div>
         </div>
 
-        <div class="accordion-body" v-show="expandedMatch === matchId">
+        <div class="accordion-body" v-show="expandedMatches.includes(matchId)">
           <div
             v-for="(game, index) in matchGroup"
             :key="game.gameId"
@@ -99,7 +100,7 @@ export default {
   },
   components: { TeamPointsCardV2, TeamPointsDetails },
   data() {
-    return { expandedMatch: null };
+    return { expandedMatches: [] };
   },
   computed: {
     groupedByMatch() {
@@ -117,6 +118,15 @@ export default {
     },
   },
   methods: {
+    toggleMatch(matchId) {
+      if (this.expandedMatches.includes(matchId)) {
+        this.expandedMatches = this.expandedMatches.filter(
+          (id) => id !== matchId,
+        );
+      } else {
+        this.expandedMatches.push(matchId);
+      }
+    },
     getOpponent(gameId) {
       const game = this.gamesList?.find((g) => g.gameId === gameId);
       if (!game) return "?";
@@ -158,7 +168,7 @@ export default {
   flex-direction: column;
   gap: 12px;
   padding: 8px;
-  width: 50%;
+  width: 80%;
   justify-content: center;
   justify-self: center;
 }
@@ -167,6 +177,41 @@ export default {
   font-size: 1.8rem;
   display: flex;
   flex-wrap: nowrap;
+}
+.accordion {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  width: 100%;
+}
+.accordion-item {
+  border: 1px solid var(--GREY-DARKER);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--SECONDARY);
+  width: 100%;
+  height: fit-content;
+}
+
+.accordion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+  background: var(--BACKGROUND-DARK);
+}
+
+.accordion-header:hover,
+.accordion-header.open {
+  background: var(--SECONDARY);
+}
+
+.accordion-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 @media (max-width: 768px) {
   .games-card {
@@ -183,38 +228,30 @@ export default {
   .player-tile-container {
     width: 100% !important;
   }
+  .accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+  }
+  .accordion-item {
+    border: 1px solid var(--GREY-DARKER);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--SECONDARY);
+  }
+
+  .accordion-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+    background: var(--BACKGROUND-DARK);
+  }
 }
-.accordion {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  width: 100%;
-}
-.accordion-item {
-  border: 1px solid var(--GREY-DARKER);
-  border-radius: 8px;
-  overflow: hidden;
-  background: var(--SECONDARY);
-}
-.accordion-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 14px;
-  cursor: pointer;
-  transition: background 0.15s;
-  background: var(--BACKGROUND-DARK);
-}
-.accordion-header:hover,
-.accordion-header.open {
-  background: var(--SECONDARY);
-}
-.accordion-header-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding-right: 5px;
-}
+
 .match-versus {
   font-size: 18px;
   font-weight: 700;
