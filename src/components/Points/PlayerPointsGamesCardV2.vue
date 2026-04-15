@@ -1,7 +1,7 @@
 <template>
   <div class="games-card">
     <!-- Player summary header -->
-    <PlayerPointsDetails
+    <!-- <PlayerPointsDetails
       class="player-summary"
       v-if="gamesPointsDetails != null"
       :role="'top'"
@@ -11,8 +11,63 @@
       :img_url="null"
       :details="true"
       :roles_img_url="$func_global.role_images"
-    />
-
+    /> -->
+    <div
+      class="player-tile-container"
+      :class="{
+        'captain-player-tile': isCaptain,
+        sub: gamesPointsDetails[0]?.role == 'sub',
+      }"
+    >
+      <div class="tile-header row" v-if="gamesPointsDetails[0]">
+        <div v-if="gamesPointsDetails[0]" class="col-2 inline-text-flag">
+          <img
+            class="flag"
+            :src="$func_global.role_images[gamesPointsDetails[0]?.role]"
+            alt="flag"
+          />
+        </div>
+        <div class="col-8 align-content-center">
+          <span
+            class="player-name"
+            :class="{
+              'captain-player': isCaptain,
+            }"
+            >{{ gamesPointsDetails[0]?.team.code || " " }}
+            {{ gamesPointsDetails[0]?.summonerName }}</span
+          >
+        </div>
+        <div class="col-2 inline-text-flag role-sub">
+          <span v-if="!isCaptain" class="match-points">
+            {{
+              totalPointsA
+                ? totalPointsA.toFixed(2)
+                : playerPoints?.totalPoints?.toFixed(2) ?? "0"
+            }}
+            pts
+          </span>
+          <span
+            v-if="isCaptain && !isTriple"
+            class="match-points captain-player"
+          >
+            {{
+              totalPointsA
+                ? totalPointsA.toFixed(2) * 2
+                : (playerPoints?.totalPoints?.toFixed(2) ?? 0) * 2 ?? "0"
+            }}
+            pts
+          </span>
+          <span v-if="isCaptain && isTriple" class="match-points triple-player">
+            {{
+              totalPointsA
+                ? totalPointsA.toFixed(2) * 3
+                : playerPoints?.totalPoints?.toFixed(2) * 3 ?? "0.00"
+            }}
+            pts
+          </span>
+        </div>
+      </div>
+    </div>
     <!-- Accordion grouped by match -->
     <div class="accordion" v-if="gamesPointsDetails != null">
       <div
@@ -37,9 +92,21 @@
             >
           </div>
           <div class="accordion-header-right">
-            <span class="match-points"
+            <span class="match-points" :class="{ crossed: isCaptain }"
               >{{ matchTotal(matchGroup).toFixed(2) }} pts</span
             >
+            <span
+              v-if="isCaptain && !isTriple"
+              class="match-points captain-player"
+            >
+              → {{ (2 * matchTotal(matchGroup)).toFixed(2) }} pts
+            </span>
+            <span
+              v-if="isCaptain && isTriple"
+              class="match-points triple-player"
+            >
+              → {{ (3 * matchTotal(matchGroup)).toFixed(2) }} pts
+            </span>
             <span class="accordion-chevron">{{
               expandedMatch === matchId ? "▲" : "▼"
             }}</span>
@@ -63,6 +130,7 @@
             <PlayerPointsCardV2
               :playerDetails="game"
               :isCaptain="isCaptain"
+              :isTriple="isCaptain && isTriple"
               :isSub="isSub"
               :totalPoints="totalPointsA"
             />
@@ -83,6 +151,7 @@ export default {
     gamesPointsDetails: Array,
     totalPointsA: Number,
     isCaptain: Boolean,
+    isTriple: Boolean,
     isSub: Boolean,
   },
   components: {
@@ -92,7 +161,7 @@ export default {
   mounted() {
     // Auto-expand the first match
     const keys = Object.keys(this.groupedByMatch);
-    if (keys.length > 0) this.expandedMatch = keys[0];
+    // if (keys.length > 0) this.expandedMatch = keys[0];
   },
   computed: {
     groupedByMatch() {
@@ -102,6 +171,7 @@ export default {
         .sort((a, b) => (a.gameId > b.gameId ? 1 : -1))
         .reduce((acc, game) => {
           const key = game.matchId || game.gameId;
+          if (key === undefined) return acc; // Skip if no matchId or gameId
           if (!acc[key]) acc[key] = [];
           acc[key].push(game);
           return acc;
@@ -142,23 +212,54 @@ export default {
 <style scoped>
 .games-card {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 12px;
   padding: 8px;
-  width: 100%;
+  width: 50%;
   justify-content: center;
+  justify-self: center;
+}
+
+.tile-header {
+  font-weight: bold;
+  font-size: 1.8rem;
+  display: flex;
+  flex-wrap: nowrap;
+}
+.role-sub {
+  justify-content: end !important;
+}
+.player-tile-container {
+  background: var(--SECONDARY);
+  color: white;
+  padding: 0px 10px;
+  border-radius: 8px;
 }
 @media (max-width: 768px) {
   .games-card {
     flex-direction: column;
     align-items: center;
+    width: 100%;
+  }
+  .tile-header {
+    font-weight: bold;
+    font-size: 1.2rem;
+    display: flex;
+    flex-wrap: nowrap;
+  }
+  .role-sub {
+    justify-content: end !important;
+    display: flex;
+  }
+  .player-tile-container {
+    width: 100% !important;
   }
 }
 .accordion {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  width: inherit;
+  width: 100%;
 }
 
 .accordion-item {
@@ -255,5 +356,37 @@ export default {
 }
 .player-summary {
   width: inherit;
+}
+.inline-text-flag {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  /* gap: 0.5rem; */
+  /* font-weight: 600; */
+  font-size: 0.4rem;
+}
+.captain-player {
+  /* background-color: rgb(250, 212, 44) !important; */
+  color: var(--GOLDEN-CAPTAIN) !important;
+}
+.triple-player {
+  /* background-color: rgb(250, 212, 44) !important; */
+  color: var(--PRIMARY) !important;
+}
+
+.player-name {
+  display: flex;
+  justify-content: center;
+}
+.flag {
+  width: 2rem;
+  /* height: stretch; */
+  /* height: min-content; */
+  object-fit: cover;
+  border-radius: 2px;
+}
+.crossed {
+  text-decoration: line-through;
+  opacity: 0.5;
 }
 </style>

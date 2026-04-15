@@ -137,9 +137,14 @@ export default {
   data() {
     return {};
   },
+  emits: ["showDetails"],
   methods: {
     showDetails(playerDetails) {
-      this.$emit("showDetails", playerDetails);
+      this.$emit("showDetails", {
+        playerDetails: playerDetails,
+        isCaptain: this.isCaptain,
+        isTriple: this.isTriple,
+      });
     },
     getFlag(countryCode) {
       return "https://cdn-icons-png.flaticon.com/512/323/323363.png";

@@ -9,7 +9,13 @@
         >
           <td class="event-name">{{ eventDisplay[event] }}</td>
           <td class="event-value">
-            {{ points.value !== null ? points.value : "-" }}
+            {{
+              points.value === true
+                ? "✓"
+                : points.value !== null
+                ? points.value
+                : "-"
+            }}
           </td>
           <td
             class="event-points"

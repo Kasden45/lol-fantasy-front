@@ -121,6 +121,7 @@
   <div class="row justify-content-center"></div>
   <div>
     <MyModal
+      :bgColor="'var(--BACKGROUND-LIGHTER)'"
       :openModal="this.openModal"
       @closeModal="closeDetailsModal"
       :title="`${participant.userLogin}'s ${fixture.title} points details`"
@@ -137,7 +138,8 @@
         <PlayerPointsGamesCardV2
           class="team-points-details align-content-center"
           :gamesList="fixtureGames"
-          :isCaptain="participantData.userTeam.captain == 1"
+          :isCaptain="isDetailsCaptain"
+          :isTriple="isDetailsTriple"
           :gamesPointsDetails="detailsData.gamesPointsDetails"
           :totalPointsA="detailsData.totalPoints"
         />
@@ -200,6 +202,8 @@ export default {
       newLeagueName: "",
       invitationCode: "",
       showDetails: false,
+      isDetailsCaptain: false,
+      isDetailsTriple: false,
       showTeamDetailsModal: false,
     };
   },
@@ -324,9 +328,11 @@ export default {
         }
       });
     },
-    showDetailsModal(detailsData) {
+    showDetailsModal({ playerDetails, isCaptain, isTriple }) {
       this.openModal = true;
-      this.detailsData = detailsData;
+      this.detailsData = playerDetails;
+      this.isDetailsCaptain = isCaptain;
+      this.isDetailsTriple = isTriple;
     },
     closeDetailsModal(name) {
       this.openModal = false;
@@ -419,7 +425,7 @@ export default {
 }
 .team-points {
   display: flex;
-  overflow-x: auto;
+  justify-content: center;
 }
 
 .team-points-details {
