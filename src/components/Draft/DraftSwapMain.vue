@@ -253,6 +253,7 @@ export default {
       _unsubscribeFunctions: [],
     };
   },
+  emits: ["refetch-teams", "refetch-swaps", "choose-role"],
   computed: {
     proposedSwapData() {
       if (!this.selectedFromYourTeam) return null;

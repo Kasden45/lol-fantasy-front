@@ -2,7 +2,6 @@
   <div
     class="player-tile-container align-content-center"
     :class="{
-      'picked-position': currentlyPicked === role,
       'captain-player-tile': isCaptain,
       'bench-boost-tile': isbenchboost,
       sub: role == 'sub',
@@ -252,6 +251,7 @@ export default {
 .image-layer-container {
   position: relative;
   aspect-ratio: 1 / 1;
+  justify-content: center;
 }
 
 .role-icon {

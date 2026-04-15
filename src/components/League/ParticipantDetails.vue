@@ -112,6 +112,7 @@ export default {
       immediate: true, // This will trigger the handler immediately when the component is created
     },
   },
+  emits: ["setActive"],
   methods: {
     setActiveUser(user) {
       this.$emit("setActive", user);

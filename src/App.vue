@@ -15,6 +15,8 @@ export default {
   name: "App",
   components: {
     Layout,
+    SpeedInsights,
+    Analytics,
   },
 };
 </script>
