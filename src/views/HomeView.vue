@@ -5,7 +5,7 @@
       <div class="row h-auto justify-content-center" id="content">
         <div class="col-md-5 col-sm-11" v-if="profile == null || profile == ''">
           <MyModal
-            :bg-color="'var(--PRIMARY)'"
+            :bg-color="'white'"
             :openModal="this.openModal"
             @closeModal="closeDetailsModal"
             :title="'Login'"

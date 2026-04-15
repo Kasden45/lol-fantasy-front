@@ -15,6 +15,8 @@ export default {
   name: "App",
   components: {
     Layout,
+    SpeedInsights,
+    Analytics,
   },
 };
 </script>
@@ -205,6 +207,9 @@ router-link {
   position: absolute;
   right: 1rem;
   top: 1rem;
+  padding: none;
+  color: var(--PRIMARY);
+  background-image: none;
 }
 
 /*NAVBAR - FIRST NAME BUTTON*/

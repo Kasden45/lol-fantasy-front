@@ -1,51 +1,40 @@
 <template>
   <div
-    class="player-card"
-    :class="{ captain: this.isCaptain, sub: this.isSub }"
+    class="points-card"
     v-if="playerDetails != null"
+    :class="{ 'card-captain': isCaptain, 'card-sub': isSub }"
   >
-    <div class="row">
-      <h2 class="text-center">{{ title }}</h2>
-
-      <div class="col-md-12">
-        <div class="">
-          <table class="points-table px-2">
-            <thead>
-              <tr>
-                <th>Event</th>
-                <th></th>
-                <th>Points</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="(points, event) in playerDetails.pointsDetails"
-                :key="event"
-              >
-                <td class="points-event">{{ eventDisplay[event] }}</td>
-                <td class="points-value">
-                  {{ points.value != null ? points.value : "-" }}
-                </td>
-                <td
-                  class="points"
-                  :class="{ 'negative-points': points.points < 0 }"
-                >
-                  {{ points.points }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="total-points pe-2">
-            <span>Game points: </span>
-            <span :class="{ crossed: this.isCaptain }"
-              >{{ playerDetails.points.toFixed(2) }}
-            </span>
-            <span v-if="this.isCaptain">
-              => {{ (playerDetails.points * 2).toFixed(2) }}</span
-            >
-          </div>
-        </div>
-      </div>
+    <table class="points-table">
+      <tbody>
+        <tr
+          v-for="(points, event) in playerDetails.pointsDetails"
+          :key="event"
+          v-show="points.value > 0 || points.value === true"
+        >
+          <td class="event-name">{{ eventDisplay[event] }}</td>
+          <td class="event-value">
+            {{ points.value !== null ? points.value : "-" }}
+          </td>
+          <td
+            class="event-points"
+            :class="{
+              negative: points.points < 0,
+              positive: points.points > 0,
+            }"
+          >
+            {{ points.points > 0 ? "+" : "" }}{{ points.points }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="game-total">
+      <span class="game-total-label">Game total</span>
+      <span class="game-total-value" :class="{ crossed: isCaptain }">{{
+        playerDetails.points.toFixed(2)
+      }}</span>
+      <span v-if="isCaptain" class="game-total-captain"
+        >→ {{ (playerDetails.points * 2).toFixed(2) }}</span
+      >
     </div>
   </div>
 </template>
@@ -67,9 +56,9 @@ export default {
         kills: "Kills",
         assists: "Assists",
         deaths: "Deaths",
-        trippleKills: "Triples",
-        quardaKills: "Quadras",
-        pentaKills: "Pentas",
+        trippleKills: "Triple kills",
+        quardaKills: "Quadra kills",
+        pentaKills: "Penta kills",
         nashorSteals: "Nashor steals",
         drakeSteals: "Drake steals",
         creepScore: "CS",
@@ -82,141 +71,109 @@ export default {
     calculateTotalPoints(pointsDetails) {
       return Object.values(pointsDetails).reduce(
         (total, points) => total + points.points,
-        0
+        0,
       );
     },
   },
-  watch: {
-    playerDetails: {
-      handler(newPlayerDetails, oldPlayerDetails) {
-        console.log(newPlayerDetails, oldPlayerDetails);
-      },
-      immediate: true, // This will trigger the handler immediately when the component is created
-    },
-  },
+  // watch: {
+  //   playerDetails: {
+  //     handler(newPlayerDetails, oldPlayerDetails) {},
+  //     immediate: true, // This will trigger the handler immediately when the component is created
+  //   },
+  // },
 };
 </script>
 
 <style scoped>
-.role:first-letter {
-  text-transform: capitalize;
-}
-table,
-tr,
-td {
-  border: none;
+.points-card {
+  padding: 12px 0 8px;
 }
 
-@media (max-width: 1000px) {
-  .player-card {
-    width: auto;
-    display: flex;
-    border: 1px solid #ddd;
-    margin: 3px;
-    padding: 3px;
-    /* max-width: 400px; */
-    /* max-height: 250px; */
-  }
-}
-.player-details {
-  display: flex;
-  width: 100%;
-  height: inherit;
+.card-captain {
+  background: rgba(248, 194, 32, 0.06);
+  border-radius: 6px;
+  padding: 12px 8px 8px;
 }
 
-.left-section {
-  padding: 10px;
-  text-align: center;
-  /* height: 800px; */
+.card-sub {
+  opacity: 0.7;
 }
 
-.right-section {
-  flex: 2;
-  overflow-y: scroll;
-  /* height: 800px; */
-}
-
-.player-info img {
-  max-width: 100px;
-}
-
-.player-info p {
-  font-size: small;
-  margin-bottom: 5px;
-}
 .points-table {
   width: 100%;
   border-collapse: collapse;
-  border: none;
 }
 
-.points-table th,
+.points-table tr {
+  border-bottom: 1px solid var(--GREY-DARKER);
+}
+
+.points-table tr:last-child {
+  border-bottom: none;
+}
+
 .points-table td {
-  border-bottom: 1px solid #ddd;
-  padding: 2px;
-  padding-left: 5px;
-  padding-right: 5px;
-  text-align: left;
+  padding: 5px 8px;
+  font-size: 13px;
+  color: var(--GREY);
 }
 
-.total-points {
+.event-name {
+  font-weight: 500;
+  color: var(--GREY-LIGHT);
+  width: 50%;
+}
+
+.event-value {
+  color: var(--GREY-DARKER);
+  font-size: 12px;
+  width: 25%;
+}
+
+.event-points {
   text-align: right;
-  margin-top: 20px;
-  font-weight: bold;
+  font-weight: 700;
+  width: 25%;
 }
 
-.player-points-scrollable {
-  flex: 1; /* Make this part expand to fill available space */
-  overflow-y: visible;
-  /* Adjust the height and other styles as needed */
+.positive {
+  color: var(--GREEN-LIGHT);
 }
-.negative-points {
-  color: red;
-}
-.points-event {
-  font-weight: 500;
-}
-.points-value {
-  font-weight: 300;
-}
-.points {
-  font-weight: 500;
+.negative {
+  color: var(--ERROR);
 }
 
-::-webkit-scrollbar {
-  width: 5px;
-  height: 15px !important;
-  background-color: var(--DARK-YELLOW);
+.game-total {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+  padding: 8px 8px 0;
+  margin-top: 6px;
+  border-top: 1px solid var(--GREY-DARKER);
+  font-size: 13px;
 }
 
-.section-bg ::-webkit-scrollbar {
-  background-color: gray;
+.game-total-label {
+  color: var(--PRIMARY-LIGHTER);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  flex: 1;
 }
 
-::-webkit-scrollbar-track {
-  --webkit-box-shadow: inset 0 0 6px rgba(200, 200, 200, 1);
-  border-radius: 3px;
+.game-total-value {
+  font-weight: 700;
+  color: var(--PRIMARY-LIGHTER);
 }
 
-.sport ::-webkit-scrollbar-thumb {
-  border-radius: 5px;
-  background-color: var(--SPORT);
-  --webkit-box-shadow: inset 0 0 6px rgba(90, 90, 90, 0.7);
+.game-total-captain {
+  font-weight: 700;
+  color: var(--GOLDEN-CAPTAIN);
 }
 
-::-webkit-scrollbar-thumb {
-  border-radius: 3px;
-  background-color: rgb(150, 79, 150);
-  --webkit-box-shadow: inset 0 0 6px rgba(90, 90, 90, 0.7);
-}
-
-.captain {
-  background-color: rgba(224, 191, 3, 0.747);
-}
-.sub {
-  background-color: rgba(114, 106, 106, 0.432);
-}
 .crossed {
   text-decoration: line-through;
+  opacity: 0.5;
 }
 </style>

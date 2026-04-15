@@ -231,6 +231,10 @@ export default {
     fixtures: {
       type: Object,
     },
+    pendingSwaps: {
+      type: Array,
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -243,13 +247,13 @@ export default {
       selectedYourRole: null,
       selectedTargetRole: null,
       rivalUserTeamId: null,
-      pendingSwaps: [],
       timeToDeadline: "",
       currentSwap: null,
       errorMessage: "",
       _unsubscribeFunctions: [],
     };
   },
+  emits: ["refetch-teams", "refetch-swaps", "choose-role"],
   computed: {
     proposedSwapData() {
       if (!this.selectedFromYourTeam) return null;
@@ -359,20 +363,10 @@ export default {
       this.openModal = true;
     },
     closeDetailsModal(name) {
-      // console.log(detailsData)
       this.openModal = false;
-      // this.detailsData = detailsData
     },
     async fetchSwaps() {
-      try {
-        const response = await this.axios.get(
-          `${this.apiURL}Draft/${this.$store.getters.getCurrentTournamentId}/trades/${this.realLeagueId}`,
-        );
-        this.pendingSwaps = response.data.draftTrades;
-        // this.sortedPlayers = this.players;
-      } catch (error) {
-        console.error("Error fetching swaps:", error);
-      }
+      this.$emit("refetch-swaps");
     },
     transformTeamData(data) {
       const team = data.team;
@@ -468,7 +462,6 @@ export default {
         this.$emit("refetch-teams");
         console.log("refetched?");
         this.selectedFromYourTeam = null;
-        // this.selectedFromUnusedPlayers = null;
         this.selectedTeamId = null;
         this.swapLoading = false;
       } catch (error) {
@@ -505,7 +498,7 @@ export default {
           swapRequest,
         );
         console.log("Swap created", response.data);
-        this.fetchSwaps();
+        await this.fetchSwaps();
         ablyProposeSwap(this.leagueId, this.rivalUserTeamId);
         this.selectedFromYourTeam = null;
         this.selectedFromTargetTeam = null;
@@ -518,7 +511,6 @@ export default {
     },
   },
   created() {
-    this.fetchSwaps();
     this.setupAblyListeners();
   },
   beforeDestroy() {

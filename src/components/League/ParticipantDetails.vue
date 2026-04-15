@@ -97,11 +97,7 @@ export default {
     };
   },
   mounted() {
-    console.log(this.participantData);
-    console.log(this.participant);
     this.participantData = this.participant;
-    console.log(this.participantData);
-    console.log(this.participant);
     this.correctEmptyPlayers();
   },
   watch: {
@@ -110,13 +106,13 @@ export default {
       handler(newparticipant, oldparticipant) {
         // React to prop changes here
         // playerDetails =
-        console.log(newparticipant, oldparticipant);
         this.participantData = this.participant;
         this.correctEmptyPlayers();
       },
       immediate: true, // This will trigger the handler immediately when the component is created
     },
   },
+  emits: ["setActive"],
   methods: {
     setActiveUser(user) {
       this.$emit("setActive", user);
@@ -291,6 +287,7 @@ p.has-error {
   display: flex;
   gap: 6px;
   align-items: center;
+  justify-content: end;
 }
 
 .status-badge {

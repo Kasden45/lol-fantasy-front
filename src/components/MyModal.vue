@@ -8,7 +8,9 @@
       class="modal modal-details"
     >
       <div class="modal-header">{{ title ? title : "Modal" }}</div>
-      <button class="btn-close" @click="closeModal()"></button>
+      <button class="btn-close" @click="closeModal()">
+        <i class="fa-solid fa-xmark fa-xl"></i>
+      </button>
       <slot></slot>
     </div>
   </Teleport>
@@ -29,13 +31,12 @@ export default {
     openModal: {
       handler(newopenModal, oldopenModal) {
         // React to prop changes here
-        // playerDetails =
-        console.log(newopenModal, oldopenModal);
         this.open = this.openModal;
       },
       immediate: true, // This will trigger the handler immediately when the component is created
     },
   },
+  emits: ["closeModal"],
   methods: {
     closeModal() {
       this.$emit("closeModal", "details");
@@ -54,6 +55,7 @@ export default {
   width: 100%;
   text-align: center;
   font-weight: 700;
+  color: var(--PRIMARY);
   border-bottom: 3px solid var(--PRIMARY);
   margin-bottom: 10px;
 }

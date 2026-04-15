@@ -9,7 +9,6 @@
         :matchesThisFixture="
           playerMatchesFixture(participantData.userTeam.topPlayerPoints.player)
         "
-        @captainPick="pickCaptain"
         v-if="participantData.userTeam != null"
         :role="'top'"
         :teamPlayer="participantData.userTeam.topPlayerPoints.player"
@@ -28,7 +27,6 @@
             participantData.userTeam.junglePlayerPoints.player,
           )
         "
-        @captainPick="pickCaptain"
         v-if="participantData.userTeam != null"
         :role="'jungle'"
         :teamPlayer="participantData.userTeam.junglePlayerPoints.player"
@@ -50,7 +48,6 @@
         :teamPlayer="participantData.userTeam.midPlayerPoints.player"
         :img_url="role_images['mid']"
         :roles_img_url="role_images"
-        @captainPick="pickCaptain"
       />
     </div>
     <div
@@ -71,7 +68,6 @@
         :teamPlayer="participantData.userTeam.bottomPlayerPoints.player"
         :img_url="role_images['bottom']"
         :roles_img_url="role_images"
-        @captainPick="pickCaptain"
       />
     </div>
     <div class="col-xl-3 col-lg-4 col-md-5 col-sm-6 col-8 align-content-center">
@@ -90,7 +86,6 @@
         :teamPlayer="participantData.userTeam.supportPlayerPoints.player"
         :img_url="role_images['support']"
         :roles_img_url="role_images"
-        @captainPick="pickCaptain"
       />
     </div>
     <div class="col-xl-3 col-lg-4 col-md-5 col-sm-6 col-8 align-content-center">
@@ -287,20 +282,16 @@ export default {
       return { planned, playing, finished };
     },
   },
+  emits: ["match-status-update"],
   mounted() {
-    console.log(this.participantData);
-    console.log(this.participant);
-    this.participantData = this.participant;
-    console.log(this.participantData);
-    console.log(this.participant);
+    this.participantData = JSON.parse(JSON.stringify(this.participant));
     this.correctEmptyPlayers();
   },
   watch: {
     // Watch for changes in the 'playerDetails' prop
     participant: {
       handler(newparticipant, oldparticipant) {
-        console.log(newparticipant, oldparticipant);
-        this.participantData = this.participant;
+        this.participantData = JSON.parse(JSON.stringify(this.participant));
         this.correctEmptyPlayers();
       },
       immediate: true,
@@ -334,13 +325,10 @@ export default {
       });
     },
     showDetailsModal(detailsData) {
-      console.log("details");
-      console.log(detailsData);
       this.openModal = true;
       this.detailsData = detailsData;
     },
     closeDetailsModal(name) {
-      console.log("details close");
       this.openModal = false;
     },
     scrollRight() {
@@ -437,7 +425,6 @@ export default {
 .team-points-details {
   flex: 0 0 auto; /* Optional: Add some space between cards */
   height: 50%;
-  max-width: 70vw;
 }
 
 ::-webkit-scrollbar {
