@@ -21,7 +21,7 @@ app.config.globalProperties.apiURL =
 // app.config.globalProperties.apiURL = "https://localhost:7061/";
 // app.config.globalProperties.apiURL =
 //   import.meta.env.VITE_API_BASE_URL || "https://api.lolfantasy.pl";
-app.config.globalProperties.currentTournament = "112966669920590211";
+app.config.globalProperties.currentTournament = "115548128960088078";
 app.config.globalProperties.worlds_2023 = "110852926142971547";
 app.config.globalProperties.msi_2024 = "112099354464733424";
 app.config.globalProperties.worlds_2024 = "112966669920590211";

@@ -1,6 +1,6 @@
 <template>
   <div class="games-card">
-    <TeamPointsDetails
+    <!-- <TeamPointsDetails
       class="player-summary"
       v-if="gamesPointsDetails != null"
       :role="'team'"
@@ -11,8 +11,27 @@
       :img_url="null"
       :details="true"
       :roles_img_url="$func_global.role_images"
-    />
-
+    /> -->
+    <div class="player-tile-container">
+      <div class="tile-header row" v-if="gamesPointsDetails[0]">
+        <div class="col-2 inline-text-flag">
+          <img class="flag" :src="gamesPointsDetails[0]?.imageUrl" alt="flag" />
+        </div>
+        <div class="col-8 align-content-center">
+          <span class="player-name">{{ gamesPointsDetails[0]?.name }}</span>
+        </div>
+        <div class="col-2 inline-text-flag role-sub">
+          <span class="match-points">
+            {{
+              totalPointsA
+                ? totalPointsA.toFixed(2)
+                : playerPoints?.totalPoints?.toFixed(2) ?? 0
+            }}
+            pts
+          </span>
+        </div>
+      </div>
+    </div>
     <div class="accordion" v-if="gamesPointsDetails != null">
       <div
         v-for="(matchGroup, matchId) in groupedByMatch"
@@ -21,8 +40,8 @@
       >
         <div
           class="accordion-header"
-          :class="{ open: expandedMatch === matchId }"
-          @click="expandedMatch = expandedMatch === matchId ? null : matchId"
+          :class="{ open: expandedMatches.includes(matchId) }"
+          @click="toggleMatch(matchId)"
         >
           <div class="accordion-header-left">
             <span class="match-versus"
@@ -39,12 +58,12 @@
               >{{ matchTotal(matchGroup).toFixed(2) }} pts</span
             >
             <span class="accordion-chevron">{{
-              expandedMatch === matchId ? "▲" : "▼"
+              expandedMatches.includes(matchId) ? "▲" : "▼"
             }}</span>
           </div>
         </div>
 
-        <div class="accordion-body" v-show="expandedMatch === matchId">
+        <div class="accordion-body" v-show="expandedMatches.includes(matchId)">
           <div
             v-for="(game, index) in matchGroup"
             :key="game.gameId"
@@ -81,7 +100,7 @@ export default {
   },
   components: { TeamPointsCardV2, TeamPointsDetails },
   data() {
-    return { expandedMatch: null };
+    return { expandedMatches: [] };
   },
   computed: {
     groupedByMatch() {
@@ -91,6 +110,7 @@ export default {
         .sort((a, b) => (a.gameId > b.gameId ? 1 : -1))
         .reduce((acc, game) => {
           const key = game.matchId || game.gameId;
+          if (key === undefined) return acc; // Skip if no matchId or gameId
           if (!acc[key]) acc[key] = [];
           acc[key].push(game);
           return acc;
@@ -98,6 +118,15 @@ export default {
     },
   },
   methods: {
+    toggleMatch(matchId) {
+      if (this.expandedMatches.includes(matchId)) {
+        this.expandedMatches = this.expandedMatches.filter(
+          (id) => id !== matchId,
+        );
+      } else {
+        this.expandedMatches.push(matchId);
+      }
+    },
     getOpponent(gameId) {
       const game = this.gamesList?.find((g) => g.gameId === gameId);
       if (!game) return "?";
@@ -121,39 +150,49 @@ export default {
   },
   mounted() {
     const keys = Object.keys(this.groupedByMatch);
-    if (keys.length > 0) this.expandedMatch = keys[0];
+    // if (keys.length > 0) this.expandedMatch = keys[0];
   },
 };
 </script>
 
 <style scoped>
 /* identical to PlayerPointsGamesCardV2 styles */
+.player-tile-container {
+  background: var(--SECONDARY);
+  color: white;
+  padding: 0px 10px;
+  border-radius: 8px;
+}
 .games-card {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 12px;
   padding: 8px;
-  width: 100%;
+  width: 80%;
   justify-content: center;
+  justify-self: center;
 }
-@media (max-width: 768px) {
-  .games-card {
-    flex-direction: column;
-    align-items: center;
-  }
+.tile-header {
+  font-weight: bold;
+  font-size: 1.8rem;
+  display: flex;
+  flex-wrap: nowrap;
 }
 .accordion {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 6px;
-  width: inherit;
+  width: 100%;
 }
 .accordion-item {
   border: 1px solid var(--GREY-DARKER);
   border-radius: 8px;
   overflow: hidden;
   background: var(--SECONDARY);
+  width: 100%;
+  height: fit-content;
 }
+
 .accordion-header {
   display: flex;
   align-items: center;
@@ -163,16 +202,56 @@ export default {
   transition: background 0.15s;
   background: var(--BACKGROUND-DARK);
 }
+
 .accordion-header:hover,
 .accordion-header.open {
   background: var(--SECONDARY);
 }
+
 .accordion-header-left {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding-right: 5px;
 }
+@media (max-width: 768px) {
+  .games-card {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+  .tile-header {
+    font-weight: bold;
+    font-size: 1.2rem;
+    display: flex;
+    flex-wrap: nowrap;
+  }
+  .player-tile-container {
+    width: 100% !important;
+  }
+  .accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+  }
+  .accordion-item {
+    border: 1px solid var(--GREY-DARKER);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--SECONDARY);
+  }
+
+  .accordion-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+    background: var(--BACKGROUND-DARK);
+  }
+}
+
 .match-versus {
   font-size: 18px;
   font-weight: 700;
@@ -228,5 +307,32 @@ export default {
 }
 .player-summary {
   width: inherit;
+}
+
+.inline-text-flag {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  /* gap: 0.5rem; */
+  /* font-weight: 600; */
+  font-size: 0.4rem;
+}
+.captain-player {
+  /* background-color: rgb(250, 212, 44) !important; */
+  color: var(--GOLDEN-CAPTAIN) !important;
+}
+.role-sub {
+  justify-content: end !important;
+}
+.player-name {
+  display: flex;
+  justify-content: center;
+}
+.flag {
+  width: 2rem;
+  /* height: stretch; */
+  /* height: min-content; */
+  object-fit: cover;
+  border-radius: 2px;
 }
 </style>

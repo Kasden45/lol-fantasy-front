@@ -13,7 +13,13 @@
         >
           <td class="event-name">{{ eventDisplay[event] }}</td>
           <td class="event-value">
-            {{ points.value !== null ? points.value : "-" }}
+            {{
+              points.value === true
+                ? "✓"
+                : points.value !== null
+                ? points.value
+                : "-"
+            }}
           </td>
           <td
             class="event-points"
@@ -32,8 +38,11 @@
       <span class="game-total-value" :class="{ crossed: isCaptain }">{{
         playerDetails.points.toFixed(2)
       }}</span>
-      <span v-if="isCaptain" class="game-total-captain"
+      <span v-if="isCaptain && !isTriple" class="game-total-captain"
         >→ {{ (playerDetails.points * 2).toFixed(2) }}</span
+      >
+      <span v-if="isCaptain && isTriple" class="game-total-triple"
+        >→ {{ (playerDetails.points * 3).toFixed(2) }}</span
       >
     </div>
   </div>
@@ -46,6 +55,7 @@ export default {
     playerDetails: Object,
     totalPoints: Number,
     isCaptain: Boolean,
+    isTriple: Boolean,
     isSub: Boolean,
     title: String,
   },
@@ -170,6 +180,10 @@ export default {
 .game-total-captain {
   font-weight: 700;
   color: var(--GOLDEN-CAPTAIN);
+}
+.game-total-triple {
+  font-weight: 700;
+  color: var(--PRIMARY);
 }
 
 .crossed {
