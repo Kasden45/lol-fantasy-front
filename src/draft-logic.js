@@ -48,7 +48,6 @@ const EMPTY_TEAM_TEMPLATE = {
  */
 export function createDraftQueue(participants, totalPicks) {
   if (!participants || participants.length === 0) {
-    console.error("[DraftLogic] No participants provided");
     return [];
   }
 
@@ -59,14 +58,6 @@ export function createDraftQueue(participants, totalPicks) {
   const shuffledParticipants = [...participants].sort(
     () => Math.random() - 0.5,
   );
-
-  console.log("[DraftLogic] Creating snake draft queue:");
-  console.log(
-    "  Participants:",
-    shuffledParticipants.map((p) => p.username),
-  );
-  console.log("  Total rounds:", rounds);
-  console.log("  Total picks:", totalPicks);
 
   for (let round = 0; round < rounds; round++) {
     if (round % 2 === 0) {
@@ -82,7 +73,6 @@ export function createDraftQueue(participants, totalPicks) {
     }
   }
 
-  console.log("[DraftLogic] Queue created with", draftQueue.length, "picks");
   return draftQueue;
 }
 
@@ -164,7 +154,6 @@ export function processPlayerSelection({
 
   // Validate role key exists
   if (!pickedPlayers[clientId][roleKey]) {
-    console.error(`[DraftLogic] Invalid role key: ${roleKey}`);
     return null;
   }
 
@@ -179,13 +168,6 @@ export function processPlayerSelection({
   // Advance to next pick
   const newCurrentPick = currentPick + 1;
   const isComplete = newCurrentPick >= draftQueue.length;
-
-  console.log(
-    `[DraftLogic] Player selected: ${player.summonerName} (${role}) by user ${clientId}`,
-  );
-  console.log(
-    `[DraftLogic] Pick ${newCurrentPick}/${draftQueue.length}, Complete: ${isComplete}`,
-  );
 
   return {
     updatedPickedPlayers: pickedPlayers,
@@ -223,7 +205,6 @@ export function processTeamSelection({
   const roleKey = "team";
 
   if (!pickedPlayers[clientId][roleKey]) {
-    console.error("[DraftLogic] Invalid team slot");
     return null;
   }
 
@@ -238,11 +219,6 @@ export function processTeamSelection({
   // Advance pick
   const newCurrentPick = currentPick + 1;
   const isComplete = newCurrentPick >= draftQueue.length;
-
-  console.log(`[DraftLogic] Team selected: ${team.name} by user ${clientId}`);
-  console.log(
-    `[DraftLogic] Pick ${newCurrentPick}/${draftQueue.length}, Complete: ${isComplete}`,
-  );
 
   return {
     updatedPickedPlayers: pickedPlayers,
@@ -306,18 +282,9 @@ export function validateDraftCompletion(pickedPlayers) {
 export async function saveDraftToAPI(draft, apiURL) {
   const errors = [];
 
-  console.log("[DraftLogic] Saving draft to API...");
-  console.log("  Tournament:", draft.tournamentId);
-  console.log("  League:", draft.leagueId);
-  console.log("  Participants:", Object.keys(draft.pickedPlayers).length);
-
   // Validate first
   const validation = validateDraftCompletion(draft.pickedPlayers);
   if (!validation.valid) {
-    console.error(
-      "[DraftLogic] Cannot save - incomplete teams:",
-      validation.incompleteUsers,
-    );
     return {
       success: false,
       errors: [
@@ -344,19 +311,11 @@ export async function saveDraftToAPI(draft, apiURL) {
         Captain: 3, // Default captain (could be configurable later)
       };
 
-      console.log(`[DraftLogic] Saving team for user ${userId}:`, payload);
-
       const response = await axios.post(
         `${apiURL}FantasyPoints/${draft.tournamentId}/user_team`,
         payload,
       );
-
-      console.log(`[DraftLogic] ✓ User ${userId} team saved`);
     } catch (error) {
-      console.error(
-        `[DraftLogic] ✗ Failed to save user ${userId}:`,
-        error.response || error,
-      );
       errors.push(`User ${userId}: ${error.message}`);
     }
   }
@@ -369,13 +328,7 @@ export async function saveDraftToAPI(draft, apiURL) {
       await axios.post(
         `${apiURL}Draft/${draft.tournamentId}/league/${draft.invitationCode}/finishDraft/${firstParticipantId}`,
       );
-
-      console.log("[DraftLogic] ✓ Draft marked as finished");
     } catch (error) {
-      console.error(
-        "[DraftLogic] ✗ Failed to finish draft:",
-        error.response || error,
-      );
       errors.push(`Finish draft: ${error.message}`);
     }
   }

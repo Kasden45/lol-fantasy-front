@@ -275,7 +275,6 @@ export default {
     },
     selectTab(index, fixture) {
       this.selectedTabIndex = index;
-      console.log(this.selectedTabIndex);
       this.teamPlayers = null;
       this.fetchUserTeamFixture(fixture);
       // this.currentLeague = this.fixturesData.fixtures.find((element) => element.fixture == fixture);
@@ -294,7 +293,6 @@ export default {
           this.fillMapPlayers();
         })
         .catch((error) => {
-          console.error("Error fetching team players:", error);
           this.errorUserTeamFixture = "No team found for this fixture";
         });
     },
@@ -305,12 +303,10 @@ export default {
         .get(url)
         .then((response) => {
           this.$store.commit("setFixtureId", response.data);
-          console.log("Current fixture: ", this.$store.getters.getFixtureId);
 
           // this.$router.push({name: 'LeaguesView'})
         })
         .catch((error) => {
-          console.log(error.response);
           this.errorUserTeamFixture = "No team found for this fixture";
         });
     },
@@ -328,7 +324,6 @@ export default {
           this.fillMapPlayers();
         })
         .catch((error) => {
-          console.error("Error fetching team players:", error);
           this.errorUserTeamFixture = "No team found for this fixture";
         });
     },
@@ -343,7 +338,6 @@ export default {
       };
     },
     fillMapPlayers() {
-      console.log("filling");
       this.playersForSummonersRiftView = [];
       this.playersForSummonersRiftView.push(
         this.teamPlayerToMapPlayer(
@@ -422,7 +416,6 @@ export default {
           this.fixtureGames = response.data;
         })
         .catch((error) => {
-          console.error("Error fetching fixture games:", error);
         });
     },
   },
@@ -454,7 +447,6 @@ export default {
         //   });
       })
       .catch((error) => {
-        console.log(error.response);
       });
 
     this.FetchFixtureGames();

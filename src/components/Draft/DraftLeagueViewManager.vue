@@ -16,6 +16,7 @@
     <button
       v-if="currentLeague?.isDrafted == false"
       class="tab-btn"
+      data-testid="draft-tab-draft"
       :class="{ active: activeTab === 'draft' }"
       @click="activeTab = 'draft'"
     >
@@ -24,6 +25,7 @@
     <button
       v-if="currentLeague?.isDrafted == true"
       class="tab-btn"
+      data-testid="draft-tab-swaps"
       :class="{ active: activeTab === 'swaps' }"
       @click="activeTab = 'swaps'"
     >
@@ -71,6 +73,7 @@
     <LazyLoader v-if="loader" />
     <button
       class="cta-btn"
+      data-testid="draft-join-btn"
       @click="joinDraft"
       v-if="
         !this.draftStarted &&
@@ -83,6 +86,7 @@
     </button>
     <button
       class="cta-btn"
+      data-testid="draft-start-btn"
       @click="startDraft"
       v-if="
         !this.draftStarted &&
@@ -396,8 +400,6 @@ export default {
     },
   },
   async mounted() {
-    console.log("📱 [DraftComponent] Mounted, waiting for Ably...");
-
     // DON'T request state here - initializeRealtime will do it when ready
 
     // Optional: Poll for readiness (safety net)
@@ -409,14 +411,10 @@ export default {
     }
 
     if (this.ablyReady) {
-      console.log("✅ [DraftComponent] Mounted & Ably ready!");
     } else {
-      console.warn("⚠️  [DraftComponent] Mounted but Ably not ready after 5s");
     }
   },
   async created() {
-    console.log("🎮 [DraftComponent] Created, fetching data...");
-
     try {
       await this.fetchPlayers();
       await this.fetchTeams();
@@ -426,9 +424,7 @@ export default {
       await this.fetchSwaps();
       // Initialize Ably AFTER data loaded
       await this.initializeRealtime();
-    } catch (error) {
-      console.error("❌ [DraftComponent] Initialization failed:", error);
-    }
+    } catch (error) {}
   },
   watch: {
     // Watch for changes in the 'playerDetails' prop
@@ -454,9 +450,7 @@ export default {
               this.$store.getters.getProfileId && s.status == 0,
         ).length;
         // this.sortedPlayers = this.players;
-      } catch (error) {
-        console.error("Error fetching swaps:", error);
-      }
+      } catch (error) {}
     },
     /**
      * Initialize Ably real-time connection and subscribe to all events
@@ -465,7 +459,6 @@ export default {
       var apiKey = process.env.VUE_APP_ABLY_API_KEY || "";
 
       if (!apiKey) {
-        console.warn("⚠️  No Ably key");
         this.ablyReady = false;
         return;
       }
@@ -474,7 +467,6 @@ export default {
         var success = await initAbly(apiKey, this.leagueId);
 
         if (success) {
-          console.log("✅ [DraftComponent] Ably connected!");
           this.setupEventListeners();
 
           // Small delay to ensure listeners are registered
@@ -483,19 +475,14 @@ export default {
           });
 
           this.ablyReady = true;
-          console.log("🚀 [DraftComponent] Real-time READY!");
 
           // CRITICAL: Request current state from others
-          console.log("📡 [DraftComponent] Requesting current draft state...");
           requestCurrentState(this.leagueId);
 
           // Set a timeout to check if we received state
           setTimeout(
             function () {
               if (!this.draftStarted && this.draftParticipants.length === 0) {
-                console.log(
-                  "⏳ [DraftComponent] No state received - may be first to join or draft not started",
-                );
                 // Don't auto-start - let user manually join/start
               }
             }.bind(this),
@@ -503,7 +490,6 @@ export default {
           );
         }
       } catch (error) {
-        console.error("❌ Init error:", error);
         this.ablyReady = false;
       }
     },
@@ -516,8 +502,6 @@ export default {
      * Called after successful Ably initialization
      */
     setupEventListeners() {
-      console.log("🎧 [Listeners] Starting setup...");
-
       var self = this;
 
       // Reset subscription tracking
@@ -533,10 +517,8 @@ export default {
       // ========================================
       // 1. CURRENT STATE SYNC (when joining/reconnecting)
       // ========================================
-      console.log("🎧 [Listeners] Setting up: current-state");
       track(
         onDraftEvent(DRAFT_EVENTS.CURRENT_STATE, function (data) {
-          console.log("📥 [Listeners] RECEIVED: current-state");
           self.handleCurrentStateUpdate(data);
         }),
       );
@@ -544,13 +526,8 @@ export default {
       // ========================================
       // 2. PLAYER SELECTED BY OTHER USER
       // ========================================
-      console.log("🎧 [Listeners] Setting up: player-selected");
       track(
         onDraftEvent(DRAFT_EVENTS.PLAYER_SELECTED, function (data) {
-          console.log(
-            "📥 [Listeners] RECEIVED: player-selected from user",
-            data.clientId,
-          );
           self.handlePlayerSelectedEvent(data);
         }),
       );
@@ -558,13 +535,8 @@ export default {
       // ========================================
       // 3. TEAM SELECTED BY OTHER USER
       // ========================================
-      console.log("🎧 [Listeners] Setting up: team-selected");
       track(
         onDraftEvent(DRAFT_EVENTS.TEAM_SELECTED, function (data) {
-          console.log(
-            "📥 [Listeners] RECEIVED: team-selected from user",
-            data.clientId,
-          );
           self.handleTeamSelectedEvent(data);
         }),
       );
@@ -572,13 +544,8 @@ export default {
       // ========================================
       // 4. TURN CHANGES (whose pick is it?)
       // ========================================
-      console.log("🎧 [Listeners] Setting up: current-drafter");
       track(
         onDraftEvent(DRAFT_EVENTS.CURRENT_DRAFTER, function (data) {
-          console.log(
-            "📥 [Listeners] RECEIVED: current-drafter:",
-            data.currentDrafter,
-          );
           self.currentDrafter = data.currentDrafter;
         }),
       );
@@ -586,11 +553,8 @@ export default {
       // ========================================
       // 5. DRAFT ORDER UPDATED (participants joined/left)
       // ========================================
-      console.log("🎧 [Listeners] Setting up: draft-order-updated");
       track(
         onDraftEvent(DRAFT_EVENTS.DRAFT_ORDER_UPDATED, function (data) {
-          console.log("📥 [Listeners] RECEIVED: draft-order-updated");
-          console.log("   Participants:", data.draftParticipants);
           self.draftParticipants = data.draftParticipants || [];
           self.currentDrafter = data.currentDrafter;
 
@@ -598,7 +562,6 @@ export default {
           var newParticipant =
             data.draftParticipants[data.draftParticipants.length - 1];
           if (newParticipant && newParticipant.id !== self.userId) {
-            console.log("👋 " + newParticipant.username + " joined the draft!");
           }
         }),
       );
@@ -606,20 +569,10 @@ export default {
       // ========================================
       // 6. ⭐ JOIN DRAFT (OTHER USER JOINED!) ⭐
       // ========================================
-      console.log("🎧 [Listeners] Setting up: join-draft ← THIS WAS MISSING!");
       track(
         onDraftEvent(DRAFT_EVENTS.JOIN_DRAFT, function (data) {
-          console.log("📥 [Listeners] RECEIVED: join-draft!");
-          console.log(
-            "   User joined:",
-            data.username,
-            "(ID:",
-            data.userId + ")",
-          );
-
           // Ignore own joins (we already handle locally)
           if (data.userId === self.userId) {
-            console.log("   (Ignoring own join)");
             return;
           }
 
@@ -629,7 +582,6 @@ export default {
           });
 
           if (!exists) {
-            console.log("✅ Adding " + data.username + " to participant list!");
             self.draftParticipants.push({
               id: data.userId,
               username: data.username,
@@ -646,7 +598,6 @@ export default {
               });
             }
           } else {
-            console.log("   (Already in list)");
           }
         }),
       );
@@ -654,10 +605,8 @@ export default {
       // ========================================
       // 7. LEAVE DRAFT (user left)
       // ========================================
-      console.log("🎧 [Listeners] Setting up: leave-draft");
       track(
         onDraftEvent(DRAFT_EVENTS.LEAVE_DRAFT, function (data) {
-          console.log("📥 [Listeners] RECEIVED: leave-draft");
           self.draftParticipants = self.draftParticipants.filter(function (p) {
             return p.id !== data.userId;
           });
@@ -667,10 +616,8 @@ export default {
       // ========================================
       // 8. DRAFT STARTED
       // ========================================
-      console.log("🎧 [Listeners] Setting up: start-draft");
       track(
         onDraftEvent(DRAFT_EVENTS.START_DRAFT, function (data) {
-          console.log("📥 [Listeners] RECEIVED: start-draft");
           self.draftStarted = true;
           self.handleDraftStart(data);
         }),
@@ -679,10 +626,8 @@ export default {
       // ========================================
       // 9. DRAFT FINISHED
       // ========================================
-      console.log("🎧 [Listeners] Setting up: draft-finished");
       track(
         onDraftEvent(DRAFT_EVENTS.DRAFT_FINISHED, async function (data) {
-          console.log("📥 [Listeners] RECEIVED: draft-finished");
           await self.handleDraftFinished(data);
         }),
       );
@@ -690,24 +635,15 @@ export default {
       // ========================================
       // 10. SWAP PROPOSAL
       // ========================================
-      console.log("🎧 [Listeners] Setting up: swap-proposed");
       track(
         onDraftEvent(DRAFT_EVENTS.SWAP_PROPOSED, function (data) {
-          console.log("📥 [Listeners] RECEIVED: swap-proposed");
           self.handleSwapProposal(data);
         }),
       );
-      console.log("🎧 [Listeners] Setting up: request-state");
       track(
         onDraftEvent(DRAFT_EVENTS.REQUEST_STATE, function (data) {
-          console.log(
-            "📥 [Listeners] Someone requested current state! Sending ours...",
-          );
-
           // If we have valid state, broadcast it
           if (self.draftStarted && self.draftQueue.length > 0) {
-            console.log("   Responding with our state...");
-
             var allTeams = {};
             allTeams[self.userId] = self.selectedTeam;
             Object.keys(self.otherTeams).forEach(function (key) {
@@ -729,17 +665,12 @@ export default {
               );
             }, 500);
           } else {
-            console.log("   No state to send (draft not started or empty)");
           }
         }),
       );
       // ========================================
       // SUMMARY
       // ========================================
-      console.log("✅ [Listeners] All listeners configured!");
-      console.log("   Total subscriptions:", self._unsubscribeFunctions.length);
-      console.log("");
-      console.log("🎯 Now listening for events from other users...");
     },
 
     // =========================================================================
@@ -756,8 +687,6 @@ export default {
       draftQueue,
       draftStarted,
     }) {
-      console.log("📦 [DraftComponent] Received current state");
-
       // Update local state
       this.otherTeams = { ...pickedPlayers };
       this.draftParticipants = draftParticipants || [];
@@ -787,12 +716,6 @@ export default {
       // Ignore own events (we already updated locally)
       if (clientId === this.userId) return;
 
-      console.log(
-        `👤 [DraftComponent] ${clientUsername || clientId} selected ${
-          player?.summonerName
-        }`,
-      );
-
       // Initialize opponent team slot if needed
       if (!this.otherTeams[clientId]) {
         this.otherTeams[clientId] = DraftLogic.getEmptyTeam();
@@ -811,10 +734,6 @@ export default {
     handleTeamSelectedEvent({ clientId, team }) {
       if (clientId === this.userId) return;
 
-      console.log(
-        `🏆 [DraftComponent] ${clientId} selected team ${team?.name}`,
-      );
-
       if (!this.otherTeams[clientId]) {
         this.otherTeams[clientId] = DraftLogic.getEmptyTeam();
       }
@@ -828,15 +747,8 @@ export default {
      * Handle draft completion
      */
     async handleDraftFinished(data) {
-      console.log(
-        "🏁 [DraftComponent] Received draft-finished event from someone else!",
-      );
-
       // Prevent double-processing if we already handled it locally
       if (this.loader && this.activeTab === "swaps") {
-        console.log(
-          "⚠️  [DraftComponent] Already processing finish, skipping duplicate",
-        );
         return;
       }
 
@@ -846,13 +758,9 @@ export default {
         // Refresh data
         await this.refetchTeams();
       } catch (error) {
-        console.error("❌ Error in remote finish handler:", error);
       } finally {
         this.loader = false;
         this.activeTab = "swaps";
-        console.log(
-          "✅ [DraftComponent] Remote finish processed, now on swaps tab",
-        );
       }
     },
 
@@ -863,8 +771,6 @@ export default {
       const myTeamId = this.selectedUserTeam.userTeamId;
 
       if (receiverUserId == myTeamId) {
-        console.log("🔄 [DraftComponent] Received swap proposal");
-
         // Trigger child component refresh
         this.$refs.swapMain?.fetchSwaps();
 
@@ -880,8 +786,6 @@ export default {
      * Handle draft start event
      */
     handleDraftStart(data) {
-      console.log("▶️  [DraftComponent] Draft started event received");
-
       this.draftStarted = true;
 
       if (this.draftQueue.length === 0 && this.draftParticipants.length >= 2) {
@@ -904,8 +808,6 @@ export default {
       this.showNotification("Draft has started!", "info");
     },
     showNotification(message, type) {
-      console.log("🔔 " + message);
-
       // Try browser notification
       if ("Notification" in window && Notification.permission === "granted") {
         new Notification("Fantasy LoL", { body: message });
@@ -921,13 +823,6 @@ export default {
       var shuffled = participants.slice().sort(function () {
         return Math.random() - 0.5;
       });
-
-      console.log(
-        "[DraftComponent] Shuffle order:",
-        shuffled.map(function (p) {
-          return p.username;
-        }),
-      );
 
       for (var round = 0; round < rounds; round++) {
         if (round % 2 === 0) {
@@ -946,8 +841,6 @@ export default {
       return draftQueue;
     },
     broadcastFullState() {
-      console.log("📡 [DraftComponent] Broadcasting full state...");
-
       var allTeams = {};
       allTeams[this.userId] = this.selectedTeam;
       // Merge other teams we know about
@@ -977,8 +870,6 @@ export default {
      * Join the draft room
      */
     joinDraft(event) {
-      console.log("🚪 [DraftComponent] Join draft clicked");
-
       var self = this;
 
       // Try immediately first
@@ -986,7 +877,6 @@ export default {
 
       if (!success) {
         // If failed, show retry UI
-        console.log("⏳ [DraftComponent] Will retry in 2 seconds...");
 
         var btn = event.target;
         var originalText = btn.innerText;
@@ -1013,7 +903,6 @@ export default {
     tryJoinNow() {
       try {
         // Optimistic attempt - just try it!
-        console.log("🔄 [DraftComponent] Attempting join...");
 
         joinDraft(this.userId, this.userLogin, this.leagueId);
 
@@ -1033,13 +922,8 @@ export default {
 
         updateDraftOrder(this.draftParticipants, this.userId);
 
-        console.log("✅ [DraftComponent] Join emitted!");
         return true;
       } catch (error) {
-        console.warn(
-          "⚠️  [DraftComponent] Join failed (will retry):",
-          error.message,
-        );
         return false;
       }
     },
@@ -1052,7 +936,6 @@ export default {
         alert("Still connecting... please wait.");
         return;
       }
-      console.log("▶️  [DraftComponent] Starting draft...");
 
       startDraft(
         this.leagueId,
@@ -1065,44 +948,29 @@ export default {
      * Select a player for current user's team
      */
     selectPlayer(player) {
-      console.log("👤 [DraftComponent] selectPlayer() called");
-      console.log("  Player:", player.summonerName);
-      console.log("  Role:", this.roleToAddPlayer);
-      console.log("  Is my turn?", this.isCurrentDrafter);
-      console.log("  Current drafter ID:", this.currentDrafter);
-      console.log("  My user ID:", this.userId);
-      console.log("  Draft started?", this.draftStarted);
-      console.log("  Queue length:", this.draftQueue.length);
-      console.log("  Current pick index:", this.currentPick);
-
-      // TEMPORARILY DISABLE TURN VALIDATION FOR TESTING
-      // (Remove this block once drafts work!)
-      /*
-  var validation = DraftLogic.validateTurn(this.userId, this.draftQueue, this.currentPick);
-  if (!validation.valid) {
-    alert(validation.reason);
-    console.warn('❌ Turn validation failed:', validation.reason);
-    return;
-  }
-  */
+      var validation = DraftLogic.validateTurn(
+        this.userId,
+        this.draftQueue,
+        this.currentPick,
+      );
+      if (!validation.valid) {
+        alert(validation.reason);
+        return;
+      }
 
       // Check if draft has actually started
       if (!this.draftStarted) {
         alert(
           "Draft has not started yet! Please wait for the commissioner to start the draft.",
         );
-        console.warn("❌ Draft not started");
         return;
       }
 
       // Check if we have a queue
       if (!this.draftQueue || this.draftQueue.length === 0) {
         alert("Draft queue not initialized. Try refreshing.");
-        console.warn("❌ No draft queue");
         return;
       }
-
-      console.log("✅ Proceeding with selection...");
 
       // Process selection
       var roleKey = this.roleToAddPlayer + "Player";
@@ -1126,7 +994,6 @@ export default {
 
       // Check if draft complete
       if (this.currentPick >= this.draftQueue.length) {
-        console.log("🏁 Draft complete!");
         this.completeDraft();
       }
 
@@ -1148,8 +1015,6 @@ export default {
         alert(validation.reason);
         return;
       }
-
-      console.log(`🏆 [DraftComponent] Selecting team: ${team.name}`);
 
       const result = DraftLogic.processTeamSelection({
         clientId: this.userId,
@@ -1222,8 +1087,6 @@ export default {
      * Complete the draft and save to API
      */
     async completeDraft() {
-      console.log("🏁 [DraftComponent] Completing draft...");
-
       this.loader = true;
 
       try {
@@ -1242,12 +1105,9 @@ export default {
           draftParticipants: this.draftParticipants,
         };
 
-        console.log("📤 [DraftComponent] Saving to API...");
         var result = await DraftLogic.saveDraftToAPI(draftData, this.apiURL);
 
         if (result.success) {
-          console.log("✅ [DraftComponent] Draft saved to API!");
-
           // Notify everyone ELSE (they'll handle their own UI update)
           finishDraft(this.leagueId);
 
@@ -1259,11 +1119,8 @@ export default {
             finishedAt: Date.now(),
           });
 
-          console.log("📡 [DraftComponent] Events emitted to others");
-
           // ⭐ CRITICAL FIX: Update OUR OWN UI too!
           // Don't wait for echo - we won't receive it
-          console.log("🔄 [DraftComponent] Updating local UI...");
 
           // Simulate what the event handler would do
           await this.handleDraftFinishedLocally();
@@ -1272,30 +1129,18 @@ export default {
           this.loader = false;
         }
       } catch (error) {
-        console.error("❌ Error completing draft:", error);
         alert("Failed to save draft: " + error.message);
         this.loader = false;
       }
     },
     async handleDraftFinishedLocally() {
-      console.log(
-        "🏁 [DraftComponent] Handling finish locally (self-triggered)",
-      );
-
       try {
         // Refresh team data from backend
-        console.log("📥 [DraftComponent] Refetching teams...");
         await this.refetchTeams();
 
-        console.log("✅ [DraftComponent] Teams refetched");
-
         // Switch to swaps tab
-        console.log("🔄 [DraftComponent] Switching to swaps tab...");
         this.activeTab = "swaps";
-
-        console.log("✅ [DraftComponent] Draft complete! Now on swaps view.");
       } catch (error) {
-        console.error("❌ Error in local finish handler:", error);
       } finally {
         this.loader = false;
       }
@@ -1305,15 +1150,10 @@ export default {
     // =========================================================================
 
     choseRole(role) {
-      console.log("📍 [DraftComponent] Role selected:", role);
       this.roleToAddPlayer = role;
     },
 
     playerSelected(player) {
-      console.log(
-        `Attempting to add ${player.summonerName} to ${this.roleToAddPlayer}`,
-      );
-
       if (
         player.role == this.roleToAddPlayer ||
         this.roleToAddPlayer == "sub"
@@ -1321,49 +1161,36 @@ export default {
         this.selectPlayer(player);
         this.roleToAddPlayer = "";
       } else {
-        console.log("WRONG ROLE");
         // Optionally show user feedback
       }
     },
 
     playerSelectedDraft(player) {
-      console.log(
-        `Draft mode: ${player.summonerName} → ${this.roleToAddPlayer}`,
-      );
-
       if (
         player.role == this.roleToAddPlayer ||
         this.roleToAddPlayer == "sub"
       ) {
         this.selectedFromUnusedPlayers = player;
       } else {
-        console.log("WRONG ROLE");
       }
     },
 
     teamSelected(team) {
-      console.log(`Adding team ${team.name} to ${this.roleToAddPlayer}`);
-
       if (this.roleToAddPlayer == "team") {
         this.selectTeam(team);
         this.roleToAddPlayer = "";
       } else {
-        console.log("WRONG ROLE");
       }
     },
 
     teamSelectedDraft(team) {
-      console.log(`Draft mode team: ${team.name}`);
-
       if (this.roleToAddPlayer == "team") {
         this.selectedFromUnusedPlayers = team;
       } else {
-        console.log("WRONG ROLE");
       }
     },
 
     handleRemovePlayer(role) {
-      console.log("Remove player from role:", role);
       // Implementation depends on whether removal is allowed during draft
       // Usually not allowed in live draft, only in swap phase
     },
@@ -1418,9 +1245,7 @@ export default {
         this.selectedUserTeam.chipActivated = userTeam.chipUsed ?? 0;
         this.selectedUserTeam.chips = userTeam.extraChips;
         this.selectedUserTeam.userTeamId = userTeam.userTeamId ?? null;
-      } catch (error) {
-        console.error("Error fetching user team:", error);
-      }
+      } catch (error) {}
     },
 
     async getFixtures() {
@@ -1447,9 +1272,7 @@ export default {
             .flatMap((m) => [m.team1, m.team2])
             .map((m) => m.code);
         }
-      } catch (error) {
-        console.log(error.response);
-      }
+      } catch (error) {}
     },
 
     async fetchPlayers() {
@@ -1458,9 +1281,7 @@ export default {
           `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/players`,
         );
         this.availablePlayers = response.data;
-      } catch (error) {
-        console.error("Error fetching players:", error);
-      }
+      } catch (error) {}
     },
 
     async fetchTeams() {
@@ -1469,9 +1290,7 @@ export default {
           `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/teams`,
         );
         this.availableTeams = response.data;
-      } catch (error) {
-        console.error("Error fetching teams:", error);
-      }
+      } catch (error) {}
     },
 
     async getLeagueDetails(invitationCode) {
@@ -1484,9 +1303,7 @@ export default {
         this.realLeagueId = this.currentLeague.participants[0].fantasyLeagueId;
 
         this.fillLeagueDetails(this.currentLeague);
-      } catch (error) {
-        console.error("Error fetching league details:", error);
-      }
+      } catch (error) {}
     },
 
     fillLeagueDetails(league) {
@@ -1533,8 +1350,6 @@ export default {
     },
   },
   beforeDestroy() {
-    console.log("🧹 [DraftComponent] Cleaning up...");
-
     // Run all unsubscribe functions
     this._unsubscribeFunctions.forEach((unsub) => {
       if (typeof unsub === "function") unsub();

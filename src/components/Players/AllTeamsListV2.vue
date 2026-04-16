@@ -244,7 +244,6 @@ export default {
       this.showFilters = !this.showFilters;
     },
     searchTeams() {
-      console.log("what");
       this.sortedTeams = this.teams.filter(
         (p) =>
           p.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
@@ -316,18 +315,15 @@ export default {
       );
     },
     filterTeams(option) {
-      console.log(option);
 
       this.sortedTeams = this.teams.filter(
         (t) => t.league == option || option == "any"
       );
-      console.log(this.sortedTeams);
 
       this.orderTeams(this.selectedSorting);
     },
     selectTeam(team) {
       // Emit an event to notify the parent component (App) about the selected player
-      console.log("leci", team);
       this.$emit("teamSelect", team);
     },
     changeRange(numberOfFixtures) {
@@ -337,8 +333,6 @@ export default {
     fetchTeams() {
       this.sortedTeams = this.teams;
       this.orderTeams("points");
-      console.log("acd", this.sortedTeams);
-      console.log("dsa teams", this.teams);
     },
   },
   created() {

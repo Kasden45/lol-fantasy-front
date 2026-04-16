@@ -380,11 +380,9 @@ export default {
       this.orderPlayers(this.selectedSorting);
     },
     selectPlayer(player) {
-      console.log("Player selected:", player);
       this.$emit("playerSelect", player);
     },
     selectTeam(team) {
-      console.log("Team selected:", team);
       this.$emit("teamSelect", team);
     },
     fetchPlayers() {
@@ -422,12 +420,7 @@ export default {
       handler() {
         this.selectedFilter =
           this.selectedRole === "sub" ? "any" : this.selectedRole;
-        console.log(
-          "Selected role changed to:",
-          this.selectedRole,
-          " - applying filters with filter:",
-          this.selectedFilter,
-        );
+
         if (this.selectedRole === "team") {
           this.applyFiltersTeams();
         } else {

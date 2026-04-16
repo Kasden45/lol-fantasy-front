@@ -276,7 +276,6 @@ export default {
   methods: {
     chipUsed(id) {
       // Emit an event to notify the parent component (App) about the chip usage
-      console.log("Chip used with id:", id);
       this.userTeam.chipActivated = id;
       this.$emit("chipUsed", id);
     },
@@ -284,26 +283,21 @@ export default {
       this.$emit("captainPick", role);
     },
     fillTeamTile(player) {
-      console.log(player);
       // Fill the corresponding tile in the team display when a player is selected
       // You can add logic to determine which tile to fill based on the player's role
     },
     playerRemoved(role) {
       // Emit an event to notify the parent component (App) about the selected player
-      console.log("usuwam z ", role);
       this.$emit("playerRemove", role);
     },
     playerSub(player) {
-      console.log("zamieniam z ", player);
       this.$emit("playerSub", player);
     },
     playerSubSub(player) {
-      console.log("zamieniam z ", player);
       this.$emit("playerSubSub", player);
     },
     rolePicked(role) {
       // Emit an event to notify the parent component (App) about the selected player
-      console.log("chce dodac do ", role);
       this.$emit("rolePick", role);
     },
   },

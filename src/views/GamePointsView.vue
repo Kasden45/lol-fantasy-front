@@ -184,7 +184,6 @@ export default {
         this.teamPoints = response.data;
         this.playersWithPoints = response.data.playersWithPoints;
       } catch (error) {
-        console.error("Error fetching game points:", error);
       }
     },
   },

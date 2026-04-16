@@ -111,12 +111,10 @@ export default {
     },
     removePlayerFromRole(role) {
       // Emit an event to notify the parent component (App) about the selected player
-      console.log("usuwam z ", role);
       this.$emit("playerRemove", role);
     },
     addPlayerToRole(role) {
       // Emit an event to notify the parent component (App) about the selected player
-      console.log("chce dodac do ", role);
       this.$emit("rolePick", role);
     },
   },

@@ -168,7 +168,6 @@ export default {
         this.matchId = data.matchId;
         this.gameDetails = data.gameDetails;
       } catch (error) {
-        console.error("Error fetching match details:", error);
       }
     },
     async updateMatchDetails() {
@@ -191,7 +190,6 @@ export default {
         }
         alert("Match details updated successfully");
       } catch (error) {
-        console.error("Error updating match details:", error);
         alert("Failed to update match details");
       }
     },
@@ -214,7 +212,6 @@ export default {
           `Match details updated successfully ${data.gameDetails[0].duration}`,
         );
       } catch (error) {
-        console.error("Error updating match details:", error);
         alert("Failed to update match details");
       }
     },

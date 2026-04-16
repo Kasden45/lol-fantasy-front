@@ -128,7 +128,6 @@ export default {
     },
     selectGame(index) {
       this.selectedGameIndex = index;
-      console.log(this.selectedGame.pointsDetails);
     },
     formatDate(inputDate) {
       // Create a Date object from the input string
@@ -166,7 +165,6 @@ export default {
           alert(`Points updated successfully: fixture ${fixtureId}`);
         })
         .catch((error) => {
-          console.log(error.response);
         });
     },
   },

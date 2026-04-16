@@ -58,7 +58,6 @@ export default {
     this.getCurrentFixture();
     this.getFixtures();
     // this.profile =
-    console.log(this.profile);
   },
   updated() {
     // this.getFixtures();
@@ -78,17 +77,12 @@ export default {
     positionScroll() {
       var continueCheck = true;
       this.matchesByFixture.forEach((element) => {
-        console.log(new Date(element.fixture.deadlineDate), "vs", Date.now());
         if (
           continueCheck &&
           element.fixture.fixtureId != this.$store.getters.getFixtureId
         ) {
-          console.log("scrolling right");
-          console.log(element.fixture.fixtureId);
-          console.log(this.$store.getters.getFixtureId);
           this.scrollRight();
         } else {
-          console.log("not scrolling right");
           continueCheck = false;
         }
       });
@@ -127,12 +121,10 @@ export default {
         .get(url)
         .then((response) => {
           this.$store.commit("setFixtureId", response.data);
-          console.log("Current fixture: ", this.$store.getters.getFixtureId);
 
           // this.$router.push({name: 'LeaguesView'})
         })
         .catch((error) => {
-          console.log(error.response);
         });
     },
     getFixtures() {
@@ -154,7 +146,6 @@ export default {
           // this.$router.push({name: 'LeaguesView'})
         })
         .catch((error) => {
-          console.log(error.response);
         });
     },
     fetchMatches() {
@@ -166,7 +157,6 @@ export default {
           this.$router.push({ name: "MatchesView" });
         })
         .catch((error) => {
-          console.log(error.response);
         });
     },
   },

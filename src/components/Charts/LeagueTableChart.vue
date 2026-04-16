@@ -39,7 +39,6 @@ export default {
     rules: Array,
   },
   mounted() {
-    console.log("fixtures data pre [0]", this.fixturesData[0]);
     var fixturesDetails = this.fixturesData
       .filter((a) => a.fixture != null)
       .sort(
@@ -50,7 +49,6 @@ export default {
     const fixtures = this.rules
       .filter((a) => a.id != null)
       .sort((a, b) => a.order - b.order);
-    console.log("fixtures data [0]", fixtures[0]);
     const labels = fixtures.map((a) => a.title);
 
     // Zbierz unikalnych uczestników
@@ -74,8 +72,6 @@ export default {
         usersMap.get(userId).data.push(points);
       });
     });
-    console.log("users map", usersMap);
-    console.log("users map values", usersMap.values());
     // Make it cumulative sum
     usersMap.forEach((userData) => {
       for (let i = 1; i < userData.data.length; i++) {

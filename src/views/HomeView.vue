@@ -225,7 +225,6 @@ export default {
     }
     // this.fetchRulesData();
     // this.profile =
-    console.log(this.profile);
   },
   methods: {
     closeDetailsModal(name) {
@@ -239,7 +238,6 @@ export default {
     selectTab(index, f) {
       var fixture = f != 0 ? f : null;
       this.selectedTabIndex = index;
-      console.log(this.selectedTabIndex);
       this.currentFixture = this.newRulesData.find(
         (element) => element.fixture.id == fixture,
       );
@@ -260,7 +258,6 @@ export default {
             return newFix;
           })
           .sort((a, b) => a.order - b.order);
-        console.log("tabs", this.tabs);
 
         this.selectTab(
           this.tabs.find(
@@ -269,7 +266,6 @@ export default {
           this.$store.getters.getFixtureId,
         );
       } catch (error) {
-        console.error("Error fetching data:", error);
       }
     },
     getCurrentFixture() {
@@ -279,12 +275,10 @@ export default {
         .get(url)
         .then((response) => {
           this.$store.commit("setFixtureId", response.data);
-          console.log("Current fixture: ", this.$store.getters.getFixtureId);
 
           // this.$router.push({name: 'LeaguesView'})
         })
         .catch((error) => {
-          console.log(error.response);
         });
     },
   },
