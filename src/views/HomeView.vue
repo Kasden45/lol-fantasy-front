@@ -139,39 +139,88 @@
           </div>
 
           <!-- Points Grid -->
-          <div class="points-grid">
+          <div class="points-grid" :class="{ 'points-grid-matrix': playerViewMode === 'matrix' }">
             <!-- Player Points -->
             <div class="points-card">
               <div class="points-card-header">
                 <h3 class="points-card-title">Player Points</h3>
-              </div>
-              <div class="role-tabs">
-                <button
-                  v-for="role in playerPointsRules.roles"
-                  :key="role"
-                  class="role-tab"
-                  :class="{ active: selectedPlayerRole === role }"
-                  @click="selectedPlayerRole = role"
-                >
-                  {{ role }}
-                </button>
-              </div>
-              <div class="points-list">
-                <div
-                  v-for="rule in playerPointsRules.rules"
-                  :key="rule.key"
-                  class="points-row"
-                  :class="{ 'points-negative': rule.value < 0 }"
-                >
-                  <span class="points-event">{{ rule.name }}</span>
-                  <span
-                    class="points-value"
-                    :class="rule.value < 0 ? 'value-negative' : 'value-positive'"
-                  >
-                    {{ rule.value > 0 ? "+" : "" }}{{ rule.value }}
-                  </span>
+                <div class="view-toggle">
+                  <button
+                    class="view-toggle-btn"
+                    :class="{ active: playerViewMode === 'tabs' }"
+                    @click="playerViewMode = 'tabs'"
+                    title="Tab view"
+                  >&#9776;</button>
+                  <button
+                    class="view-toggle-btn"
+                    :class="{ active: playerViewMode === 'matrix' }"
+                    @click="playerViewMode = 'matrix'"
+                    title="Matrix view"
+                  >&#9638;</button>
                 </div>
               </div>
+
+              <!-- Tab view -->
+              <template v-if="playerViewMode === 'tabs'">
+                <div class="role-tabs">
+                  <button
+                    v-for="role in playerPointsRules.roles"
+                    :key="role"
+                    class="role-tab"
+                    :class="{ active: selectedPlayerRole === role }"
+                    @click="selectedPlayerRole = role"
+                  >{{ role }}</button>
+                </div>
+                <div class="points-list">
+                  <div
+                    v-for="rule in playerPointsRules.rules"
+                    :key="rule.key"
+                    class="points-row"
+                    :class="{ 'points-negative': rule.value < 0 }"
+                  >
+                    <span class="points-event">{{ rule.name }}</span>
+                    <span class="points-value" :class="rule.value < 0 ? 'value-negative' : 'value-positive'">
+                      {{ rule.value > 0 ? "+" : "" }}{{ rule.value }}
+                    </span>
+                  </div>
+                </div>
+              </template>
+
+              <!-- Matrix view -->
+              <template v-else>
+                <div class="matrix-wrap">
+                  <table class="matrix-table">
+                    <thead>
+                      <tr>
+                        <th class="matrix-metric-col"></th>
+                        <th v-for="role in playerPointsMatrix.roles" :key="role" class="matrix-role-col">
+                          {{ role }}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="row in playerPointsMatrix.rows" :key="row.key">
+                        <td class="matrix-metric-name">{{ row.name }}</td>
+                        <td
+                          v-for="role in playerPointsMatrix.roles"
+                          :key="role"
+                          class="matrix-value"
+                          :class="{
+                            'value-positive': row.values[role] > 0,
+                            'value-negative': row.values[role] < 0,
+                            'matrix-na': row.values[role] === null
+                          }"
+                        >
+                          <template v-if="row.values[role] !== null">
+                            {{ row.values[role] > 0 ? "+" : "" }}{{ row.values[role] }}
+                          </template>
+                          <template v-else>—</template>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </template>
             </div>
 
             <!-- Team Points -->
@@ -225,6 +274,7 @@ export default {
       newRulesData: [],
       selectedTabIndex: 0,
       selectedPlayerRole: "top",
+      playerViewMode: "tabs",
     };
   },
   async mounted() {
@@ -321,6 +371,30 @@ export default {
           (r) => r.type === "PlayerPoints" && r.role === this.selectedPlayerRole,
         ),
       };
+    },
+    playerPointsMatrix() {
+      const roleOrder = ["top", "jungle", "mid", "bottom", "support"];
+      const all = this.currentFixture.rules.filter(
+        (r) => r.type === "PlayerPoints" && roleOrder.includes(r.role),
+      );
+      const roles = [...new Set(all.map((r) => r.role))].sort(
+        (a, b) => roleOrder.indexOf(a) - roleOrder.indexOf(b),
+      );
+      const keys = [...new Set(all.map((r) => r.key))];
+      const rows = keys.map((key) => {
+        const sample = all.find((r) => r.key === key);
+        return {
+          key,
+          name: sample.name,
+          values: Object.fromEntries(
+            roles.map((role) => [
+              role,
+              all.find((r) => r.key === key && r.role === role)?.value ?? null,
+            ]),
+          ),
+        };
+      });
+      return { roles, rows };
     },
     teamPointsRules() {
       return this.currentFixture.rules.filter(
@@ -678,6 +752,100 @@ p {
   color: var(--GREY-LIGHT);
   text-transform: uppercase;
   letter-spacing: 1px;
+}
+
+.points-grid-matrix {
+  grid-template-columns: 1fr;
+}
+
+.points-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.view-toggle {
+  display: flex;
+  gap: 4px;
+}
+
+.view-toggle-btn {
+  padding: 3px 8px;
+  font-size: 13px;
+  background: transparent;
+  border: 1px solid var(--GREY-DARKER);
+  border-radius: 4px;
+  color: var(--GREY);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.view-toggle-btn.active {
+  background: var(--PRIMARY);
+  color: #fff;
+  border-color: var(--PRIMARY);
+}
+
+.matrix-wrap {
+  overflow-x: auto;
+}
+
+.matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.matrix-table thead th {
+  padding: 8px 12px;
+  background: var(--BACKGROUND-DARK);
+  color: var(--GREY);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+  border-bottom: 1px solid var(--GREY-DARKER);
+  white-space: nowrap;
+}
+
+.matrix-metric-col {
+  text-align: left !important;
+  min-width: 140px;
+}
+
+.matrix-role-col {
+  min-width: 64px;
+}
+
+.matrix-table tbody tr {
+  border-bottom: 1px solid var(--GREY-DARKER);
+  transition: background 0.12s;
+}
+
+.matrix-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.matrix-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.matrix-metric-name {
+  padding: 9px 12px;
+  color: var(--GREY);
+  font-weight: 500;
+}
+
+.matrix-value {
+  padding: 9px 12px;
+  text-align: center;
+  font-weight: 800;
+}
+
+.matrix-na {
+  color: var(--GREY-DARKER);
+  font-weight: 400;
 }
 
 .role-tabs {
