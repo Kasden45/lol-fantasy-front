@@ -145,19 +145,28 @@
               <div class="points-card-header">
                 <h3 class="points-card-title">Player Points</h3>
               </div>
+              <div class="role-tabs">
+                <button
+                  v-for="role in playerPointsRules.roles"
+                  :key="role"
+                  class="role-tab"
+                  :class="{ active: selectedPlayerRole === role }"
+                  @click="selectedPlayerRole = role"
+                >
+                  {{ role }}
+                </button>
+              </div>
               <div class="points-list">
                 <div
-                  v-for="rule in playerPointsRules"
-                  :key="rule.name"
+                  v-for="rule in playerPointsRules.rules"
+                  :key="rule.key"
                   class="points-row"
                   :class="{ 'points-negative': rule.value < 0 }"
                 >
                   <span class="points-event">{{ rule.name }}</span>
                   <span
                     class="points-value"
-                    :class="
-                      rule.value < 0 ? 'value-negative' : 'value-positive'
-                    "
+                    :class="rule.value < 0 ? 'value-negative' : 'value-positive'"
                   >
                     {{ rule.value > 0 ? "+" : "" }}{{ rule.value }}
                   </span>
@@ -215,6 +224,7 @@ export default {
       tabs: [], // {id, name, order}
       newRulesData: [],
       selectedTabIndex: 0,
+      selectedPlayerRole: "top",
     };
   },
   async mounted() {
@@ -292,9 +302,25 @@ export default {
       return "";
     },
     playerPointsRules() {
-      return this.currentFixture.rules.filter(
-        (rule) => rule.type === "PlayerPoints",
-      );
+      const roleOrder = ["top", "jungle", "mid", "bottom", "support"];
+      const roles = [
+        ...new Set(
+          this.currentFixture.rules
+            .filter((r) => r.type === "PlayerPoints" && roleOrder.includes(r.role))
+            .map((r) => r.role),
+        ),
+      ].sort((a, b) => roleOrder.indexOf(a) - roleOrder.indexOf(b));
+
+      if (!roles.includes(this.selectedPlayerRole)) {
+        this.selectedPlayerRole = roles[0] ?? "top";
+      }
+
+      return {
+        roles,
+        rules: this.currentFixture.rules.filter(
+          (r) => r.type === "PlayerPoints" && r.role === this.selectedPlayerRole,
+        ),
+      };
     },
     teamPointsRules() {
       return this.currentFixture.rules.filter(
@@ -652,6 +678,40 @@ p {
   color: var(--GREY-LIGHT);
   text-transform: uppercase;
   letter-spacing: 1px;
+}
+
+.role-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 10px 12px;
+  background: var(--BACKGROUND-DARK);
+  border-bottom: 1px solid var(--GREY-DARKER);
+  flex-wrap: wrap;
+}
+
+.role-tab {
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid var(--GREY-DARKER);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--GREY);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.role-tab.active {
+  background: var(--PRIMARY);
+  color: #fff;
+  border-color: var(--PRIMARY);
+}
+
+.role-tab:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--GREY-LIGHT);
 }
 
 .points-list {
