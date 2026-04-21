@@ -87,6 +87,7 @@
           swap.tradeReceiverUserTeam.userId == this.$store.getters.getProfileId
         "
         class="action-btn accept-btn"
+        data-testid="swap-accept-btn"
         @click="acceptSwap(swap)"
       >
         Accept
@@ -97,6 +98,7 @@
           swap.tradeReceiverUserTeam.userId == this.$store.getters.getProfileId
         "
         class="action-btn cancel-btn"
+        data-testid="swap-decline-btn"
         @click="cancelSwap(swap)"
       >
         Decline
@@ -107,6 +109,7 @@
           swap.tradeInitiatorUserTeam.userId == this.$store.getters.getProfileId
         "
         class="action-btn cancel-btn"
+        data-testid="swap-withdraw-btn"
         @click="withdrawSwap(swap)"
       >
         Withdraw

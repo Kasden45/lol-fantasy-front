@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "./views/HomeView.vue";
-import TeamSelection from "./views/TeamSelection.vue";
 import TeamSelectionV2 from "./views/TeamSelection-v2.vue";
 import PlayersView from "./views/PlayersView.vue"; // Import your component
 import LeaguesView from "./views/LeaguesView.vue"; // Import your component
@@ -16,7 +15,7 @@ import DraftView from "./components/League/DraftView.vue"; // Import your compon
 
 const routes = [
   { name: "Home", path: "/", component: HomeView },
-  { name: "TeamSelection", path: "/team-selection", component: TeamSelection },
+  { name: "TeamSelection", path: "/team-selection", component: TeamSelectionV2 },
   {
     name: "TeamSelectionV2",
     path: "/team-selection-v2",
@@ -48,11 +47,6 @@ const routes = [
     name: "GamePointsView",
     path: "/points/team/:teamSlug/game/:gameId",
     component: GamePointsView,
-  },
-  {
-    path: "/test-ably",
-    name: "TestAbly",
-    component: () => import("@/TestAbly.vue"),
   },
   // Define more routes as needed
 ];

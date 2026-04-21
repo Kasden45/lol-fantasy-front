@@ -21,6 +21,7 @@
           <label class="me-1" for="filter-method">Filter by:</label>
           <br /><select
             id="filter-method"
+            data-testid="player-filter-select"
             v-model="selectedFilter"
             @change="filterPlayers(selectedFilter)"
           >
@@ -47,6 +48,7 @@
           <label class="me-1" for="sorting-method">Sort by: </label>
           <br /><select
             id="sorting-method"
+            data-testid="player-sort-select"
             v-model="selectedSorting"
             @change="orderPlayers(selectedSorting)"
           >
@@ -138,6 +140,7 @@
                     this.teamsPlayingNextFixture.includes(p.team.code)))
             )"
             :key="player.esportsPlayerId"
+            :data-testid="'player-row-' + player.esportsPlayerId"
             :class="{
               'player-inactive': !this.teamsPlayingNextFixture.includes(
                 player.team.code
@@ -152,6 +155,7 @@
             </button> -->
               <button
                 @click="selectPlayer(player)"
+                data-testid="player-select-btn"
                 class="action-icon"
                 :disabled="
                   !this.teamsPlayingNextFixture.includes(player.team.code) ||
@@ -347,17 +351,14 @@ export default {
       );
     },
     filterPlayers(option) {
-      console.log(option);
       if (
         ["top", "jungle", "mid", "bottom", "support", "any"].includes(option)
       ) {
         this.sortedPlayers = this.players.filter(
           (p) => p.role == option || option == "any"
         );
-        console.log(this.sortedPlayers);
       } else {
         this.sortedPlayers = this.players.filter((p) => p.team.code == option);
-        console.log(this.sortedPlayers);
       }
       this.orderPlayers(this.selectedSorting);
     },
@@ -367,14 +368,11 @@ export default {
     },
     selectPlayer(player) {
       // Emit an event to notify the parent component (App) about the selected player
-      console.log("leci", player);
       this.$emit("playerSelect", player);
     },
     fetchPlayers() {
       this.sortedPlayers = this.players.filter((p) => p.price > 0);
       this.orderPlayers("points");
-      console.log("acd", this.sortedPlayers);
-      console.log("dsa", this.players);
     },
   },
   created() {
@@ -388,7 +386,6 @@ export default {
       handler(newselectedRole, oldselectedRole) {
         // React to prop changes here
         // playerDetails =
-        console.log(newselectedRole, oldselectedRole);
         if (
           newselectedRole != "sub" &&
           newselectedRole != "" &&

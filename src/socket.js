@@ -38,14 +38,6 @@ var activeChannel = null;
 var currentInvitationCode = null;
 var isInitialized = false;
 
-var debugLog = [];
-
-function logDebug(msg) {
-  return;
-  var timestamp = new Date().toISOString().substr(11, 12);
-  console.log("[" + timestamp + "] [SOCKET-DEBUG] " + msg);
-  debugLog.push({ time: Date.now(), msg: msg });
-}
 // ============================================================================
 // CORE FUNCTIONS
 // ============================================================================
@@ -54,19 +46,11 @@ function logDebug(msg) {
  * Initialize Ably connection for real-time draft communication
  */
 export async function initAbly(apiKey, invitationCode) {
-  logDebug("=== initAbly() CALLED ===");
-  logDebug("API Key provided: " + !!apiKey);
-  logDebug("Key length: " + (apiKey ? apiKey.length : 0));
-  logDebug("Invitation code: " + invitationCode);
-
   try {
     // Cleanup old connection
     if (ablyInstance) {
-      logDebug("Closing existing connection...");
       await disconnectAbly();
     }
-
-    logDebug("Creating new Ably.Realtime instance...");
 
     ablyInstance = new Ably.Realtime({
       key: apiKey,
@@ -75,18 +59,13 @@ export async function initAbly(apiKey, invitationCode) {
       echoMessages: false, // Don't receive own messages back
     });
 
-    logDebug("Ably instance created");
-
     // Create channel
     currentInvitationCode = invitationCode;
     var channelName = "draft:" + invitationCode;
 
-    logDebug("Getting channel: " + channelName);
     activeChannel = ablyInstance.channels.get(channelName);
-    logDebug("Channel object created, state=" + activeChannel.state);
 
     // STEP 1: Wait for CONNECTION to be ready (not channel!)
-    logDebug("Step 1: Waiting for connection...");
 
     await new Promise(function (resolve, reject) {
       var timeoutId;
@@ -103,7 +82,6 @@ export async function initAbly(apiKey, invitationCode) {
 
       // If already connected, resolve immediately
       if (ablyInstance.connection.state === "connected") {
-        logDebug("Already connected!");
         done = true;
         clearTimeout(timeoutId);
         resolve();
@@ -115,7 +93,6 @@ export async function initAbly(apiKey, invitationCode) {
         if (!done) {
           done = true;
           clearTimeout(timeoutId);
-          logDebug("✅ Connection established!");
           ablyInstance.connection.off("connected", onConnected);
           resolve();
         }
@@ -134,21 +111,16 @@ export async function initAbly(apiKey, invitationCode) {
       ablyInstance.connection.on("failed", onFailed);
     });
 
-    logDebug("Step 2: Initiating channel attach (fire and forget)...");
-
     // STEP 2: Initiate attach but DON'T WAIT FOR CALLBACK!
     // Just trigger it - we'll check state ourselves
     activeChannel.attach(function (err) {
       // This callback MAY or MAY NOT fire (Ably bug!)
       if (err) {
-        logDebug("⚠️  Attach callback error (ignoring): " + err.message);
       } else {
-        logDebug("✅ Attach callback fired (unexpected but good!)");
       }
     });
 
     // STEP 3: Poll for channel to reach "attached" state (reliable!)
-    logDebug("Step 3: Polling for channel attached state...");
 
     await new Promise(function (resolve) {
       var checks = 0;
@@ -158,17 +130,13 @@ export async function initAbly(apiKey, invitationCode) {
         checks++;
         var state = activeChannel ? activeChannel.state : "null";
 
-        logDebug("   Poll #" + checks + ": channel state = " + state);
-
         if (state === "attached" || state === "suspended") {
           // Attached or suspended (both are usable)
-          logDebug("✅ Channel ready! State: " + state);
           resolve();
           return;
         }
 
         if (checks >= maxChecks) {
-          logDebug("⚠️  Polling timeout, using channel anyway...");
           resolve(); // Try to use it anyway
           return;
         }
@@ -189,14 +157,8 @@ export async function initAbly(apiKey, invitationCode) {
       : "unknown";
     var finalChanState = activeChannel ? activeChannel.state : "unknown";
 
-    logDebug("=== initAbly() COMPLETE - SUCCESS ===");
-    logDebug("Final connection state: " + finalConnState);
-    logDebug("Final channel state: " + finalChanState);
-    logDebug("Ready to publish and subscribe!");
-
     return true;
   } catch (error) {
-    logDebug("❌ initAbly() ERROR: " + error.message);
     cleanup();
     return false;
   }
@@ -210,26 +172,18 @@ function setupConnectionMonitoring() {
 
   var connection = ablyInstance.connection;
 
-  connection.on("connected", function () {
-    console.log("[Ably] Connection established");
-  });
+  connection.on("connected", function () {});
 
-  connection.on("disconnected", function () {
-    console.warn("[Ably] Disconnected - will auto-reconnect...");
-  });
+  connection.on("disconnected", function () {});
 
-  connection.on("suspended", function () {
-    console.warn("[Ably] Connection suspended (network issue?)");
-  });
+  connection.on("suspended", function () {});
 
   // Note: Using string 'failed' to avoid any reserved word issues
   connection.on("failed", function (err) {
-    console.error("[Ably] Connection failed permanently:", err);
     isInitialized = false;
   });
 
   connection.on("closed", function () {
-    console.log("[Ably] Connection closed");
     isInitialized = false;
   });
 }
@@ -252,24 +206,18 @@ function generateClientId() {
  */
 export function onDraftEvent(eventName, callback) {
   if (!activeChannel || !isInitialized) {
-    console.error("[Ably] Not initialized. Call initAbly() first.");
     return function () {};
   }
 
   if (!eventName || typeof eventName !== "string") {
-    console.error("[Ably] Invalid event name:", eventName);
     return function () {};
   }
 
   activeChannel.subscribe(eventName, function (message) {
     try {
       callback(message.data, message);
-    } catch (error) {
-      console.error("[Ably] Error in handler for " + eventName + ":", error);
-    }
+    } catch (error) {}
   });
-
-  console.log("[Ably] Subscribed to: " + eventName);
 
   return function () {
     offDraftEvent(eventName, callback);
@@ -284,10 +232,8 @@ export function offDraftEvent(eventName, callback) {
 
   if (callback) {
     activeChannel.unsubscribe(eventName, callback);
-    console.log("[Ably] Unsubscribed handler from: " + eventName);
   } else {
     activeChannel.unsubscribe(eventName);
-    console.log("[Ably] Unsubscribed all from: " + eventName);
   }
 }
 
@@ -296,15 +242,10 @@ export function offDraftEvent(eventName, callback) {
  */
 export function emitDraftEvent(eventName, data) {
   if (!activeChannel || !isInitialized) {
-    console.warn('[Ably] ⚠️  Cannot emit "' + eventName + '" - not ready yet');
-    console.warn("   State:", getConnectionState());
-    console.warn("   Initialized:", isInitialized);
-    console.warn("   Channel:", activeChannel ? "exists" : "null");
     return false;
   }
 
   if (!eventName) {
-    console.error("[Ably] Cannot emit - missing event name");
     return false;
   }
 
@@ -317,9 +258,7 @@ export function emitDraftEvent(eventName, data) {
 
   activeChannel.publish(eventName, enrichedData, function (err) {
     if (err) {
-      console.error("[Ably] Publish failed for " + eventName + ":", err);
     } else {
-      console.log("[Ably] Published: " + eventName);
     }
   });
 
@@ -334,8 +273,6 @@ export function emitDraftEvent(eventName, data) {
  * Join a draft room
  */
 export function joinDraft(userId, username, invitationCode) {
-  console.log("[Ably] Joining draft: " + invitationCode + " as " + username);
-
   emitDraftEvent(DRAFT_EVENTS.JOIN_DRAFT, {
     userId: userId,
     username: username,
@@ -348,9 +285,7 @@ export function joinDraft(userId, username, invitationCode) {
       { userId: userId, username: username, joinedAt: Date.now() },
       function (err) {
         if (err) {
-          console.error("[Ably] Presence enter failed:", err);
         } else {
-          console.log("[Ably] " + username + " entered presence");
         }
       },
     );
@@ -362,18 +297,12 @@ export function joinDraft(userId, username, invitationCode) {
  */
 export function leaveDraft() {
   if (!activeChannel || !isInitialized) {
-    console.log("[Ably] Skipping leaveDraft - not connected");
     return;
   }
 
   // Only enter presence if channel state is 'attached'
   if (activeChannel.state === "attached") {
     activeChannel.presence.leave(null, function (err) {
-      if (err)
-        console.log(
-          "[Ably] Presence leave warning (non-critical):",
-          err.message,
-        );
       // Don't throw - this is non-critical cleanup
     });
   }
@@ -502,7 +431,6 @@ export function getOnlineParticipants(callback) {
 
   activeChannel.presence.get(function (err, members) {
     if (err) {
-      console.error("[Ably] Failed to get presence:", err);
       callback([]);
     } else {
       var participants = members.map(function (member) {
@@ -535,8 +463,6 @@ export function onPresenceChange(callback) {
     callback(member, "update");
   });
 
-  console.log("[Ably] Subscribed to presence changes");
-
   return function () {
     if (activeChannel) {
       activeChannel.presence.unsubscribe("enter");
@@ -554,8 +480,6 @@ export function onPresenceChange(callback) {
  * Gracefully disconnect from Ably
  */
 export async function disconnectAbly() {
-  console.log("[Ably] Disconnecting...");
-
   // SAFETY: Skip presence if already detached
   if (activeChannel && activeChannel.state === "attached") {
     try {
@@ -564,12 +488,7 @@ export async function disconnectAbly() {
           resolve();
         });
       });
-    } catch (e) {
-      console.log(
-        "[Ably] Presence leave failed during disconnect (ok):",
-        e.message,
-      );
-    }
+    } catch (e) {}
   }
 
   // SAFETY: Only close if connection exists and isn't already closed
@@ -583,9 +502,6 @@ export async function disconnectAbly() {
         });
       });
     } else {
-      console.log(
-        "[Ably] Connection already " + currentState + ", skipping close",
-      );
     }
   }
 }

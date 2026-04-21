@@ -66,6 +66,7 @@
           <button
             :title="!canSwap ? errorMessage : 'Propose this swap'"
             class="propose-swap-btn"
+            data-testid="swap-propose-btn"
             @click="proposeSwap"
             :disabled="
               !selectedFromYourTeam ||
@@ -115,6 +116,7 @@
             <div
               v-for="(userTeam, clientId) in otherTeams"
               :key="clientId"
+              :data-testid="'swap-team-btn-' + clientId"
               class="team-selector-btn"
               :class="{ active: selectedTeamId === clientId }"
               @click="selectTeamToSwapWith(clientId)"
@@ -332,10 +334,6 @@ export default {
       }
     },
     selectedTeamData() {
-      console.log(
-        "Selected Team ID:",
-        this.otherTeams[this.selectedTeamId].team,
-      );
       return this.selectedTeamId
         ? this.transformTeamData(this.otherTeams[this.selectedTeamId]).result
         : null;
@@ -343,7 +341,6 @@ export default {
   },
   methods: {
     setupAblyListeners() {
-      console.log("🔔 [SwapComponent] Setting up Ably listeners...");
       var self = this;
 
       // Listen for swap proposals FROM OTHER USERS
@@ -352,10 +349,8 @@ export default {
       });
 
       this._unsubscribeFunctions.push(unsubSwap);
-      console.log("✅ [SwapComponent] Listening for swap proposals");
     },
     refreshTeams() {
-      console.log("forcing refetch");
       this.$emit("refetch-teams");
     },
     openDetailsModal(swap) {
@@ -404,23 +399,15 @@ export default {
       };
     },
     selectFromYourTeam(role) {
-      console.log("Selected from your team:", role);
       this.selectedYourRole = role;
       this.$emit("choose-role", role);
       // In actual implementation, emit event to parent to select player from pool
     },
     selectPlayerFromYourTeam(player, ownTeam, profileId) {
-      console.log(
-        "Selected player from your team:",
-        player,
-        ownTeam,
-        profileId,
-      );
       if (ownTeam && profileId === this.profileId) {
         this.selectedFromYourTeam = player;
       } else {
         this.selectedFromTargetTeam = player;
-        console.warn("Attempted to select player from another team");
       }
     },
     selectFromTargetTeam(role) {
@@ -450,33 +437,26 @@ export default {
         TradeReceiverUserTeamId: 0,
       };
 
-      console.log("Proposing from player pool swap with data:", swapRequest);
       try {
         const response = await this.axios.post(
           `${this.apiURL}Draft/${this.$store.getters.getCurrentTournamentId}/trades/${this.$store.getters.getProfileId}`,
           swapRequest,
         );
-        console.log("Swap created", response.data);
         await this.fetchSwaps();
-        console.log("to refetch");
         this.$emit("refetch-teams");
-        console.log("refetched?");
         this.selectedFromYourTeam = null;
         this.selectedTeamId = null;
         this.swapLoading = false;
       } catch (error) {
-        console.error("Error swapping", error);
         this.swapLoading = false;
       }
     },
     async proposeSwap() {
       if (!this.canSwap) {
-        console.log("Missing swap data");
         return;
       }
       this.swapLoading = true;
       if (this.activeTab === "unused" && this.selectedFromUnusedPlayers) {
-        console.log("Proposing swap with player pool");
         this.proposeSwapFromPlayerPool();
         return;
       }
@@ -491,13 +471,11 @@ export default {
         TradeReceiverUserTeamId: this.rivalUserTeamId,
       };
 
-      console.log("Proposing swap with data:", swapRequest);
       try {
         const response = await this.axios.post(
           `${this.apiURL}Draft/${this.$store.getters.getCurrentTournamentId}/trades/${this.$store.getters.getProfileId}`,
           swapRequest,
         );
-        console.log("Swap created", response.data);
         await this.fetchSwaps();
         ablyProposeSwap(this.leagueId, this.rivalUserTeamId);
         this.selectedFromYourTeam = null;
@@ -506,7 +484,6 @@ export default {
         this.swapLoading = false;
       } catch (error) {
         this.swapLoading = false;
-        console.error("Error swapping", error);
       }
     },
   },
@@ -514,8 +491,6 @@ export default {
     this.setupAblyListeners();
   },
   beforeDestroy() {
-    console.log("🗑️  [SwapComponent] Destroying - cleaning up...");
-
     // CRITICAL: Cleanup Ably listeners to prevent memory leaks!
     this.cleanupAblyListeners();
   },
