@@ -56,18 +56,11 @@
               v-if="match.team1?.wins != null && match.team2?.wins != null"
             >
               <router-link
-                v-if="$store.getters.getProfileId == 5"
-                :to="{
-                  name: 'MatchDetailsView',
-                  params: { matchId: match.id },
-                }"
+                :to="{ name: 'MatchPointsView', params: { matchId: match.id } }"
                 class="score"
               >
                 {{ match.team1.wins }} - {{ match.team2.wins }}
               </router-link>
-              <span v-else class="score"
-                >{{ match.team1.wins }} - {{ match.team2.wins }}</span
-              >
               <span v-if="isInPlay(match)" class="live-dot">🔴</span>
             </template>
             <template v-else>
