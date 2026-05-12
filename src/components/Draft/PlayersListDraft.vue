@@ -175,6 +175,7 @@ export default {
     selectedRole: String,
     players: Array,
     teams: Array,
+    tournamentCode: String,
   },
   name: "PlayersListDraft",
   data() {
@@ -186,6 +187,10 @@ export default {
       sortedPlayers: [],
       sortedTeams: [],
       uniqueTeamCodes: [],
+      formFixtures: null,
+      formPlayers: [],
+      formTeams: [],
+      formLoading: false,
     };
   },
   computed: {
@@ -207,9 +212,15 @@ export default {
         return acc;
       }, {});
     },
+    activePlayers() {
+      return this.formPlayers.length ? this.formPlayers : this.players;
+    },
+    activeTeams() {
+      return this.formTeams.length ? this.formTeams : this.teams;
+    },
     uniqueTeamCodes() {
       return Array.from(
-        new Set(this.players.map((player) => player.team.code)),
+        new Set(this.activePlayers.map((player) => player.team.code)),
       ).sort();
     },
     filteredAndSortedPlayers() {
@@ -348,14 +359,12 @@ export default {
       this.applyFilters();
     },
     applyFiltersTeams() {
-      let filtered = [...this.teams];
-
-      // Apply team filter
+      let filtered = [...this.activeTeams];
       this.sortedTeams = filtered;
       this.orderTeams(this.selectedSorting);
     },
     applyFilters() {
-      let filtered = [...this.players];
+      let filtered = [...this.activePlayers];
 
       // Apply role filter
       if (
@@ -388,11 +397,11 @@ export default {
       this.$emit("teamSelect", team);
     },
     fetchPlayers() {
-      this.sortedPlayers = this.players.filter((p) => p.price > 0);
+      this.sortedPlayers = this.activePlayers.filter((p) => p.price > 0);
       this.orderPlayers("points");
     },
     fetchTeams() {
-      this.sortedTeams = this.teams.filter((p) => p.price > 0);
+      this.sortedTeams = this.activeTeams.filter((p) => p.price > 0);
       this.orderTeams("points");
     },
     scrollGridToTop() {
