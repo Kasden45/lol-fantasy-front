@@ -60,36 +60,31 @@ export default {
     // this.profile =
     console.log(this.profile);
   },
-  updated() {
-    // this.getFixtures();
-    this.positionScroll();
-  },
+  updated() {},
   methods: {
     scrollRight() {
       const cardWidth = this.$refs.fixturesContainer.children[0].offsetWidth; // get width of the first card
       const scrollAmount = cardWidth; // scroll width for 4 cards
-      this.$refs.fixturesContainer.scrollLeft += scrollAmount; // scroll right
+      this.$refs.fixturesContainer.scrollLeft += scrollAmount + 16; // scroll right
     },
     scrollLeft() {
       const cardWidth = this.$refs.fixturesContainer.children[0].offsetWidth; // get width of the first card
       const scrollAmount = cardWidth; // scroll width for 4 cards
-      this.$refs.fixturesContainer.scrollLeft -= scrollAmount; // scroll left
+      this.$refs.fixturesContainer.scrollLeft -= scrollAmount + 16; // scroll left
     },
     positionScroll() {
-      var continueCheck = true;
-      this.matchesByFixture.forEach((element) => {
-        console.log(new Date(element.fixture.deadlineDate), "vs", Date.now());
-        if (
-          continueCheck &&
-          element.fixture.fixtureId != this.$store.getters.getFixtureId
-        ) {
-          console.log("scrolling right");
-          console.log(element.fixture.fixtureId);
-          console.log(this.$store.getters.getFixtureId);
-          this.scrollRight();
-        } else {
-          console.log("not scrolling right");
-          continueCheck = false;
+      this.$nextTick(() => {
+        const container = this.$refs.fixturesContainer;
+        if (!container || !container.children.length) return;
+        const currentFixtureId = this.$store.getters.getFixtureId;
+        const index = this.matchesByFixture.findIndex(
+          (el) => el.fixture.fixtureId == currentFixtureId,
+        );
+        if (index > 0) {
+          const cardWidth =
+            container.children[0].offsetWidth +
+            parseInt(getComputedStyle(container).gap || "0");
+          container.scrollLeft = cardWidth * index;
         }
       });
     },
@@ -241,10 +236,19 @@ export default {
 
 /* Make each fixture card a fixed width so scrolling works predictably */
 .fixtures > :deep(.fixture-card) {
-  min-width: 320px;
-  max-width: 320px;
+  min-width: 250px;
+  width: 300px;
+  max-width: 100%;
   flex-shrink: 0;
   white-space: normal;
+}
+@media (min-width: 301px) and (max-width: 600px) {
+  .fixtures > :deep(.fixture-card) {
+    min-width: 150px;
+    max-width: 100%;
+    flex-shrink: 0;
+    white-space: normal;
+  }
 }
 
 .scroll-btn {
