@@ -56,7 +56,7 @@
           </span>
         </div>
         <span class="role-badge" :class="`role-${position.role.toLowerCase()}`">
-          {{ position.role.toUpperCase() }}
+          {{ $func_global.roleMapShort[position.role.toUpperCase()] }}
         </span>
       </div>
 
@@ -385,7 +385,7 @@ export default {
   font-weight: bold;
   color: #fff;
   background: rgba(0, 217, 255, 0.1);
-  padding: 2px 6px;
+  padding: 2px 4px;
   border-radius: 4px;
 }
 .team-badges {
@@ -394,9 +394,11 @@ export default {
   gap: 4px;
 }
 .role-badge {
+  display: inline-block;
   font-size: 9px;
   font-weight: bold;
-  padding: 2px 6px;
+  line-height: 14px;
+  padding: 4px 6px;
   border-radius: 4px;
   color: #fff;
   text-transform: uppercase;

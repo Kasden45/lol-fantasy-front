@@ -54,6 +54,15 @@ export const func_global = {
     sub: "https://cdn3.emoji.gg/emojis/2724-lol-role-fill.png",
     team: "https://i.imgur.com/bLArMp2.png",
   },
+  roleMapShort: {
+    TOP: "TOP",
+    JUNGLE: "JGL",
+    MID: "MID",
+    BOTTOM: "BOT",
+    SUPPORT: "SUPP",
+    SUB: "SUB",
+    TEAM: "TEAM",
+  },
   getDayOfWeek(inputDate) {
     var dateFormat = inputDate.split(".");
     const today = new Date(
