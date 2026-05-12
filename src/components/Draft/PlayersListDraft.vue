@@ -102,6 +102,26 @@
           </select>
         </div>
 
+        <!-- Form Filter -->
+        <div class="filter-group">
+          <label class="filter-label"
+            >Form: <span v-if="formLoading">(loading…)</span></label
+          >
+          <select
+            class="filter-select"
+            v-model="formFixtures"
+            :disabled="formLoading || !tournamentCode"
+            data-testid="form-fixtures-select"
+          >
+            <option :value="null">All time</option>
+            <option :value="1">Last 1</option>
+            <option :value="2">Last 2</option>
+            <option :value="3">Last 3</option>
+            <option :value="4">Last 4</option>
+            <option :value="5">Last 5</option>
+          </select>
+        </div>
+
         <!-- Active Only Toggle -->
         <div class="filter-group">
           <label class="toggle-label">
@@ -175,6 +195,7 @@ export default {
     selectedRole: String,
     players: Array,
     teams: Array,
+    tournamentCode: String,
   },
   name: "PlayersListDraft",
   data() {
@@ -185,7 +206,11 @@ export default {
       selectedTeamFilter: "all",
       sortedPlayers: [],
       sortedTeams: [],
-      uniqueTeamCodes: [],
+      formFixtures: null,
+      formPlayers: [],
+      formTeams: [],
+      formLoading: false,
+      _formFetchId: 0,
     };
   },
   computed: {
@@ -207,9 +232,21 @@ export default {
         return acc;
       }, {});
     },
+    // Form stats are historical — overlay persists across prop updates;
+    // drafted players remain visible but show as owned via userTeamsPicked.
+    activePlayers() {
+      return this.formPlayers.length ? this.formPlayers : this.players;
+    },
+    activeTeams() {
+      return this.formTeams.length ? this.formTeams : this.teams;
+    },
     uniqueTeamCodes() {
       return Array.from(
-        new Set(this.players.map((player) => player.team.code)),
+        new Set(
+          this.activePlayers
+            .filter((p) => p.team?.code)
+            .map((player) => player.team.code),
+        ),
       ).sort();
     },
     filteredAndSortedPlayers() {
@@ -331,11 +368,6 @@ export default {
       }
       this.scrollGridToTop();
     },
-    extractUniqueTeamCodes() {
-      this.uniqueTeamCodes = Array.from(
-        new Set(this.players.map((player) => player.team.code)),
-      ).sort();
-    },
     filterPlayers(option) {
       this.selectedFilter = option;
       this.applyFilters();
@@ -348,14 +380,12 @@ export default {
       this.applyFilters();
     },
     applyFiltersTeams() {
-      let filtered = [...this.teams];
-
-      // Apply team filter
+      let filtered = [...this.activeTeams];
       this.sortedTeams = filtered;
       this.orderTeams(this.selectedSorting);
     },
     applyFilters() {
-      let filtered = [...this.players];
+      let filtered = [...this.activePlayers];
 
       // Apply role filter
       if (
@@ -388,11 +418,11 @@ export default {
       this.$emit("teamSelect", team);
     },
     fetchPlayers() {
-      this.sortedPlayers = this.players.filter((p) => p.price > 0);
+      this.sortedPlayers = this.activePlayers.filter((p) => p.price > 0);
       this.orderPlayers("points");
     },
     fetchTeams() {
-      this.sortedTeams = this.teams.filter((p) => p.price > 0);
+      this.sortedTeams = this.activeTeams.filter((p) => p.price > 0);
       this.orderTeams("points");
     },
     scrollGridToTop() {
@@ -401,7 +431,6 @@ export default {
   },
   created() {
     this.fetchPlayers();
-    this.extractUniqueTeamCodes();
   },
   watch: {
     players: {
@@ -434,6 +463,41 @@ export default {
           this.applyFilters();
         }
       },
+    },
+    async formFixtures(val) {
+      if (val === null) {
+        this.formPlayers = [];
+        this.formTeams = [];
+        this.applyFilters();
+        this.applyFiltersTeams();
+        return;
+      }
+      if (!this.tournamentCode) return;
+      this.formLoading = true;
+      const fetchId = ++this._formFetchId;
+      try {
+        const [playersRes, teamsRes] = await Promise.all([
+          this.axios.get(
+            `${this.apiURL}FantasyPoints/${this.tournamentCode}/players/form/${val}`,
+          ),
+          this.axios.get(
+            `${this.apiURL}FantasyPoints/${this.tournamentCode}/teams/form/${val}`,
+          ),
+        ]);
+        if (fetchId !== this._formFetchId) return;
+        this.formPlayers = playersRes.data;
+        this.formTeams = teamsRes.data;
+        this.applyFilters();
+        this.applyFiltersTeams();
+      } catch {
+        this.formFixtures = null;
+        this.formPlayers = [];
+        this.formTeams = [];
+        this.applyFilters();
+        this.applyFiltersTeams();
+      } finally {
+        this.formLoading = false;
+      }
     },
   },
 };

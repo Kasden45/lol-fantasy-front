@@ -63,6 +63,7 @@
       :players="availablePlayers"
       :teams="availableTeams"
       :selectedForSwap="selectedFromUnusedPlayers"
+      :tournamentCode="$store.getters.getCurrentTournamentId"
       v-if="availablePlayers.length > 0 && availableTeams.length > 0"
     />
   </DraftSwapMain>
@@ -156,6 +157,7 @@
           :selectedRole="roleToAddPlayer"
           :players="availablePlayers"
           :teams="availableTeams"
+          :tournamentCode="$store.getters.getCurrentTournamentId"
           v-if="availablePlayers.length > 0 && availableTeams.length > 0"
         />
       </div>

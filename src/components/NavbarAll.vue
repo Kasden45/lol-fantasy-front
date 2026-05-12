@@ -12,6 +12,15 @@
     <login-panel />
   </MyModal>
   <div class="navbar-expand-md bg-white sticky-top">
+    <nav class="navbar navbar-expand-md py-0 mb-0">
+      <h4
+        v-if="this.nextFixture != null && new Date(2026, 5, 20) > new Date()"
+        class="w-100 banner-info"
+      >
+        Form filtering added in players list! Click the "Form" dropdown to
+        filter by recent performance.
+      </h4>
+    </nav>
     <nav class="navbar navbar-expand-md py-0">
       <h4
         v-if="
@@ -506,6 +515,11 @@ export default {
   background-color: var(--ERROR);
 }
 
+.banner-info {
+  background-color: var(--PRIMARY);
+  margin-bottom: 0;
+}
+
 .deadline-banner-warning {
   background-color: var(--WARNING);
 }
@@ -520,6 +534,7 @@ export default {
 
 /* Constrain the deadline banner */
 .deadline-banner,
+.banner-info,
 .deadline-banner-danger,
 .deadline-banner-warning {
   color: white;
