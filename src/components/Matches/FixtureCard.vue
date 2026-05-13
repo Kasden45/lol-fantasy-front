@@ -51,23 +51,16 @@
           </div>
 
           <!-- Score / Time -->
-          <div class="match-center">
+          <div class="match-center" title="Click for match points details">
             <template
               v-if="match.team1?.wins != null && match.team2?.wins != null"
             >
               <router-link
-                v-if="$store.getters.getProfileId == 5"
-                :to="{
-                  name: 'MatchDetailsView',
-                  params: { matchId: match.id },
-                }"
+                :to="{ name: 'MatchPointsView', params: { matchId: match.id } }"
                 class="score"
               >
                 {{ match.team1.wins }} - {{ match.team2.wins }}
               </router-link>
-              <span v-else class="score"
-                >{{ match.team1.wins }} - {{ match.team2.wins }}</span
-              >
               <span v-if="isInPlay(match)" class="live-dot">🔴</span>
             </template>
             <template v-else>
@@ -330,5 +323,34 @@ export default {
 
 .live-dot {
   font-size: 10px;
+}
+.tooltips {
+  position: relative;
+  display: inline-block;
+}
+.additional-info {
+  font-size: 0.7rem;
+  color: var(--BENCH-BOOST);
+}
+
+/* Tooltip text */
+.tooltips .tooltiptext {
+  visibility: hidden;
+  width: 15rem;
+  background-color: VAR(--GREY-DARKER);
+  color: white;
+  opacity: 0.9;
+  text-align: center;
+  padding: 5px;
+  border-radius: 6px;
+
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 999;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltips:hover .tooltiptext {
+  visibility: visible;
 }
 </style>

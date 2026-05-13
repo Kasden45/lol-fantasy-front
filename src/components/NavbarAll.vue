@@ -17,6 +17,15 @@
         v-if="this.nextFixture != null && new Date(2026, 5, 20) > new Date()"
         class="w-100 banner-info"
       >
+        Match scoring details added in Matches view! Click the score and dive
+        into points breakdown.
+      </h4>
+    </nav>
+    <nav class="navbar navbar-expand-md py-0 mb-0">
+      <h4
+        v-if="this.nextFixture != null && new Date(2026, 5, 15) > new Date()"
+        class="w-100 banner-info"
+      >
         Form filtering added in players list! Click the "Form" dropdown to
         filter by recent performance.
       </h4>
@@ -159,7 +168,7 @@
                 class="nav-link"
                 :class="{ active: this.$route.name === 'MatchesView' }"
                 :to="{ name: 'MatchesView' }"
-                >Matches</router-link
+                >Matches<span class="inform"> NEW</span></router-link
               >
             </li>
             <li class="nav-item pe-3">
@@ -516,7 +525,7 @@ export default {
 }
 
 .banner-info {
-  background-color: var(--PRIMARY);
+  background-color: var(--SECONDARY);
   margin-bottom: 0;
 }
 
