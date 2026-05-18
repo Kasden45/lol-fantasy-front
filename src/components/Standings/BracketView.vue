@@ -45,77 +45,105 @@ export default {
 <style scoped>
 .bracket-scroll {
   overflow-x: auto;
+  scrollbar-width: none;
 }
+
+.bracket-scroll::-webkit-scrollbar {
+  display: none;
+}
+
 .bracket-container {
   display: flex;
   gap: 12px;
-  padding: 8px 4px;
+  padding: 4px 2px 12px;
   min-width: max-content;
 }
+
 .bracket-column {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  min-width: 190px;
+  min-width: 200px;
 }
+
 .bracket-cell {
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 8px;
-  padding: 8px;
+  background: var(--BACKGROUND-LIGHTER);
+  border: 1px solid var(--GREY-DARKER);
+  border-radius: 10px;
+  padding: 10px;
+  overflow: hidden;
 }
+
 .cell-name {
-  font-size: 0.72rem;
+  font-size: 10px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #888;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 4px;
-  margin-bottom: 6px;
+  letter-spacing: 1.5px;
+  color: var(--PRIMARY-LIGHTER);
+  border-bottom: 1px solid var(--GREY-DARKER);
+  padding-bottom: 6px;
+  margin-bottom: 8px;
 }
+
 .bracket-match {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--SECONDARY);
+  border: 1px solid var(--GREY-DARKER);
   border-radius: 6px;
   overflow: hidden;
   margin-bottom: 8px;
 }
+
 .bracket-match:last-child {
   margin-bottom: 0;
 }
+
 .bracket-team {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  gap: 7px;
+  padding: 6px 9px;
+  border-bottom: 1px solid var(--GREY-DARKER);
 }
+
 .bracket-team:last-child {
   border-bottom: none;
 }
+
 .team-logo {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   object-fit: contain;
   flex-shrink: 0;
 }
+
 .team-code {
   flex: 1;
-  font-size: 0.85rem;
+  font-size: 12px;
   font-weight: 600;
+  color: var(--GREY);
 }
+
 .game-wins {
-  font-size: 0.85rem;
+  font-size: 12px;
   font-weight: 700;
   min-width: 16px;
   text-align: right;
+  color: var(--GREY-DARKER);
 }
-.team-winner .team-code,
+
+.team-winner .team-code {
+  color: var(--GREEN-LIGHT);
+}
+
 .team-winner .game-wins {
-  color: #4caf50;
+  color: var(--GREEN-LIGHT);
 }
+
 .team-loser {
-  opacity: 0.5;
+  opacity: 0.45;
 }
+
 .team-tbd .team-code {
-  color: #555;
+  color: var(--GREY-DARKER);
 }
 </style>

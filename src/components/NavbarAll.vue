@@ -14,7 +14,10 @@
   <div class="navbar-expand-md bg-white sticky-top">
     <nav class="navbar navbar-expand-md py-0 mb-0">
       <h4
-        v-if="this.nextFixture != null && new Date(2026, 5, 20) > new Date()"
+        v-if="
+          this.nextFixture != null &&
+          new Date('2026-05-18T07:00:00Z') > new Date()
+        "
         class="w-100 banner-info"
       >
         Match scoring details added in Matches view! Click the score and dive
@@ -23,11 +26,14 @@
     </nav>
     <nav class="navbar navbar-expand-md py-0 mb-0">
       <h4
-        v-if="this.nextFixture != null && new Date(2026, 5, 15) > new Date()"
+        v-if="
+          this.nextFixture != null &&
+          new Date('2026-05-25T07:00:00Z') > new Date()
+        "
         class="w-100 banner-info"
       >
-        Form filtering added in players list! Click the "Form" dropdown to
-        filter by recent performance.
+        Standings tab added with group rankings and bracket view! Check it out
+        in Matches dropdown.
       </h4>
     </nav>
     <nav class="navbar navbar-expand-md py-0">
@@ -168,7 +174,11 @@
                 <button
                   class="nav-link"
                   id="dropdownMenuMatches"
-                  :class="{ active: $route.name === 'MatchesView' || $route.name === 'StandingsView' }"
+                  :class="{
+                    active:
+                      $route.name === 'MatchesView' ||
+                      $route.name === 'StandingsView',
+                  }"
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
@@ -176,12 +186,20 @@
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuMatches">
                   <li>
-                    <a @click="navigateTo('MatchesView')" class="dropdown-item" style="cursor:pointer">
+                    <a
+                      @click="navigateTo('MatchesView')"
+                      class="dropdown-item"
+                      style="cursor: pointer"
+                    >
                       <span>Matches</span>
                     </a>
                   </li>
                   <li>
-                    <a @click="navigateTo('StandingsView')" class="dropdown-item" style="cursor:pointer">
+                    <a
+                      @click="navigateTo('StandingsView')"
+                      class="dropdown-item"
+                      style="cursor: pointer"
+                    >
                       <span>Standings</span>
                     </a>
                   </li>
@@ -208,7 +226,7 @@
                     <a
                       @click="navigateTo('DreamTeamView')"
                       class="dropdown-item"
-                      style="cursor:pointer"
+                      style="cursor: pointer"
                     >
                       <span>Dream teams</span>
                     </a>
@@ -217,7 +235,7 @@
                     <a
                       @click="navigateTo('StatsView')"
                       class="dropdown-item"
-                      style="cursor:pointer"
+                      style="cursor: pointer"
                     >
                       <span>Player stats</span>
                     </a>
@@ -385,10 +403,12 @@ export default {
 
   methods: {
     closeAllDropdowns() {
-      document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach((toggle) => {
-        const instance = window.bootstrap?.Dropdown?.getInstance(toggle);
-        if (instance) instance.hide();
-      });
+      document
+        .querySelectorAll('[data-bs-toggle="dropdown"]')
+        .forEach((toggle) => {
+          const instance = window.bootstrap?.Dropdown?.getInstance(toggle);
+          if (instance) instance.hide();
+        });
     },
     navigateTo(routeName) {
       this.$router.push({ name: routeName });
