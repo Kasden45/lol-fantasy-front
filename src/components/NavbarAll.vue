@@ -164,12 +164,29 @@
               >
             </li>
             <li class="nav-item pe-3">
-              <router-link
-                class="nav-link"
-                :class="{ active: this.$route.name === 'MatchesView' }"
-                :to="{ name: 'MatchesView' }"
-                >Matches<span class="inform"> NEW</span></router-link
-              >
+              <div class="dropdown">
+                <button
+                  class="nav-link"
+                  id="dropdownMenuMatches"
+                  :class="{ active: $route.name === 'MatchesView' || $route.name === 'StandingsView' }"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  Matches
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuMatches">
+                  <li>
+                    <a @click="navigateTo('MatchesView')" class="dropdown-item" style="cursor:pointer">
+                      <span>Matches</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a @click="navigateTo('StandingsView')" class="dropdown-item" style="cursor:pointer">
+                      <span>Standings</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </li>
             <li class="nav-item pe-3">
               <div class="dropdown">
@@ -189,18 +206,18 @@
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuStats">
                   <li>
                     <a
-                      @click="this.$router.push({ name: 'DreamTeamView' })"
+                      @click="navigateTo('DreamTeamView')"
                       class="dropdown-item"
-                      href="#"
+                      style="cursor:pointer"
                     >
                       <span>Dream teams</span>
                     </a>
                   </li>
                   <li>
                     <a
-                      @click="this.$router.push({ name: 'StatsView' })"
+                      @click="navigateTo('StatsView')"
                       class="dropdown-item"
-                      href="#"
+                      style="cursor:pointer"
                     >
                       <span>Player stats</span>
                     </a>
@@ -367,6 +384,16 @@ export default {
   },
 
   methods: {
+    closeAllDropdowns() {
+      document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach((toggle) => {
+        const instance = window.bootstrap?.Dropdown?.getInstance(toggle);
+        if (instance) instance.hide();
+      });
+    },
+    navigateTo(routeName) {
+      this.$router.push({ name: routeName });
+      this.closeAllDropdowns();
+    },
     async deadlineCountdown() {
       if (this.$store.getters.getNextFixture != null) {
         const deadline = new Date(
