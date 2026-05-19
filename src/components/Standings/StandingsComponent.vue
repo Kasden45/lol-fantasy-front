@@ -34,6 +34,7 @@
           <GroupStandingsTable
             v-if="section.type === 'group'"
             :rankings="section.rankings"
+            :enrichment="enrichment"
           />
           <BracketView
             v-else-if="section.type === 'bracket'"
@@ -58,6 +59,7 @@ export default {
       selectedStageIndex: 0,
       loading: false,
       error: null,
+      enrichment: null,
     };
   },
   computed: {
@@ -74,11 +76,13 @@ export default {
       this.error = null;
       try {
         const tournamentId = this.$store.state.currentTournamentId;
-        const response = await this.axios.get(
-          `${this.apiURL}Matches/${tournamentId}/standings`,
-        );
-        const standing = response.data.data.standings[0];
+        const [standingsRes, enrichmentRes] = await Promise.all([
+          this.axios.get(`${this.apiURL}Matches/${tournamentId}/standings`),
+          this.axios.get(`${this.apiURL}Matches/${tournamentId}/standings-enrichment`).catch(() => null),
+        ]);
+        const standing = standingsRes.data.data.standings[0];
         this.stages = standing.stages;
+        this.enrichment = enrichmentRes?.data?.enrichment ?? null;
       } catch {
         this.error = "Failed to load standings.";
       } finally {
