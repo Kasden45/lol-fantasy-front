@@ -8,8 +8,7 @@
           <th>W</th>
           <th>L</th>
           <template v-if="enrichment">
-            <th class="maps-header">MW</th>
-            <th class="maps-header">ML</th>
+            <th class="maps-header">Maps</th>
             <th class="form-header">Form</th>
           </template>
         </tr>
@@ -26,24 +25,37 @@
             <td class="wins-cell">{{ team.record.wins }}</td>
             <td class="losses-cell">{{ team.record.losses }}</td>
             <template v-if="enrichment">
-              <td class="maps-won-cell">
-                {{ teamEnrichment(team.slug)?.mapsWon ?? '—' }}
-              </td>
-              <td class="maps-lost-cell">
-                {{ teamEnrichment(team.slug)?.mapsLost ?? '—' }}
+              <td class="maps-cell">
+                <template v-if="teamEnrichment(team.slug)">
+                  <span class="maps-won">{{
+                    teamEnrichment(team.slug).mapsWon
+                  }}</span>
+                  <span class="maps-sep">-</span>
+                  <span class="maps-lost">{{
+                    teamEnrichment(team.slug).mapsLost
+                  }}</span>
+                </template>
+                <span v-else class="no-data">—</span>
               </td>
               <td class="form-cell">
                 <div class="form-inner" v-if="teamEnrichment(team.slug)">
                   <span
-                    v-for="(result, i) in (teamEnrichment(team.slug).recentForm || [])"
+                    v-for="(result, i) in teamEnrichment(team.slug)
+                      .recentForm || []"
                     :key="i"
                     class="form-pill"
-                    :class="result === 'W' ? 'form-pill--win' : 'form-pill--loss'"
+                    :class="
+                      result === 'W' ? 'form-pill--win' : 'form-pill--loss'
+                    "
                     :title="result === 'W' ? 'Win' : 'Loss'"
                   ></span>
                   <span
                     class="streak-label"
-                    :class="(teamEnrichment(team.slug).streak || '').endsWith('W') ? 'streak--win' : 'streak--loss'"
+                    :class="
+                      (teamEnrichment(team.slug).streak || '').endsWith('W')
+                        ? 'streak--win'
+                        : 'streak--loss'
+                    "
                   >
                     {{ teamEnrichment(team.slug).streak }}
                   </span>
@@ -86,7 +98,7 @@ export default {
   border: 1px solid var(--GREY-DARKER);
   border-radius: 10px;
   overflow: hidden;
-  max-width: 780px;
+  max-width: 700px;
   display: inline-block;
   justify-content: center;
 }
@@ -173,11 +185,13 @@ export default {
 .wins-cell {
   font-weight: 700;
   color: var(--GREEN-LIGHT) !important;
+  text-align: center;
 }
 
 .losses-cell {
   font-weight: 700;
   color: var(--RED-LIGHT) !important;
+  text-align: center;
 }
 
 /* Maps record */
@@ -185,16 +199,24 @@ export default {
   color: var(--GREY-DARKER);
 }
 
-.maps-won-cell {
-  font-weight: 600;
-  color: var(--GREEN-LIGHT);
+.maps-cell {
   font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-align: center;
 }
 
-.maps-lost-cell {
-  font-weight: 600;
-  color: var(--RED-LIGHT);
-  font-size: 12px;
+.maps-won {
+  color: var(--GREY);
+}
+
+.maps-sep {
+  color: var(--GREY);
+  margin: 0 1px;
+}
+
+.maps-lost {
+  color: var(--GREY);
 }
 
 /* Form column */
