@@ -27,15 +27,15 @@
             <td class="losses-cell">{{ team.record.losses }}</td>
             <template v-if="enrichment">
               <td class="maps-won-cell">
-                {{ teamEnrichment(team.slug) ? teamEnrichment(team.slug).mapsWon : '—' }}
+                {{ teamEnrichment(team.slug)?.mapsWon ?? '—' }}
               </td>
               <td class="maps-lost-cell">
-                {{ teamEnrichment(team.slug) ? teamEnrichment(team.slug).mapsLost : '—' }}
+                {{ teamEnrichment(team.slug)?.mapsLost ?? '—' }}
               </td>
               <td class="form-cell">
                 <div class="form-inner" v-if="teamEnrichment(team.slug)">
                   <span
-                    v-for="(result, i) in teamEnrichment(team.slug).recentForm"
+                    v-for="(result, i) in (teamEnrichment(team.slug).recentForm || [])"
                     :key="i"
                     class="form-pill"
                     :class="result === 'W' ? 'form-pill--win' : 'form-pill--loss'"
@@ -43,7 +43,7 @@
                   ></span>
                   <span
                     class="streak-label"
-                    :class="teamEnrichment(team.slug).streak.endsWith('W') ? 'streak--win' : 'streak--loss'"
+                    :class="(teamEnrichment(team.slug).streak || '').endsWith('W') ? 'streak--win' : 'streak--loss'"
                   >
                     {{ teamEnrichment(team.slug).streak }}
                   </span>
