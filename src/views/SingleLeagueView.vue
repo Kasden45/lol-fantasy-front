@@ -19,6 +19,13 @@
     <button class="btn btn-primary" @click="openModal = !openModal">
       <i class="fa-solid fa-chart-line"></i> See league race Chart
     </button>
+    <router-link
+      v-if="invitationCode === 'hHAR-PdWt'"
+      :to="{ name: 'LeagueRecapView' }"
+      class="btn btn-outline-warning ms-2"
+    >
+      <i class="fa-solid fa-trophy"></i> Season Recap
+    </router-link>
     <MyModal
       v-if="openModal"
       :openModal="this.openModal"

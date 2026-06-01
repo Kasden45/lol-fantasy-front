@@ -14,6 +14,7 @@ import SettingsView from "./views/SettingsView.vue"; // Import your component
 import StatsView from "./views/StatsView.vue"; // Import your component
 import DreamTeamView from "./views/DreamTeamView.vue"; // Import your component
 import StandingsView from "./views/StandingsView.vue";
+import LeagueRecapView from "./views/LeagueRecapView.vue";
 import DraftView from "./components/League/DraftView.vue"; // Import your component
 
 const routes = [
@@ -37,6 +38,7 @@ const routes = [
     component: SingleLeagueView,
   },
   { name: "DraftView", path: "/draft", component: DraftView },
+  { name: "LeagueRecapView", path: "/league-recap/lck-split-2-2026", component: LeagueRecapView },
   {
     name: "CurrentPointsView",
     path: "/current-points/:userId",
