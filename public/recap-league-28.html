@@ -1,0 +1,1741 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LCK Split 2 2026 — League 2KPI Recap</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+      :root {
+        --color-text-primary: #f0f0f0;
+        --color-text-secondary: #a0a0b0;
+        --color-background-primary: #0d0d14;
+        --color-background-secondary: #16161f;
+        --color-border-tertiary: #2a2a38;
+        --border-radius-lg: 16px;
+        --border-radius-md: 10px;
+        --accent: #c8a014;
+        --c-nevi: #c8a014;
+        --c-sly: #378add;
+        --c-hakkene: #5dcaa5;
+        --c-cond: #d85a30;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: var(--color-background-primary);
+        color: var(--color-text-primary);
+        line-height: 1.5;
+        min-height: 100vh;
+      }
+      .lf-root {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 20px 60px;
+      }
+
+      /* HERO */
+      .hero {
+        background: linear-gradient(
+          135deg,
+          #0a0a10 0%,
+          #1a1228 50%,
+          #0d0d14 100%
+        );
+        border-bottom: 1px solid var(--color-border-tertiary);
+        padding: 56px 20px 40px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse 80% 60% at 50% 0%,
+          rgba(55, 138, 221, 0.12) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+      .hero-eyebrow {
+        font-size: 0.75rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 10px;
+      }
+      .hero-title {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(2.4rem, 6vw, 4.5rem);
+        letter-spacing: 0.04em;
+        line-height: 1.05;
+      }
+      .hero-sub {
+        margin-top: 8px;
+        font-size: 0.9rem;
+        color: var(--color-text-secondary);
+      }
+      .hero-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 28px;
+        margin-top: 32px;
+      }
+      .hero-stat {
+        text-align: center;
+      }
+      .hero-stat-val {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 2rem;
+        line-height: 1;
+      }
+      .hero-stat-lbl {
+        font-size: 0.7rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--color-text-secondary);
+        margin-top: 4px;
+      }
+
+      /* SECTIONS */
+      .section {
+        margin-top: 44px;
+      }
+      .section-title {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 1.6rem;
+        letter-spacing: 0.06em;
+        border-bottom: 2px solid var(--color-border-tertiary);
+        padding-bottom: 8px;
+        margin-bottom: 20px;
+      }
+      .section-title span {
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.75rem;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--color-text-secondary);
+        margin-left: 10px;
+      }
+
+      /* STANDINGS */
+      .standings-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.88rem;
+      }
+      .standings-table th {
+        text-align: left;
+        padding: 8px 12px;
+        font-size: 0.68rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--color-text-secondary);
+        border-bottom: 1px solid var(--color-border-tertiary);
+      }
+      .standings-table td {
+        padding: 12px 12px;
+        border-bottom: 1px solid var(--color-border-tertiary);
+      }
+      .standings-table tr:last-child td {
+        border-bottom: none;
+      }
+      .standings-table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .rank-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        font-weight: 700;
+        font-size: 0.8rem;
+      }
+      .rank-1 {
+        background: #c8a014;
+        color: #000;
+      }
+      .rank-2 {
+        background: #8c9298;
+        color: #000;
+      }
+      .rank-3 {
+        background: #a0522d;
+        color: #fff;
+      }
+      .rank-4 {
+        background: var(--color-border-tertiary);
+        color: var(--color-text-secondary);
+      }
+      .manager-name {
+        font-weight: 600;
+        font-size: 0.93rem;
+      }
+      .trend-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+      }
+      .trend-up {
+        background: rgba(93, 202, 165, 0.15);
+        color: #5dcaa5;
+      }
+      .trend-down {
+        background: rgba(216, 90, 48, 0.15);
+        color: #d85a30;
+      }
+      .trend-steady {
+        background: rgba(200, 160, 20, 0.13);
+        color: #c8a014;
+      }
+      .pts-big {
+        font-size: 1rem;
+        font-weight: 700;
+      }
+
+      /* DOTS */
+      .legend-dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-right: 6px;
+        flex-shrink: 0;
+      }
+
+      /* CHART */
+      .chart-wrapper {
+        background: var(--color-background-secondary);
+        border: 1px solid var(--color-border-tertiary);
+        border-radius: var(--border-radius-lg);
+        padding: 24px;
+      }
+      .chart-canvas {
+        width: 100% !important;
+        height: 280px !important;
+      }
+      .chart-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-top: 16px;
+        font-size: 0.8rem;
+      }
+      .chart-legend-item {
+        display: flex;
+        align-items: center;
+      }
+
+      /* CHIPS */
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      @media (max-width: 680px) {
+        .two-col {
+          grid-template-columns: 1fr;
+        }
+      }
+      .chip-card {
+        background: var(--color-background-secondary);
+        border: 1px solid var(--color-border-tertiary);
+        border-radius: var(--border-radius-lg);
+        padding: 20px;
+      }
+      .chip-card-title {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 1.2rem;
+        letter-spacing: 0.06em;
+        margin-bottom: 4px;
+      }
+      .chip-card-sub {
+        font-size: 0.75rem;
+        color: var(--color-text-secondary);
+        margin-bottom: 16px;
+      }
+      .chip-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.83rem;
+      }
+      .chip-table th {
+        text-align: left;
+        padding: 6px 8px;
+        font-size: 0.66rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--color-text-secondary);
+        border-bottom: 1px solid var(--color-border-tertiary);
+      }
+      .chip-table td {
+        padding: 9px 8px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      }
+      .chip-table tr:last-child td {
+        border-bottom: none;
+      }
+      .gain-val {
+        color: #5dcaa5;
+        font-weight: 600;
+      }
+      .loss-val {
+        color: #d85a30;
+        font-weight: 600;
+      }
+      .perfect-badge {
+        background: rgba(93, 202, 165, 0.18);
+        color: #5dcaa5;
+        padding: 1px 7px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 600;
+      }
+
+      /* LINEUPS */
+      .four-col {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+      }
+      @media (max-width: 880px) {
+        .four-col {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 480px) {
+        .four-col {
+          grid-template-columns: 1fr;
+        }
+      }
+      .lineup-card {
+        background: var(--color-background-secondary);
+        border: 1px solid var(--color-border-tertiary);
+        border-radius: var(--border-radius-lg);
+        padding: 16px;
+      }
+      .lineup-header {
+        font-size: 0.72rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--color-text-secondary);
+        margin-bottom: 4px;
+      }
+      .lineup-score {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 2rem;
+        line-height: 1;
+        margin-bottom: 14px;
+      }
+      .pick-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        font-size: 0.82rem;
+      }
+      .pick-row:last-child {
+        border-bottom: none;
+      }
+      .pick-pos {
+        width: 30px;
+        text-align: center;
+        padding: 2px 4px;
+        border-radius: 4px;
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        flex-shrink: 0;
+      }
+      .pos-top {
+        background: rgba(255, 100, 100, 0.15);
+        color: #ff8080;
+      }
+      .pos-jng {
+        background: rgba(100, 220, 100, 0.15);
+        color: #80dd80;
+      }
+      .pos-mid {
+        background: rgba(100, 150, 255, 0.15);
+        color: #80aaff;
+      }
+      .pos-bot {
+        background: rgba(255, 200, 80, 0.15);
+        color: #ffd080;
+      }
+      .pos-sup {
+        background: rgba(200, 100, 255, 0.15);
+        color: #d080ff;
+      }
+      .pos-sub {
+        background: rgba(150, 150, 150, 0.15);
+        color: #aaa;
+      }
+      .pos-team {
+        background: rgba(200, 160, 20, 0.15);
+        color: #c8a014;
+      }
+      .pick-name {
+        flex: 1;
+        font-weight: 500;
+      }
+      .pick-pts {
+        font-weight: 700;
+        font-size: 0.88rem;
+      }
+      .capt-star {
+        color: #c8a014;
+        font-size: 0.7rem;
+        vertical-align: super;
+      }
+
+      /* ROLE STATS */
+      .role-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+      }
+      @media (max-width: 700px) {
+        .role-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      .role-card {
+        background: var(--color-background-secondary);
+        border: 1px solid var(--color-border-tertiary);
+        border-radius: var(--border-radius-md);
+        padding: 16px;
+      }
+      .role-label {
+        font-size: 0.7rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--color-text-secondary);
+        margin-bottom: 8px;
+      }
+      .role-avg {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 1.8rem;
+        line-height: 1;
+        margin-bottom: 8px;
+      }
+      .role-bar-row {
+        margin-top: 4px;
+      }
+      .role-bar-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.72rem;
+        color: var(--color-text-secondary);
+        margin-bottom: 3px;
+      }
+      .role-bar-track {
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 4px;
+        height: 5px;
+        overflow: hidden;
+      }
+      .role-bar-fill {
+        height: 100%;
+        border-radius: 4px;
+      }
+
+      /* CAPTAIN */
+      .capt-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      @media (max-width: 600px) {
+        .capt-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .capt-card {
+        background: var(--color-background-secondary);
+        border: 1px solid var(--color-border-tertiary);
+        border-radius: var(--border-radius-md);
+        padding: 16px;
+      }
+      .capt-card-name {
+        font-weight: 700;
+        font-size: 0.95rem;
+        margin-bottom: 10px;
+      }
+      .capt-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 0;
+        font-size: 0.82rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      }
+      .capt-row:last-child {
+        border-bottom: none;
+      }
+      .capt-count {
+        background: rgba(200, 160, 20, 0.15);
+        color: #c8a014;
+        padding: 1px 6px;
+        border-radius: 10px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        min-width: 26px;
+        text-align: center;
+      }
+      .capt-player {
+        flex: 1;
+        font-weight: 500;
+      }
+      .capt-avg {
+        color: var(--color-text-secondary);
+        font-size: 0.8rem;
+      }
+
+      /* SUB BENCH */
+      .sub-wrapper {
+        background: var(--color-background-secondary);
+        border: 1px solid var(--color-border-tertiary);
+        border-radius: var(--border-radius-lg);
+        overflow: hidden;
+      }
+      .sub-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+      }
+      .sub-table th {
+        text-align: left;
+        padding: 8px 12px;
+        font-size: 0.68rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--color-text-secondary);
+        border-bottom: 1px solid var(--color-border-tertiary);
+      }
+      .sub-table td {
+        padding: 11px 12px;
+        border-bottom: 1px solid var(--color-border-tertiary);
+      }
+      .sub-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* AWARDS */
+      .awards-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+      }
+      @media (max-width: 600px) {
+        .awards-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .award-card {
+        background: var(--color-background-secondary);
+        border: 1px solid var(--color-border-tertiary);
+        border-radius: var(--border-radius-md);
+        padding: 18px;
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+      }
+      .award-icon {
+        font-size: 1.8rem;
+        line-height: 1;
+        flex-shrink: 0;
+      }
+      .award-title {
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin-bottom: 2px;
+      }
+      .award-desc {
+        font-size: 0.8rem;
+        color: var(--color-text-secondary);
+      }
+
+      /* HIGHLIGHTS */
+      .insight-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      @media (max-width: 600px) {
+        .insight-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .insight-card {
+        background: var(--color-background-secondary);
+        border: 1px solid var(--color-border-tertiary);
+        border-radius: var(--border-radius-lg);
+        padding: 20px;
+      }
+      .insight-label {
+        font-size: 0.68rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--color-text-secondary);
+        margin-bottom: 8px;
+      }
+      .insight-name {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 1.9rem;
+        letter-spacing: 0.04em;
+        line-height: 1;
+      }
+      .insight-meta {
+        font-size: 0.8rem;
+        color: var(--color-text-secondary);
+        margin-top: 4px;
+      }
+      .stat-row {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 14px;
+      }
+      .stat-box {
+        text-align: center;
+      }
+      .stat-box-val {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 1.4rem;
+        line-height: 1;
+      }
+      .stat-box-lbl {
+        font-size: 0.68rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--color-text-secondary);
+        margin-top: 2px;
+      }
+
+      .divider {
+        border: none;
+        border-top: 1px solid var(--color-border-tertiary);
+        margin: 40px 0;
+      }
+      .text-muted {
+        color: var(--color-text-secondary);
+      }
+      .fw-bold {
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="hero">
+      <div class="hero-eyebrow">Season Recap · Draft League</div>
+      <div class="hero-title">LCK Split 2 2026</div>
+      <div class="hero-sub">
+        League 2KPI — Nevi · Cond1tion · Hakkene · SlyMarbo · Rounds 1–9
+      </div>
+      <div class="hero-grid">
+        <div class="hero-stat">
+          <div class="hero-stat-val">16,903</div>
+          <div class="hero-stat-lbl">Total Points</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-val">9</div>
+          <div class="hero-stat-lbl">Weeks Played</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-val">712.64</div>
+          <div class="hero-stat-lbl">Best Single Week</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lf-root">
+      <!-- STANDINGS -->
+      <div class="section">
+        <div class="section-title">Final Standings <span>League 28</span></div>
+        <table class="standings-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Manager</th>
+              <th>Total Pts</th>
+              <th>Best Wk</th>
+              <th>Worst Wk</th>
+              <th>Avg / Wk</th>
+              <th>Std Dev</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="rank-badge rank-1">1</span></td>
+              <td>
+                <span class="manager-name"
+                  ><span
+                    class="legend-dot"
+                    style="background: var(--c-sly)"
+                  ></span
+                  >SlyMarbo</span
+                >
+              </td>
+              <td><span class="pts-big">4338.69</span></td>
+              <td class="text-muted">W6 712.64</td>
+              <td class="text-muted">W5 333.90</td>
+              <td class="fw-bold">482.08</td>
+              <td class="text-muted">116.7</td>
+            </tr>
+            <tr>
+              <td><span class="rank-badge rank-2">2</span></td>
+              <td>
+                <span class="manager-name"
+                  ><span
+                    class="legend-dot"
+                    style="background: var(--c-cond)"
+                  ></span
+                  >Cond1tion</span
+                >
+              </td>
+              <td><span class="pts-big">4228.33</span></td>
+              <td class="text-muted">W6 559.58</td>
+              <td class="text-muted">W5 347.64</td>
+              <td class="fw-bold">469.81</td>
+              <td class="text-muted">77.0</td>
+            </tr>
+            <tr>
+              <td><span class="rank-badge rank-3">3</span></td>
+              <td>
+                <span class="manager-name"
+                  ><span
+                    class="legend-dot"
+                    style="background: var(--c-hakkene)"
+                  ></span
+                  >Hakkene</span
+                >
+              </td>
+              <td><span class="pts-big">4184.48</span></td>
+              <td class="text-muted">W4 692.71</td>
+              <td class="text-muted">W1 305.55</td>
+              <td class="fw-bold">464.94</td>
+              <td class="text-muted">128.3</td>
+            </tr>
+            <tr>
+              <td><span class="rank-badge rank-4">4</span></td>
+              <td>
+                <span class="manager-name"
+                  ><span
+                    class="legend-dot"
+                    style="background: var(--c-nevi)"
+                  ></span
+                  >Nevi</span
+                >
+              </td>
+              <td><span class="pts-big">4151.12</span></td>
+              <td class="text-muted">W3 517.50</td>
+              <td class="text-muted">W1 407.26</td>
+              <td class="fw-bold">461.24</td>
+              <td class="text-muted">29.9</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- WEEKLY CHART -->
+      <div class="section">
+        <div class="section-title">Weekly Points <span>W1–W9</span></div>
+        <div class="chart-wrapper">
+          <canvas id="weeklyChart" class="chart-canvas"></canvas>
+          <div class="chart-legend">
+            <div class="chart-legend-item">
+              <span class="legend-dot" style="background: var(--c-sly)"></span
+              >SlyMarbo
+            </div>
+            <div class="chart-legend-item">
+              <span class="legend-dot" style="background: var(--c-cond)"></span
+              >Cond1tion
+            </div>
+            <div class="chart-legend-item">
+              <span
+                class="legend-dot"
+                style="background: var(--c-hakkene)"
+              ></span
+              >Hakkene
+            </div>
+            <div class="chart-legend-item">
+              <span class="legend-dot" style="background: var(--c-nevi)"></span
+              >Nevi
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHIPS -->
+      <div class="section">
+        <div class="section-title">
+          Chip Analysis <span>Triple Captain &amp; Bench Boost</span>
+        </div>
+        <div class="two-col">
+          <div class="chip-card">
+            <div class="chip-card-title" style="color: #c8a014">
+              Triple Captain
+            </div>
+            <div class="chip-card-sub">
+              Gain = +1× captain points (3× instead of 2×)
+            </div>
+            <table class="chip-table">
+              <thead>
+                <tr>
+                  <th>Manager</th>
+                  <th>Week</th>
+                  <th>Gained</th>
+                  <th>Optimal</th>
+                  <th>Missed</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <span
+                      class="legend-dot"
+                      style="background: var(--c-hakkene)"
+                    ></span
+                    >Hakkene
+                  </td>
+                  <td>W2</td>
+                  <td class="gain-val">+92.2</td>
+                  <td class="text-muted">W4 101.1</td>
+                  <td class="loss-val">−8.9</td>
+                </tr>
+                <tr>
+                  <td>
+                    <span
+                      class="legend-dot"
+                      style="background: var(--c-sly)"
+                    ></span
+                    >SlyMarbo
+                  </td>
+                  <td>W7</td>
+                  <td class="gain-val">+86.4</td>
+                  <td class="text-muted">W6 107.9</td>
+                  <td class="loss-val">−21.5</td>
+                </tr>
+                <tr>
+                  <td>
+                    <span
+                      class="legend-dot"
+                      style="background: var(--c-cond)"
+                    ></span
+                    >Cond1tion
+                  </td>
+                  <td>W6</td>
+                  <td class="gain-val">+79.2</td>
+                  <td class="text-muted">W9 111.9</td>
+                  <td class="loss-val">−32.7</td>
+                </tr>
+                <tr>
+                  <td>
+                    <span
+                      class="legend-dot"
+                      style="background: var(--c-nevi)"
+                    ></span
+                    >Nevi
+                  </td>
+                  <td>W1</td>
+                  <td class="gain-val">+47.1</td>
+                  <td class="text-muted">W3 83.5</td>
+                  <td class="loss-val">−36.4</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="chip-card">
+            <div class="chip-card-title" style="color: #378add">
+              Bench Boost
+            </div>
+            <div class="chip-card-sub">
+              Gain = sub player points added to weekly total
+            </div>
+            <table class="chip-table">
+              <thead>
+                <tr>
+                  <th>Manager</th>
+                  <th>Week</th>
+                  <th>Gained</th>
+                  <th>Optimal</th>
+                  <th>Missed</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <span
+                      class="legend-dot"
+                      style="background: var(--c-sly)"
+                    ></span
+                    >SlyMarbo
+                  </td>
+                  <td>W6</td>
+                  <td class="gain-val">+74.1</td>
+                  <td class="text-muted">W6 74.1</td>
+                  <td><span class="perfect-badge">PERFECT</span></td>
+                </tr>
+                <tr>
+                  <td>
+                    <span
+                      class="legend-dot"
+                      style="background: var(--c-hakkene)"
+                    ></span
+                    >Hakkene
+                  </td>
+                  <td>W4</td>
+                  <td class="gain-val">+81.3</td>
+                  <td class="text-muted">W3 102.7</td>
+                  <td class="loss-val">−21.4</td>
+                </tr>
+                <tr>
+                  <td>
+                    <span
+                      class="legend-dot"
+                      style="background: var(--c-nevi)"
+                    ></span
+                    >Nevi
+                  </td>
+                  <td>W8</td>
+                  <td class="gain-val">+64.3</td>
+                  <td class="text-muted">W9 87.6</td>
+                  <td class="loss-val">−23.2</td>
+                </tr>
+                <tr>
+                  <td>
+                    <span
+                      class="legend-dot"
+                      style="background: var(--c-cond)"
+                    ></span
+                    >Cond1tion
+                  </td>
+                  <td>W8</td>
+                  <td class="gain-val">+60.7</td>
+                  <td class="text-muted">W9 95.9</td>
+                  <td class="loss-val">−35.2</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- BEST LINEUPS -->
+      <div class="section">
+        <div class="section-title">
+          Best Lineups <span>Each Manager's Peak Week</span>
+        </div>
+        <div class="four-col">
+          <div class="lineup-card">
+            <div class="lineup-header">
+              <span class="legend-dot" style="background: var(--c-sly)"></span
+              >SlyMarbo · W6 · BB
+            </div>
+            <div class="lineup-score" style="color: var(--c-sly)">712.64</div>
+            <div class="pick-row">
+              <span class="pick-pos pos-top">TOP</span
+              ><span class="pick-name">Kiin</span
+              ><span class="pick-pts">76.23</span>
+            </div>
+            <div class="pick-row">
+              <span class="pick-pos pos-jng">JNG</span
+              ><span class="pick-name">Canyon</span
+              ><span class="pick-pts">108.87</span>
+            </div>
+            <div class="pick-row">
+              <span class="pick-pos pos-mid">MID</span
+              ><span class="pick-name">Roamer</span
+              ><span class="pick-pts">65.76</span>
+            </div>
+            <div class="pick-row">
+              <span class="pick-pos pos-bot">BOT</span
+              ><span class="pick-name"
+                >Ruler<span class="capt-star">©</span></span
+              ><span class="pick-pts">107.85</span>
+            </div>
+            <div class="pick-row">
+              <span class="pick-pos pos-sup">SUP</span
+              ><span class="pick-name">Duro</span
+              ><span class="pick-pts">93.26</span>
+            </div>
+            <div class="pick-row">
+              <span class="pick-pos pos-sub">SUB</span
+              ><span class="pick-name">Teddy</span
+              ><span class="pick-pts">74.09</span>
+            </div>
+            <div class="pick-row">
+              <span class="pick-pos pos-team">TEAM</span
+              ><span class="pick-name">BRION</span
+              ><span class="pick-pts">78.75</span>
+            </div>
+          </div>
+
+          <div class="lineup-card">
+            <div class="lineup-header">
+              <span
+                class="legend-dot"
+                style="background: var(--c-hakkene)"
+              ></span
+              >Hakkene · W4 · BB
+            </div>
+            <div class="lineup-score" style="color: var(--c-hakkene)">
+              692.71
+            </div>
+            <div class="pick-row">
+              <span class="pick-pos pos-top">TOP</span
+              ><span class="pick-name">Siwoo</span
+              ><span class="pick-pts">52.21</span>
+            </div>
+            <div class="pick-row">
+              <span class="pick-pos pos-jng">JNG</span
+              ><span class="pick-name">Cuzz</span
+              ><span class="pick-pts">81.18</span>
+            </div>
+            <div class="pick-row">
+              <span class="pick-pos pos-mid">MID</span
+              ><span class="pick-name">Bdd<span class="capt-star">©</span></span
+              ><span class="pick-pts">101.06</span>
+            </div>
+            <div class="pick-row">
+              <span class="pick-pos pos-bot">BOT</span
+              ><span class="pick-name">Peyz</span
+              ><span class="pick-pts">94.06</span>
+            </div>
+            <div class="pick-row">
+              <span class="pick-pos pos-sup">SUP</span
+              ><span class="pick-name">Effort</span
+              ><span class="pick-pts">85.73</span>
+            </div>
+            <div class="pick-row">
+              <span class="pick-pos pos-sub">SUB</span
+              ><span class="pick-name">Lucid</span
+              ><span class="pick-pts">81.31</span>
+            </div>
+            <div class="pick-row">
+              <span class="pick-pos pos-team">TEAM</span
+              ><span class="pick-name">KT</span
+              ><span class="pick-pts">96.13</span>
+            </div>
+          </div>
+
+          <div class="lineup-card">
+            <div class="lineup-header">
+              <span class="legend-dot" style="background: var(--c-cond)"></span
+              >Cond1tion · W6 · TC
+            </div>
+            <div class="lineup-score" style="color: var(--c-cond)">559.58</div>
+            <div class="pick-row">
+              <span class="pick-pos pos-top">TOP</span
+              ><span class="pick-name">PerfecT</span
+              ><span class="pick-pts">30.13</span>
+            </div>
+            <div class="pick-row">
+              <span class="pick-pos pos-jng">JNG</span
+              ><span class="pick-name">Sponge</span
+              ><span class="pick-pts">56.45</span>
+            </div>
+            <div class="pick-row">
+              <span class="pick-pos pos-mid">MID</span
+              ><span class="pick-name"
+                >Zeka<span class="capt-star">©</span></span
+              ><span class="pick-pts">79.18</span>
+            </div>
+            <div class="pick-row">
+              <span class="pick-pos pos-bot">BOT</span
+              ><span class="pick-name">Diable</span
+              ><span class="pick-pts">60.42</span>
+            </div>
+            <div class="pick-row">
+              <span class="pick-pos pos-sup">SUP</span
+              ><span class="pick-name">Delight</span
+              ><span class="pick-pts">70.68</span>
+            </div>
+            <div class="pick-row">
+              <span class="pick-pos pos-team">TEAM</span
+              ><span class="pick-name">Gen.G</span
+              ><span class="pick-pts">104.38</span>
+            </div>
+          </div>
+
+          <div class="lineup-card">
+            <div class="lineup-header">
+              <span class="legend-dot" style="background: var(--c-nevi)"></span
+              >Nevi · W3
+            </div>
+            <div class="lineup-score" style="color: var(--c-nevi)">517.50</div>
+            <div class="pick-row">
+              <span class="pick-pos pos-top">TOP</span
+              ><span class="pick-name">Zeus</span
+              ><span class="pick-pts">65.80</span>
+            </div>
+            <div class="pick-row">
+              <span class="pick-pos pos-jng">JNG</span
+              ><span class="pick-name"
+                >Kanavi<span class="capt-star">©</span></span
+              ><span class="pick-pts">83.52</span>
+            </div>
+            <div class="pick-row">
+              <span class="pick-pos pos-mid">MID</span
+              ><span class="pick-name">Faker</span
+              ><span class="pick-pts">61.56</span>
+            </div>
+            <div class="pick-row">
+              <span class="pick-pos pos-bot">BOT</span
+              ><span class="pick-name">Aiming</span
+              ><span class="pick-pts">87.12</span>
+            </div>
+            <div class="pick-row">
+              <span class="pick-pos pos-sup">SUP</span
+              ><span class="pick-name">Keria</span
+              ><span class="pick-pts">44.37</span>
+            </div>
+            <div class="pick-row">
+              <span class="pick-pos pos-team">TEAM</span
+              ><span class="pick-name">HLE</span
+              ><span class="pick-pts">91.63</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROLE STATS -->
+      <div class="section">
+        <div class="section-title">
+          Role Performance
+          <span>Avg · Max · Min across all managers, all weeks</span>
+        </div>
+        <div class="role-grid">
+          <div class="role-card">
+            <div class="role-label" style="color: #ffd080">
+              BOT — highest scoring
+            </div>
+            <div class="role-avg" style="color: #ffd080">75.72</div>
+            <div class="role-bar-row">
+              <div class="role-bar-label">
+                <span>max</span><span>111.92</span>
+              </div>
+              <div class="role-bar-track">
+                <div
+                  class="role-bar-fill"
+                  style="width: 100%; background: #ffd080"
+                ></div>
+              </div>
+            </div>
+            <div class="role-bar-row" style="margin-top: 4px">
+              <div class="role-bar-label">
+                <span>avg</span><span>75.72</span>
+              </div>
+              <div class="role-bar-track">
+                <div
+                  class="role-bar-fill"
+                  style="width: 67.6%; background: #ffd08077"
+                ></div>
+              </div>
+            </div>
+            <div class="role-bar-row" style="margin-top: 4px">
+              <div class="role-bar-label">
+                <span>min</span><span>18.03</span>
+              </div>
+              <div class="role-bar-track">
+                <div
+                  class="role-bar-fill"
+                  style="width: 16.1%; background: #ffd08033"
+                ></div>
+              </div>
+            </div>
+          </div>
+          <div class="role-card">
+            <div class="role-label" style="color: #80aaff">MID</div>
+            <div class="role-avg" style="color: #80aaff">64.63</div>
+            <div class="role-bar-row">
+              <div class="role-bar-label">
+                <span>max</span><span>101.84</span>
+              </div>
+              <div class="role-bar-track">
+                <div
+                  class="role-bar-fill"
+                  style="width: 91%; background: #80aaff"
+                ></div>
+              </div>
+            </div>
+            <div class="role-bar-row" style="margin-top: 4px">
+              <div class="role-bar-label">
+                <span>avg</span><span>64.63</span>
+              </div>
+              <div class="role-bar-track">
+                <div
+                  class="role-bar-fill"
+                  style="width: 57.8%; background: #80aaff77"
+                ></div>
+              </div>
+            </div>
+            <div class="role-bar-row" style="margin-top: 4px">
+              <div class="role-bar-label">
+                <span>min</span><span>37.54</span>
+              </div>
+              <div class="role-bar-track">
+                <div
+                  class="role-bar-fill"
+                  style="width: 33.6%; background: #80aaff33"
+                ></div>
+              </div>
+            </div>
+          </div>
+          <div class="role-card">
+            <div class="role-label" style="color: #80dd80">JNG</div>
+            <div class="role-avg" style="color: #80dd80">61.40</div>
+            <div class="role-bar-row">
+              <div class="role-bar-label">
+                <span>max</span><span>108.87</span>
+              </div>
+              <div class="role-bar-track">
+                <div
+                  class="role-bar-fill"
+                  style="width: 97.3%; background: #80dd80"
+                ></div>
+              </div>
+            </div>
+            <div class="role-bar-row" style="margin-top: 4px">
+              <div class="role-bar-label">
+                <span>avg</span><span>61.40</span>
+              </div>
+              <div class="role-bar-track">
+                <div
+                  class="role-bar-fill"
+                  style="width: 54.9%; background: #80dd8077"
+                ></div>
+              </div>
+            </div>
+            <div class="role-bar-row" style="margin-top: 4px">
+              <div class="role-bar-label">
+                <span>min</span><span>30.28</span>
+              </div>
+              <div class="role-bar-track">
+                <div
+                  class="role-bar-fill"
+                  style="width: 27.1%; background: #80dd8033"
+                ></div>
+              </div>
+            </div>
+          </div>
+          <div class="role-card">
+            <div class="role-label" style="color: #ff8080">TOP</div>
+            <div class="role-avg" style="color: #ff8080">52.93</div>
+            <div class="role-bar-row">
+              <div class="role-bar-label">
+                <span>max</span><span>79.21</span>
+              </div>
+              <div class="role-bar-track">
+                <div
+                  class="role-bar-fill"
+                  style="width: 70.8%; background: #ff8080"
+                ></div>
+              </div>
+            </div>
+            <div class="role-bar-row" style="margin-top: 4px">
+              <div class="role-bar-label">
+                <span>avg</span><span>52.93</span>
+              </div>
+              <div class="role-bar-track">
+                <div
+                  class="role-bar-fill"
+                  style="width: 47.3%; background: #ff808077"
+                ></div>
+              </div>
+            </div>
+            <div class="role-bar-row" style="margin-top: 4px">
+              <div class="role-bar-label">
+                <span>min</span><span>18.22</span>
+              </div>
+              <div class="role-bar-track">
+                <div
+                  class="role-bar-fill"
+                  style="width: 16.3%; background: #ff808033"
+                ></div>
+              </div>
+            </div>
+          </div>
+          <div class="role-card">
+            <div class="role-label" style="color: #d080ff">SUP</div>
+            <div class="role-avg" style="color: #d080ff">52.56</div>
+            <div class="role-bar-row">
+              <div class="role-bar-label">
+                <span>max</span><span>93.26</span>
+              </div>
+              <div class="role-bar-track">
+                <div
+                  class="role-bar-fill"
+                  style="width: 83.4%; background: #d080ff"
+                ></div>
+              </div>
+            </div>
+            <div class="role-bar-row" style="margin-top: 4px">
+              <div class="role-bar-label">
+                <span>avg</span><span>52.56</span>
+              </div>
+              <div class="role-bar-track">
+                <div
+                  class="role-bar-fill"
+                  style="width: 47%; background: #d080ff77"
+                ></div>
+              </div>
+            </div>
+            <div class="role-bar-row" style="margin-top: 4px">
+              <div class="role-bar-label">
+                <span>min</span><span>21.92</span>
+              </div>
+              <div class="role-bar-track">
+                <div
+                  class="role-bar-fill"
+                  style="width: 19.6%; background: #d080ff33"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CAPTAIN CHOICES -->
+      <div class="section">
+        <div class="section-title">
+          Captain Choices <span>9 rounds — who they trusted each week</span>
+        </div>
+        <div class="capt-grid">
+          <div class="capt-card">
+            <div class="capt-card-name">
+              <span class="legend-dot" style="background: var(--c-sly)"></span
+              >SlyMarbo
+            </div>
+            <div class="capt-row">
+              <span class="capt-count">8×</span
+              ><span class="capt-player"
+                >Ruler <span class="text-muted">(bot · GEN)</span></span
+              ><span class="capt-avg">avg 81.9 pts</span>
+            </div>
+            <div class="capt-row">
+              <span class="capt-count">1×</span
+              ><span class="capt-player"
+                >Lucid <span class="text-muted">(jng · DK)</span></span
+              ><span class="capt-avg">51.5 pts</span>
+            </div>
+          </div>
+
+          <div class="capt-card">
+            <div class="capt-card-name">
+              <span class="legend-dot" style="background: var(--c-cond)"></span
+              >Cond1tion
+            </div>
+            <div class="capt-row">
+              <span class="capt-count">3×</span
+              ><span class="capt-player"
+                >Chovy <span class="text-muted">(mid · GEN)</span></span
+              ><span class="capt-avg">avg 77.2 pts</span>
+            </div>
+            <div class="capt-row">
+              <span class="capt-count">3×</span
+              ><span class="capt-player"
+                >Gumayusi <span class="text-muted">(bot · HLE)</span></span
+              ><span class="capt-avg">avg 77.8 pts</span>
+            </div>
+            <div class="capt-row">
+              <span class="capt-count">2×</span
+              ><span class="capt-player"
+                >Zeka <span class="text-muted">(mid · HLE)</span></span
+              ><span class="capt-avg">avg 83.6 pts</span>
+            </div>
+            <div class="capt-row">
+              <span class="capt-count">1×</span
+              ><span class="capt-player"
+                >Peyz <span class="text-muted">(bot · T1)</span></span
+              ><span class="capt-avg">111.9 pts</span>
+            </div>
+          </div>
+
+          <div class="capt-card">
+            <div class="capt-card-name">
+              <span
+                class="legend-dot"
+                style="background: var(--c-hakkene)"
+              ></span
+              >Hakkene
+            </div>
+            <div class="capt-row">
+              <span class="capt-count">4×</span
+              ><span class="capt-player"
+                >Bdd <span class="text-muted">(mid · KT)</span></span
+              ><span class="capt-avg">avg 79.0 pts</span>
+            </div>
+            <div class="capt-row">
+              <span class="capt-count">1×</span
+              ><span class="capt-player"
+                >Smash <span class="text-muted">(bot)</span></span
+              ><span class="capt-avg">95.9 pts</span>
+            </div>
+            <div class="capt-row">
+              <span class="capt-count">1×</span
+              ><span class="capt-player"
+                >Gumayusi <span class="text-muted">(bot · HLE)</span></span
+              ><span class="capt-avg">83.4 pts</span>
+            </div>
+            <div class="capt-row">
+              <span class="capt-count">3×</span
+              ><span class="capt-player"
+                >others
+                <span class="text-muted">(VicLa, GIDEON, Taeyoon)</span></span
+              ><span class="capt-avg">—</span>
+            </div>
+          </div>
+
+          <div class="capt-card">
+            <div class="capt-card-name">
+              <span class="legend-dot" style="background: var(--c-nevi)"></span
+              >Nevi
+            </div>
+            <div class="capt-row">
+              <span class="capt-count">7×</span
+              ><span class="capt-player"
+                >Kanavi <span class="text-muted">(jng · HLE)</span></span
+              ><span class="capt-avg">avg 66.5 pts</span>
+            </div>
+            <div class="capt-row">
+              <span class="capt-count">2×</span
+              ><span class="capt-player"
+                >Faker <span class="text-muted">(mid · T1)</span></span
+              ><span class="capt-avg">avg 46.8 pts</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB BENCH -->
+      <div class="section">
+        <div class="section-title">
+          Sub Bench Impact <span>Did they start the right player?</span>
+        </div>
+        <div class="sub-wrapper">
+          <table class="sub-table">
+            <thead>
+              <tr>
+                <th>Manager</th>
+                <th>Wks Sub Better</th>
+                <th>Total Pts Missed</th>
+                <th>Net Sub Impact</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <span
+                    class="legend-dot"
+                    style="background: var(--c-sly)"
+                  ></span
+                  ><strong>SlyMarbo</strong>
+                </td>
+                <td>1 / 9</td>
+                <td class="text-muted">1.45</td>
+                <td class="loss-val">−107.96</td>
+                <td class="text-muted" style="font-size: 0.8rem">
+                  Best active roster decisions — sub almost never helped
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span
+                    class="legend-dot"
+                    style="background: var(--c-nevi)"
+                  ></span
+                  ><strong>Nevi</strong>
+                </td>
+                <td>5 / 9</td>
+                <td class="text-muted">74.60</td>
+                <td class="gain-val">+14.75</td>
+                <td class="text-muted" style="font-size: 0.8rem">
+                  Oner consistently outperformed Kanavi in second half
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span
+                    class="legend-dot"
+                    style="background: var(--c-hakkene)"
+                  ></span
+                  ><strong>Hakkene</strong>
+                </td>
+                <td>5 / 9</td>
+                <td class="text-muted">73.01</td>
+                <td class="loss-val">−9.25</td>
+                <td class="text-muted" style="font-size: 0.8rem">
+                  Close — big misses balanced by good weeks
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span
+                    class="legend-dot"
+                    style="background: var(--c-cond)"
+                  ></span
+                  ><strong>Cond1tion</strong>
+                </td>
+                <td>4 / 9</td>
+                <td class="text-muted">75.12</td>
+                <td class="loss-val">−48.13</td>
+                <td class="text-muted" style="font-size: 0.8rem">
+                  Most value left on bench — costly positional mismatches
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PLAYER HIGHLIGHTS -->
+      <div class="section">
+        <div class="section-title">Player Highlights</div>
+        <div class="insight-grid">
+          <div class="insight-card">
+            <div class="insight-label">Season MVP</div>
+            <div class="insight-name">Ruler</div>
+            <div class="insight-meta">
+              BOT · Gen.G · owned by SlyMarbo all 9 weeks
+            </div>
+            <div class="stat-row">
+              <div class="stat-box">
+                <div class="stat-box-val">8×</div>
+                <div class="stat-box-lbl">Times Captained</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-box-val">81.9</div>
+                <div class="stat-box-lbl">Avg / Wk as Capt</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-box-val">107.85</div>
+                <div class="stat-box-lbl">Best Week</div>
+              </div>
+            </div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-label">Breakout Player</div>
+            <div class="insight-name">Canyon</div>
+            <div class="insight-meta">
+              JNG · Gen.G · 108.87 pts in W6 — highest jng week of the split
+            </div>
+            <div class="stat-row">
+              <div class="stat-box">
+                <div class="stat-box-val">108.87</div>
+                <div class="stat-box-lbl">Peak Week</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-box-val">1</div>
+                <div class="stat-box-lbl">Manager Owned</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-box-val">W6</div>
+                <div class="stat-box-lbl">Best Round</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEASON AWARDS -->
+      <div class="section">
+        <div class="section-title">Season Awards</div>
+        <div class="awards-grid">
+          <div class="award-card">
+            <div class="award-icon">🏆</div>
+            <div>
+              <div class="award-title">Champion</div>
+              <div class="award-desc">
+                <strong>SlyMarbo</strong> — 4338.69 pts. Slow start (W2: 345)
+                but an explosive second half — averaged 574.5 pts/week in W6–W9.
+              </div>
+            </div>
+          </div>
+          <div class="award-card">
+            <div class="award-icon">🎯</div>
+            <div>
+              <div class="award-title">Chip Master</div>
+              <div class="award-desc">
+                <strong>SlyMarbo</strong> — Only manager to play Bench Boost on
+                the perfect week. W6: gained exactly the maximum possible +74.1
+                pts. TC also well-timed in W7.
+              </div>
+            </div>
+          </div>
+          <div class="award-card">
+            <div class="award-icon">👑</div>
+            <div>
+              <div class="award-title">Ruler Loyalist</div>
+              <div class="award-desc">
+                <strong>SlyMarbo</strong> — Captained Ruler 8/9 weeks (avg 81.9
+                pts). The one week they switched to Lucid: 51.5 pts. Loyalty was
+                the right call.
+              </div>
+            </div>
+          </div>
+          <div class="award-card">
+            <div class="award-icon">🎢</div>
+            <div>
+              <div class="award-title">Rollercoaster Season</div>
+              <div class="award-desc">
+                <strong>Hakkene</strong> — Lowest week of the split (W1: 305.55)
+                AND one of the highest (W4: 692.71). A 387-point swing between
+                worst and best.
+              </div>
+            </div>
+          </div>
+          <div class="award-card">
+            <div class="award-icon">💼</div>
+            <div>
+              <div class="award-title">Best Squad Builder</div>
+              <div class="award-desc">
+                <strong>SlyMarbo</strong> — Sub outscored the active slot in
+                only 1 of 9 weeks. Net sub impact: −107.96, meaning they
+                consistently picked the right starter.
+              </div>
+            </div>
+          </div>
+          <div class="award-card">
+            <div class="award-icon">📈</div>
+            <div>
+              <div class="award-title">Most Consistent</div>
+              <div class="award-desc">
+                <strong>Nevi</strong> — Std dev of just 29.9 pts/week — never
+                had a disaster week (407 floor) and never needed a monster week
+                to stay competitive.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="divider" />
+      <div
+        style="
+          text-align: center;
+          font-size: 0.75rem;
+          color: var(--color-text-secondary);
+        "
+      >
+        LolFantasy.pl · LCK Split 2 2026 · League 28 · Generated 2026-06-01
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const weeks = ["W1", "W2", "W3", "W4", "W5", "W6", "W7", "W8", "W9"];
+        const datasets = [
+          {
+            label: "SlyMarbo",
+            color: "#378add",
+            data: [
+              400.99, 345.81, 446.49, 513.26, 333.9, 712.64, 581.41, 433.51,
+              570.68,
+            ],
+          },
+          {
+            label: "Cond1tion",
+            color: "#d85a30",
+            data: [
+              351.09, 397.54, 501.33, 496.14, 347.64, 559.58, 513.59, 533.17,
+              528.25,
+            ],
+          },
+          {
+            label: "Hakkene",
+            color: "#5dcaa5",
+            data: [
+              305.55, 657.61, 439.37, 692.71, 322.37, 441.48, 487.52, 357.66,
+              480.21,
+            ],
+          },
+          {
+            label: "Nevi",
+            color: "#c8a014",
+            data: [
+              407.26, 453.12, 517.5, 480.21, 467.95, 447.04, 454.04, 486.88,
+              437.12,
+            ],
+          },
+        ];
+        const ctx = document.getElementById("weeklyChart").getContext("2d");
+        new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: weeks,
+            datasets: datasets.map((d) => ({
+              label: d.label,
+              data: d.data,
+              borderColor: d.color,
+              backgroundColor: d.color + "14",
+              borderWidth: 2.5,
+              pointRadius: 4,
+              pointHoverRadius: 7,
+              tension: 0.35,
+              fill: false,
+            })),
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: "index", intersect: false },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: "#1e1e2e",
+                borderColor: "#2a2a38",
+                borderWidth: 1,
+                titleColor: "#f0f0f0",
+                bodyColor: "#a0a0b0",
+                padding: 12,
+                callbacks: {
+                  label: (ctx) =>
+                    ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}`,
+                },
+              },
+            },
+            scales: {
+              x: {
+                grid: { color: "rgba(255,255,255,.05)" },
+                ticks: { color: "#a0a0b0", font: { size: 11 } },
+                border: { color: "rgba(255,255,255,.08)" },
+              },
+              y: {
+                min: 250,
+                grid: { color: "rgba(255,255,255,.05)" },
+                ticks: { color: "#a0a0b0", font: { size: 11 } },
+                border: { color: "rgba(255,255,255,.08)" },
+              },
+            },
+          },
+        });
+      })();
+    </script>
+  </body>
+</html>
