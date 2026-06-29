@@ -299,6 +299,21 @@
                       MSI 2024
                     </a>
                   </li> -->
+
+                  <li>
+                    <a
+                      :class="{
+                        'active-tournament':
+                          this.$store.getters.getCurrentTournamentId ===
+                          this.msi_2026,
+                      }"
+                      class="dropdown-item"
+                      href="#"
+                      @click="switchTournament(this.msi_2026)"
+                    >
+                      MSI 2026
+                    </a>
+                  </li>
                   <li>
                     <a
                       :class="{

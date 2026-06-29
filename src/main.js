@@ -21,7 +21,7 @@ app.config.globalProperties.apiURL =
 // app.config.globalProperties.apiURL = "https://localhost:7061/";
 // app.config.globalProperties.apiURL =
 //   import.meta.env.VITE_API_BASE_URL || "https://api.lolfantasy.pl";
-app.config.globalProperties.currentTournament = "115548128960088078";
+app.config.globalProperties.currentTournament = "115570934354631452";
 app.config.globalProperties.worlds_2023 = "110852926142971547";
 app.config.globalProperties.msi_2024 = "112099354464733424";
 app.config.globalProperties.worlds_2024 = "112966669920590211";
@@ -29,6 +29,7 @@ app.config.globalProperties.msi_2025 = "113470835034591734";
 app.config.globalProperties.worlds_2025 = "113475452383887518";
 app.config.globalProperties.lec_split_1_2026 = "115548424304940735";
 app.config.globalProperties.lck_split_2_2026 = "115548128960088078";
+app.config.globalProperties.msi_2026 = "115570934354631452";
 
 app.config.globalProperties.tournaments = {
   "110852926142971547": "Worlds 2023",
@@ -38,6 +39,7 @@ app.config.globalProperties.tournaments = {
   "113475452383887518": "Worlds 2025",
   "115548424304940735": "LEC Split 1 2026",
   "115548128960088078": "LCK Split 2 2026",
+  "115570934354631452": "MSI 2026",
 };
 
 app.config.globalProperties.tournaments_icons = {
@@ -48,6 +50,7 @@ app.config.globalProperties.tournaments_icons = {
   "113475452383887518": "WORLDS",
   "115548424304940735": "LEC",
   "115548128960088078": "LCK",
+  "115570934354631452": "MSI",
 };
 
 app.config.globalProperties.$func_global = func_global;
