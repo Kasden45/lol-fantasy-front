@@ -1,118 +1,44 @@
 <template>
-  <div class="row team-row justify-content-start align-content-center">
-    <div class="col-xl-3 col-lg-4 col-md-5 col-sm-6 col-8 align-content-center">
-      <PlayerPoints
-        :is-triple="participantData.userTeam.chipUsed == 1"
-        :is-captain="participantData.userTeam.captain == 1"
-        @showDetails="showDetailsModal"
-        :playerPoints="participantData.userTeam.topPlayerPoints"
-        :matchesThisFixture="
-          playerMatchesFixture(participantData.userTeam.topPlayerPoints.player)
-        "
-        v-if="participantData.userTeam != null"
-        :role="'top'"
-        :teamPlayer="participantData.userTeam.topPlayerPoints.player"
-        :img_url="role_images['top']"
-        :roles_img_url="role_images"
-      />
-    </div>
-    <div class="col-xl-3 col-lg-4 col-md-5 col-sm-6 col-8 align-content-center">
-      <PlayerPoints
-        :is-triple="participantData.userTeam.chipUsed == 1"
-        :is-captain="participantData.userTeam.captain == 2"
-        @showDetails="showDetailsModal"
-        :playerPoints="participantData.userTeam.junglePlayerPoints"
-        :matchesThisFixture="
-          playerMatchesFixture(
-            participantData.userTeam.junglePlayerPoints.player,
-          )
-        "
-        v-if="participantData.userTeam != null"
-        :role="'jungle'"
-        :teamPlayer="participantData.userTeam.junglePlayerPoints.player"
-        :img_url="role_images['jungle']"
-        :roles_img_url="role_images"
-      />
-    </div>
-    <div class="col-xl-3 col-lg-4 col-md-5 col-sm-6 col-8 align-content-center">
-      <PlayerPoints
-        :is-triple="participantData.userTeam.chipUsed == 1"
-        :is-captain="participantData.userTeam.captain == 3"
-        @showDetails="showDetailsModal"
-        :playerPoints="participantData.userTeam.midPlayerPoints"
-        :matchesThisFixture="
-          playerMatchesFixture(participantData.userTeam.midPlayerPoints.player)
-        "
-        v-if="participantData.userTeam != null"
-        :role="'mid'"
-        :teamPlayer="participantData.userTeam.midPlayerPoints.player"
-        :img_url="role_images['mid']"
-        :roles_img_url="role_images"
-      />
-    </div>
+  <div class="row team-row justify-content-start align-content-center" v-if="participantData.userTeam != null">
     <div
-      class="col-xl-3 col-lg-4 col-md-5 col-sm-6 col-8 col-offset-2 align-content-center"
+      v-for="(slotData, index) in participantData.userTeam.playersPoints.filter(s => s.slot !== 'sub')"
+      :key="slotData.slot"
+      class="col-xl-3 col-lg-4 col-md-5 col-sm-6 col-8 align-content-center"
     >
       <PlayerPoints
         :is-triple="participantData.userTeam.chipUsed == 1"
-        :is-captain="participantData.userTeam.captain == 4"
+        :is-captain="participantData.userTeam.captain == index + 1"
         @showDetails="showDetailsModal"
-        :playerPoints="participantData.userTeam.bottomPlayerPoints"
-        :matchesThisFixture="
-          playerMatchesFixture(
-            participantData.userTeam.bottomPlayerPoints.player,
-          )
-        "
-        v-if="participantData.userTeam != null"
-        :role="'bottom'"
-        :teamPlayer="participantData.userTeam.bottomPlayerPoints.player"
-        :img_url="role_images['bottom']"
-        :roles_img_url="role_images"
-      />
-    </div>
-    <div class="col-xl-3 col-lg-4 col-md-5 col-sm-6 col-8 align-content-center">
-      <PlayerPoints
-        :is-triple="participantData.userTeam.chipUsed == 1"
-        :is-captain="participantData.userTeam.captain == 5"
-        @showDetails="showDetailsModal"
-        :playerPoints="participantData.userTeam.supportPlayerPoints"
-        :matchesThisFixture="
-          playerMatchesFixture(
-            participantData.userTeam.supportPlayerPoints.player,
-          )
-        "
-        v-if="participantData.userTeam != null"
-        :role="'support'"
-        :teamPlayer="participantData.userTeam.supportPlayerPoints.player"
-        :img_url="role_images['support']"
+        :playerPoints="slotData"
+        :matchesThisFixture="playerMatchesFixture(slotData.player)"
+        :role="slotData.slot"
+        :teamPlayer="slotData.player"
+        :img_url="role_images[slotData.slot]"
         :roles_img_url="role_images"
       />
     </div>
     <div class="col-xl-3 col-lg-4 col-md-5 col-sm-6 col-8 align-content-center">
       <TeamPoints
-        v-if="participantData.userTeam != null"
         :role="'team'"
         @showDetails="showDetailsModal"
         :teamTeam="participantData.userTeam.teamPoints.team"
-        :matchesThisFixture="
-          playerMatchesFixture(participantData.userTeam.teamPoints.team)
-        "
+        :matchesThisFixture="playerMatchesFixture(participantData.userTeam.teamPoints.team)"
         :teamPoints="participantData.userTeam.teamPoints"
         :img_url="role_images['team']"
         :roles_img_url="role_images"
       />
     </div>
-    <div class="col-xl-3 col-lg-4 col-md-5 col-sm-6 col-8 align-content-center">
+    <div
+      v-if="participantData.userTeam.playersPoints.find(s => s.slot === 'sub')"
+      class="col-xl-3 col-lg-4 col-md-5 col-sm-6 col-8 align-content-center"
+    >
       <PlayerPoints
         @showDetails="showDetailsModal"
-        :playerPoints="participantData.userTeam.subPlayerPoints"
-        :matchesThisFixture="
-          playerMatchesFixture(participantData.userTeam.subPlayerPoints.player)
-        "
+        :playerPoints="participantData.userTeam.playersPoints.find(s => s.slot === 'sub')"
+        :matchesThisFixture="playerMatchesFixture(participantData.userTeam.playersPoints.find(s => s.slot === 'sub')?.player)"
         :isbenchboost="participantData.userTeam.chipUsed == 4"
-        v-if="participantData.userTeam != null"
         :role="'sub'"
-        :teamPlayer="participantData.userTeam.subPlayerPoints.player"
+        :teamPlayer="participantData.userTeam.playersPoints.find(s => s.slot === 'sub')?.player"
         :img_url="role_images['sub']"
         :roles_img_url="role_images"
       />
@@ -222,26 +148,10 @@ export default {
 
       // Collect all gamesPointsDetails across all slots (excluding sub)
       const slots = [
-        {
-          points: userTeam.topPlayerPoints,
-          code: userTeam.topPlayerPoints?.player?.team?.code,
-        },
-        {
-          points: userTeam.junglePlayerPoints,
-          code: userTeam.junglePlayerPoints?.player?.team?.code,
-        },
-        {
-          points: userTeam.midPlayerPoints,
-          code: userTeam.midPlayerPoints?.player?.team?.code,
-        },
-        {
-          points: userTeam.bottomPlayerPoints,
-          code: userTeam.bottomPlayerPoints?.player?.team?.code,
-        },
-        {
-          points: userTeam.supportPlayerPoints,
-          code: userTeam.supportPlayerPoints?.player?.team?.code,
-        },
+        ...(userTeam.playersPoints ?? []).map((s) => ({
+          points: s,
+          code: s.player?.team?.code,
+        })),
         { points: userTeam.teamPoints, code: userTeam.teamPoints?.team?.code },
       ];
 
@@ -313,13 +223,14 @@ export default {
   },
   methods: {
     playerMatchesFixture(entity) {
+      if (!entity) return [];
       return this.fixtureGames.filter((game) => {
         if (entity.code) {
           return (
             game.fixtureId == this.fixture.id &&
             (game.gameTeam1 == entity.code || game.gameTeam2 == entity.code)
           );
-        } else if (entity.team.code) {
+        } else if (entity.team?.code) {
           return (
             game.fixtureId == this.fixture.id &&
             (game.gameTeam1 == entity.team.code ||
@@ -352,58 +263,12 @@ export default {
     },
     correctEmptyPlayers() {
       if (this.participantData.userTeam == null) return;
-
-      if (
-        this.participantData.userTeam.topPlayerPoints.gamesPointsDetails
-          .length == 0
-      ) {
-        this.participantData.userTeam.topPlayerPoints.gamesPointsDetails = [
-          this.participantData.userTeam.topPlayerPoints.player,
-        ];
+      for (const slot of this.participantData.userTeam.playersPoints ?? []) {
+        if (!slot.gamesPointsDetails?.length) {
+          slot.gamesPointsDetails = [slot.player];
+        }
       }
-      if (
-        this.participantData.userTeam.junglePlayerPoints.gamesPointsDetails
-          .length == 0
-      ) {
-        this.participantData.userTeam.junglePlayerPoints.gamesPointsDetails = [
-          this.participantData.userTeam.junglePlayerPoints.player,
-        ];
-      }
-      if (
-        this.participantData.userTeam.midPlayerPoints.gamesPointsDetails
-          .length == 0
-      ) {
-        this.participantData.userTeam.midPlayerPoints.gamesPointsDetails = [
-          this.participantData.userTeam.midPlayerPoints.player,
-        ];
-      }
-      if (
-        this.participantData.userTeam.bottomPlayerPoints.gamesPointsDetails
-          .length == 0
-      ) {
-        this.participantData.userTeam.bottomPlayerPoints.gamesPointsDetails = [
-          this.participantData.userTeam.bottomPlayerPoints.player,
-        ];
-      }
-      if (
-        this.participantData.userTeam.supportPlayerPoints.gamesPointsDetails
-          .length == 0
-      ) {
-        this.participantData.userTeam.supportPlayerPoints.gamesPointsDetails = [
-          this.participantData.userTeam.supportPlayerPoints.player,
-        ];
-      }
-      if (
-        this.participantData.userTeam.subPlayerPoints.gamesPointsDetails
-          .length == 0
-      ) {
-        this.participantData.userTeam.subPlayerPoints.gamesPointsDetails = [
-          this.participantData.userTeam.subPlayerPoints.player,
-        ];
-      }
-      if (
-        this.participantData.userTeam.teamPoints.gamesPointsDetails.length == 0
-      ) {
+      if (!this.participantData.userTeam.teamPoints?.gamesPointsDetails?.length) {
         this.participantData.userTeam.teamPoints.gamesPointsDetails = [
           this.participantData.userTeam.teamPoints.team,
         ];

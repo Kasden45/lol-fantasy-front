@@ -12,7 +12,6 @@ import "@fortawesome/fontawesome-free/css/all.css";
 // Create a Vue app instance
 const app = createApp(App);
 
-console.log("🚀 Starting app with API URL:", process.env.VUE_APP_API_BASE_URL);
 app.config.globalProperties.apiURL =
   process.env.VUE_APP_API_BASE_URL || "https://api.lolfantasy.pl/";
 

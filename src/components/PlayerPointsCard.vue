@@ -86,7 +86,6 @@ export default {
       handler(newPlayerDetails, oldPlayerDetails) {
         // React to prop changes here
         // playerDetails =
-        console.log(newPlayerDetails, oldPlayerDetails);
       },
       immediate: true, // This will trigger the handler immediately when the component is created
     },

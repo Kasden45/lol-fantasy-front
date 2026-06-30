@@ -144,11 +144,9 @@ export default {
   },
   methods: {
     handlePositionClickSwap(role) {
-      console.log("Swap click on position:", role);
       this.$emit("choose-role", role);
     },
     handlePositionSwapPlayer(player) {
-      console.log("Swap click on player:", player);
       this.$emit("choose-player", player, this.ownTeam, this.profileId);
     },
     handlePositionClick(position) {

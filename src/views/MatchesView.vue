@@ -58,7 +58,6 @@ export default {
     this.getCurrentFixture();
     this.getFixtures();
     // this.profile =
-    console.log(this.profile);
   },
   updated() {},
   methods: {
@@ -122,13 +121,10 @@ export default {
         .get(url)
         .then((response) => {
           this.$store.commit("setFixtureId", response.data);
-          console.log("Current fixture: ", this.$store.getters.getFixtureId);
 
           // this.$router.push({name: 'LeaguesView'})
         })
-        .catch((error) => {
-          console.log(error.response);
-        });
+        .catch((error) => {});
     },
     getFixtures() {
       const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixtures`;
@@ -148,9 +144,7 @@ export default {
           this.positionScroll();
           // this.$router.push({name: 'LeaguesView'})
         })
-        .catch((error) => {
-          console.log(error.response);
-        });
+        .catch((error) => {});
     },
     fetchMatches() {
       const url = `${this.apiURL}Config/${this.$store.getters.getCurrentTournamentId}/fetchMatches`;
@@ -160,9 +154,7 @@ export default {
         .then((response) => {
           this.$router.push({ name: "MatchesView" });
         })
-        .catch((error) => {
-          console.log(error.response);
-        });
+        .catch((error) => {});
     },
   },
   computed: {

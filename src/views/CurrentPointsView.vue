@@ -74,64 +74,14 @@
             ref="pointsContainer"
           >
             <PlayerPointsGamesCard
+              v-for="(slot, index) in teamPlayers.playersPoints"
+              :key="slot.slot"
               class="team-points-details"
               :gamesList="fixtureGames"
-              :isCaptain="teamPlayers.captain == 1"
-              :key="teamPlayers"
-              :gamesPointsDetails="
-                teamPlayers.topPlayerPoints.gamesPointsDetails
-              "
-              :totalPointsA="teamPlayers.topPlayerPoints.totalPoints"
-            />
-            <PlayerPointsGamesCard
-              class="team-points-details"
-              :gamesList="fixtureGames"
-              :isCaptain="teamPlayers.captain == 2"
-              :key="teamPlayers"
-              :gamesPointsDetails="
-                teamPlayers.junglePlayerPoints.gamesPointsDetails
-              "
-              :totalPointsA="teamPlayers.junglePlayerPoints.totalPoints"
-            />
-            <PlayerPointsGamesCard
-              class="team-points-details"
-              :gamesList="fixtureGames"
-              :isCaptain="teamPlayers.captain == 3"
-              :key="teamPlayers"
-              :gamesPointsDetails="
-                teamPlayers.midPlayerPoints.gamesPointsDetails
-              "
-              :totalPointsA="teamPlayers.midPlayerPoints.totalPoints"
-            />
-            <PlayerPointsGamesCard
-              class="team-points-details"
-              :gamesList="fixtureGames"
-              :isCaptain="teamPlayers.captain == 4"
-              :key="teamPlayers"
-              :gamesPointsDetails="
-                teamPlayers.bottomPlayerPoints.gamesPointsDetails
-              "
-              :totalPointsA="teamPlayers.bottomPlayerPoints.totalPoints"
-            />
-            <PlayerPointsGamesCard
-              class="team-points-details"
-              :gamesList="fixtureGames"
-              :isCaptain="teamPlayers.captain == 5"
-              :key="teamPlayers"
-              :gamesPointsDetails="
-                teamPlayers.supportPlayerPoints.gamesPointsDetails
-              "
-              :totalPointsA="teamPlayers.supportPlayerPoints.totalPoints"
-            />
-            <PlayerPointsGamesCard
-              class="team-points-details"
-              :gamesList="fixtureGames"
-              :isSub="true"
-              :key="teamPlayers"
-              :gamesPointsDetails="
-                teamPlayers.subPlayerPoints.gamesPointsDetails
-              "
-              :totalPointsA="teamPlayers.subPlayerPoints.totalPoints"
+              :isCaptain="slot.slot !== 'sub' && teamPlayers.captain == index + 1"
+              :isSub="slot.slot === 'sub'"
+              :gamesPointsDetails="slot.gamesPointsDetails"
+              :totalPointsA="slot.totalPoints"
             />
             <TeamPointsGamesCard
               class="team-points-details"
@@ -275,7 +225,6 @@ export default {
     },
     selectTab(index, fixture) {
       this.selectedTabIndex = index;
-      console.log(this.selectedTabIndex);
       this.teamPlayers = null;
       this.fetchUserTeamFixture(fixture);
       // this.currentLeague = this.fixturesData.fixtures.find((element) => element.fixture == fixture);
@@ -294,7 +243,6 @@ export default {
           this.fillMapPlayers();
         })
         .catch((error) => {
-          console.error("Error fetching team players:", error);
           this.errorUserTeamFixture = "No team found for this fixture";
         });
     },
@@ -305,12 +253,10 @@ export default {
         .get(url)
         .then((response) => {
           this.$store.commit("setFixtureId", response.data);
-          console.log("Current fixture: ", this.$store.getters.getFixtureId);
 
           // this.$router.push({name: 'LeaguesView'})
         })
         .catch((error) => {
-          console.log(error.response);
           this.errorUserTeamFixture = "No team found for this fixture";
         });
     },
@@ -328,7 +274,6 @@ export default {
           this.fillMapPlayers();
         })
         .catch((error) => {
-          console.error("Error fetching team players:", error);
           this.errorUserTeamFixture = "No team found for this fixture";
         });
     },
@@ -343,71 +288,22 @@ export default {
       };
     },
     fillMapPlayers() {
-      console.log("filling");
       this.playersForSummonersRiftView = [];
-      this.playersForSummonersRiftView.push(
-        this.teamPlayerToMapPlayer(
-          this.teamPlayers.topPlayerPoints,
-          this.teamPlayers.captain == 1
-        )
-      );
-      this.playersForSummonersRiftView.push(
-        this.teamPlayerToMapPlayer(
-          this.teamPlayers.junglePlayerPoints,
-          this.teamPlayers.captain == 2
-        )
-      );
-      this.playersForSummonersRiftView.push(
-        this.teamPlayerToMapPlayer(
-          this.teamPlayers.midPlayerPoints,
-          this.teamPlayers.captain == 3
-        )
-      );
-      this.playersForSummonersRiftView.push(
-        this.teamPlayerToMapPlayer(
-          this.teamPlayers.bottomPlayerPoints,
-          this.teamPlayers.captain == 4
-        )
-      );
-      this.playersForSummonersRiftView.push(
-        this.teamPlayerToMapPlayer(
-          this.teamPlayers.supportPlayerPoints,
-          this.teamPlayers.captain == 5
-        )
-      );
+      (this.teamPlayers.playersPoints ?? [])
+        .filter((s) => s.slot !== "sub")
+        .forEach((slot, index) => {
+          this.playersForSummonersRiftView.push(
+            this.teamPlayerToMapPlayer(slot, this.teamPlayers.captain == index + 1)
+          );
+        });
     },
     correctEmptyPlayers() {
-      if (this.teamPlayers.topPlayerPoints.gamesPointsDetails.length == 0) {
-        this.teamPlayers.topPlayerPoints.gamesPointsDetails = [
-          this.teamPlayers.topPlayerPoints.player,
-        ];
+      for (const slot of this.teamPlayers.playersPoints ?? []) {
+        if (!slot.gamesPointsDetails?.length) {
+          slot.gamesPointsDetails = [slot.player];
+        }
       }
-      if (this.teamPlayers.junglePlayerPoints.gamesPointsDetails.length == 0) {
-        this.teamPlayers.junglePlayerPoints.gamesPointsDetails = [
-          this.teamPlayers.junglePlayerPoints.player,
-        ];
-      }
-      if (this.teamPlayers.midPlayerPoints.gamesPointsDetails.length == 0) {
-        this.teamPlayers.midPlayerPoints.gamesPointsDetails = [
-          this.teamPlayers.midPlayerPoints.player,
-        ];
-      }
-      if (this.teamPlayers.bottomPlayerPoints.gamesPointsDetails.length == 0) {
-        this.teamPlayers.bottomPlayerPoints.gamesPointsDetails = [
-          this.teamPlayers.bottomPlayerPoints.player,
-        ];
-      }
-      if (this.teamPlayers.supportPlayerPoints.gamesPointsDetails.length == 0) {
-        this.teamPlayers.supportPlayerPoints.gamesPointsDetails = [
-          this.teamPlayers.supportPlayerPoints.player,
-        ];
-      }
-      if (this.teamPlayers.subPlayerPoints.gamesPointsDetails.length == 0) {
-        this.teamPlayers.subPlayerPoints.gamesPointsDetails = [
-          this.teamPlayers.subPlayerPoints.player,
-        ];
-      }
-      if (this.teamPlayers.teamPoints.gamesPointsDetails.length == 0) {
+      if (!this.teamPlayers.teamPoints?.gamesPointsDetails?.length) {
         this.teamPlayers.teamPoints.gamesPointsDetails = [
           this.teamPlayers.teamPoints.team,
         ];
@@ -422,7 +318,6 @@ export default {
           this.fixtureGames = response.data;
         })
         .catch((error) => {
-          console.error("Error fetching fixture games:", error);
         });
     },
   },
@@ -454,7 +349,6 @@ export default {
         //   });
       })
       .catch((error) => {
-        console.log(error.response);
       });
 
     this.FetchFixtureGames();

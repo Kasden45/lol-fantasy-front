@@ -48,8 +48,6 @@ export default {
   },
   methods: {
     getGameHeader(gameId) {
-      console.log(gameId);
-      console.log(this.gamesList);
       var game = this.gamesList.find((game) => game.gameId === gameId);
       if (!game) return "";
       var teamCode = this.gamesPointsDetails[0].code;
@@ -65,7 +63,6 @@ export default {
     },
     selectGame(index) {
       this.selectedGameIndex = index;
-      console.log(this.selectedGame.pointsDetails);
     },
   },
 };

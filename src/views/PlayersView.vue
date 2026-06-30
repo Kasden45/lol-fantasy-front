@@ -141,7 +141,6 @@ export default {
           }));
         })
         .catch((error) => {
-          console.error("Error fetching team players:", error);
         });
     },
   },

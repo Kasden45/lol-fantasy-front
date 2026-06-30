@@ -50,12 +50,12 @@
                   <tr>
                     <th class="pt-player">Player</th>
                     <th
-                      v-for="metric in playerMetrics"
+                      v-for="metric in gameMetricsReversed(game)"
                       :key="metric.key"
                       class="pt-metric-col"
-                      :title="metric.label"
+                      :title="metric.name"
                     >
-                      {{ metric.short }}
+                      <span class="pt-header-text">{{ metric.name }}</span>
                     </th>
                     <th class="pt-total">Pts</th>
                   </tr>
@@ -82,18 +82,11 @@
                         </div>
                       </td>
                       <td
-                        v-for="metric in playerMetrics"
+                        v-for="metric in gameMetricsReversed(game)"
                         :key="metric.key"
                         class="pt-val"
-                        :class="{ 'pt-val-kda': metric.isKda }"
                       >
-                        {{
-                          metric.isKda
-                            ? kdaValue(player)
-                            : formatMetricValue(
-                                player.pointsDetails[metric.key],
-                              )
-                        }}
+                        {{ bRaw(player, metric.key) }}
                       </td>
                       <td class="pt-total-cell" rowspan="2">
                         {{ Number(player.points).toFixed(1) }}
@@ -101,15 +94,15 @@
                     </tr>
                     <tr class="pt-points-row">
                       <td
-                        v-for="metric in playerMetrics"
+                        v-for="metric in gameMetricsReversed(game)"
                         :key="metric.key"
                         class="pt-pts-cell"
                         :class="{
-                          positive: metricPts(metric, player) > 0,
-                          negative: metricPts(metric, player) < 0,
+                          positive: bPts(player, metric.key) > 0,
+                          negative: bPts(player, metric.key) < 0,
                         }"
                       >
-                        {{ formatPts(metricPts(metric, player)) }}
+                        {{ formatPts(bPts(player, metric.key)) }}
                       </td>
                     </tr>
                   </template>
@@ -129,12 +122,12 @@
                   <tr>
                     <th class="pt-total">Pts</th>
                     <th
-                      v-for="metric in playerMetricsReversed"
+                      v-for="metric in gameMetrics(game)"
                       :key="metric.key"
                       class="pt-metric-col"
-                      :title="metric.label"
+                      :title="metric.name"
                     >
-                      {{ metric.short }}
+                      <span class="pt-header-text">{{ metric.name }}</span>
                     </th>
                     <th class="pt-player pt-player-right">Player</th>
                   </tr>
@@ -149,18 +142,11 @@
                         {{ Number(player.points).toFixed(1) }}
                       </td>
                       <td
-                        v-for="metric in playerMetricsReversed"
+                        v-for="metric in gameMetrics(game)"
                         :key="metric.key"
                         class="pt-val"
-                        :class="{ 'pt-val-kda': metric.isKda }"
                       >
-                        {{
-                          metric.isKda
-                            ? kdaValue(player)
-                            : formatMetricValue(
-                                player.pointsDetails[metric.key],
-                              )
-                        }}
+                        {{ bRaw(player, metric.key) }}
                       </td>
                       <td
                         class="pt-player-cell pt-player-cell-right"
@@ -183,15 +169,15 @@
                     </tr>
                     <tr class="pt-points-row">
                       <td
-                        v-for="metric in playerMetricsReversed"
+                        v-for="metric in gameMetrics(game)"
                         :key="metric.key"
                         class="pt-pts-cell"
                         :class="{
-                          positive: metricPts(metric, player) > 0,
-                          negative: metricPts(metric, player) < 0,
+                          positive: bPts(player, metric.key) > 0,
+                          negative: bPts(player, metric.key) < 0,
                         }"
                       >
-                        {{ formatPts(metricPts(metric, player)) }}
+                        {{ formatPts(bPts(player, metric.key)) }}
                       </td>
                     </tr>
                   </template>
@@ -212,18 +198,12 @@
                   <tr>
                     <th class="pt-player">Team</th>
                     <th
-                      v-for="metric in teamMetrics"
+                      v-for="metric in gameTeamMetricsReversed(game)"
                       :key="metric.key"
                       class="pt-metric-col"
-                      :title="metric.label"
+                      :title="metric.name"
                     >
-                      <img
-                        v-if="metric.icon"
-                        :src="metric.icon"
-                        :alt="metric.short"
-                        class="metric-icon"
-                      />
-                      <span v-else>{{ metric.short }}</span>
+                      <span class="pt-header-text">{{ metric.name }}</span>
                     </th>
                     <th class="pt-total">Pts</th>
                   </tr>
@@ -246,15 +226,11 @@
                         </div>
                       </td>
                       <td
-                        v-for="metric in teamMetrics"
+                        v-for="metric in gameTeamMetricsReversed(game)"
                         :key="metric.key"
                         class="pt-val"
                       >
-                        {{
-                          formatMetricValue(
-                            game.team1Stats.pointsDetails[metric.key],
-                          )
-                        }}
+                        {{ bTeamRaw(game.team1Stats, metric.key) }}
                       </td>
                       <td class="pt-total-cell" rowspan="2">
                         {{ Number(game.team1Stats.points).toFixed(1) }}
@@ -262,23 +238,15 @@
                     </tr>
                     <tr class="pt-points-row">
                       <td
-                        v-for="metric in teamMetrics"
+                        v-for="metric in gameTeamMetricsReversed(game)"
                         :key="metric.key"
                         class="pt-pts-cell"
                         :class="{
-                          positive:
-                            game.team1Stats.pointsDetails[metric.key]?.points >
-                            0,
-                          negative:
-                            game.team1Stats.pointsDetails[metric.key]?.points <
-                            0,
+                          positive: bTeamPts(game.team1Stats, metric.key) > 0,
+                          negative: bTeamPts(game.team1Stats, metric.key) < 0,
                         }"
                       >
-                        {{
-                          formatPts(
-                            game.team1Stats.pointsDetails[metric.key]?.points,
-                          )
-                        }}
+                        {{ formatPts(bTeamPts(game.team1Stats, metric.key)) }}
                       </td>
                     </tr>
                   </template>
@@ -298,18 +266,12 @@
                   <tr>
                     <th class="pt-total">Pts</th>
                     <th
-                      v-for="metric in teamMetricsReversed"
+                      v-for="metric in gameTeamMetrics(game)"
                       :key="metric.key"
                       class="pt-metric-col"
-                      :title="metric.label"
+                      :title="metric.name"
                     >
-                      <img
-                        v-if="metric.icon"
-                        :src="metric.icon"
-                        :alt="metric.short"
-                        class="metric-icon"
-                      />
-                      <span v-else>{{ metric.short }}</span>
+                      <span class="pt-header-text">{{ metric.name }}</span>
                     </th>
                     <th class="pt-player pt-player-right">Team</th>
                   </tr>
@@ -321,15 +283,11 @@
                         {{ Number(game.team2Stats.points).toFixed(1) }}
                       </td>
                       <td
-                        v-for="metric in teamMetricsReversed"
+                        v-for="metric in gameTeamMetrics(game)"
                         :key="metric.key"
                         class="pt-val"
                       >
-                        {{
-                          formatMetricValue(
-                            game.team2Stats.pointsDetails[metric.key],
-                          )
-                        }}
+                        {{ bTeamRaw(game.team2Stats, metric.key) }}
                       </td>
                       <td
                         class="pt-player-cell pt-player-cell-right"
@@ -351,23 +309,15 @@
                     </tr>
                     <tr class="pt-points-row">
                       <td
-                        v-for="metric in teamMetricsReversed"
+                        v-for="metric in gameTeamMetrics(game)"
                         :key="metric.key"
                         class="pt-pts-cell"
                         :class="{
-                          positive:
-                            game.team2Stats.pointsDetails[metric.key]?.points >
-                            0,
-                          negative:
-                            game.team2Stats.pointsDetails[metric.key]?.points <
-                            0,
+                          positive: bTeamPts(game.team2Stats, metric.key) > 0,
+                          negative: bTeamPts(game.team2Stats, metric.key) < 0,
                         }"
                       >
-                        {{
-                          formatPts(
-                            game.team2Stats.pointsDetails[metric.key]?.points,
-                          )
-                        }}
+                        {{ formatPts(bTeamPts(game.team2Stats, metric.key)) }}
                       </td>
                     </tr>
                   </template>
@@ -448,19 +398,27 @@
               <template v-else>
                 <span class="bt-pts">{{ avgPts(player.totalPoints) }}</span>
                 <span class="bt-role bt-role-center">{{ player.role }}</span>
-                <span class="bt-name bt-name-right">{{ player.summonerName }}</span>
+                <span class="bt-name bt-name-right">{{
+                  player.summonerName
+                }}</span>
               </template>
             </div>
             <div class="by-team-row">
               <template v-if="tIdx === 0">
                 <span class="bt-name">{{ teamTotal?.teamName }}</span>
                 <span class="bt-role"></span>
-                <span class="bt-pts">{{ avgPts(teamTotal?.totalPoints ?? 0) }}</span>
+                <span class="bt-pts">{{
+                  avgPts(teamTotal?.totalPoints ?? 0)
+                }}</span>
               </template>
               <template v-else>
-                <span class="bt-pts">{{ avgPts(teamTotal?.totalPoints ?? 0) }}</span>
+                <span class="bt-pts">{{
+                  avgPts(teamTotal?.totalPoints ?? 0)
+                }}</span>
                 <span class="bt-role"></span>
-                <span class="bt-name bt-name-right">{{ teamTotal?.teamName }}</span>
+                <span class="bt-name bt-name-right">{{
+                  teamTotal?.teamName
+                }}</span>
               </template>
             </div>
           </div>
@@ -513,35 +471,83 @@ export default {
       return slug;
     },
     formatMetricValue(detail) {
-      if (!detail) return "-";
+      if (!detail) return "—";
       if (detail.value === true) return "✓";
       if (detail.value === false) return "✗";
-      if (detail.value === null || detail.value === undefined) return "-";
+      if (detail.value === null || detail.value === undefined) return "—";
       return detail.value;
     },
     formatPts(pts) {
-      if (pts === null || pts === undefined) return "-";
+      if (pts === null || pts === undefined || pts === 0) return "";
       const n = Number(pts);
       return n > 0 ? `+${n.toFixed(1)}` : n.toFixed(1);
     },
-    kdaValue(player) {
-      const d = player.pointsDetails;
-      const k = d?.kills?.value ?? "-";
-      const de = d?.deaths?.value ?? "-";
-      const a = d?.assists?.value ?? "-";
-      return `${k}/${de}/${a}`;
+    bRaw(player, key) {
+      const b = (player.breakdown ?? []).find((x) => x.key === key);
+      if (!b) return "—";
+      const v = b.rawValue;
+      if (v === 1 && (key === "first_blood" || key === "ten_ka")) return "✓";
+      if (v === 0 && (key === "first_blood" || key === "ten_ka")) return "✗";
+      return Number.isInteger(v) ? v : Number(v).toFixed(1);
     },
-    kdaPoints(player) {
-      const d = player.pointsDetails;
+    bPts(player, key) {
       return (
-        (d?.kills?.points ?? 0) +
-        (d?.deaths?.points ?? 0) +
-        (d?.assists?.points ?? 0)
+        (player.breakdown ?? []).find((x) => x.key === key)?.points ?? null
       );
     },
-    metricPts(metric, player) {
-      if (metric.isKda) return this.kdaPoints(player);
-      return player.pointsDetails[metric.key]?.points;
+    gameMetrics(game) {
+      const seen = new Map();
+      for (const player of [
+        ...(game.team1Players ?? []),
+        ...(game.team2Players ?? []),
+      ]) {
+        for (const b of player.breakdown ?? []) {
+          if (!seen.has(b.key)) seen.set(b.key, b.name);
+        }
+      }
+      return [...seen.entries()].map(([key, name]) => ({ key, name }));
+    },
+    gameMetricsReversed(game) {
+      return [...this.gameMetrics(game)].reverse();
+    },
+    gameTeamMetrics(game) {
+      const seen = new Map();
+      for (const stats of [game.team1Stats, game.team2Stats]) {
+        for (const b of stats?.breakdown ?? []) {
+          if (!seen.has(b.key)) seen.set(b.key, b.name);
+        }
+      }
+      return [...seen.entries()].map(([key, name]) => ({ key, name }));
+    },
+    gameTeamMetricsReversed(game) {
+      return [...this.gameTeamMetrics(game)].reverse();
+    },
+    bTeamRaw(stats, key) {
+      const b = (stats?.breakdown ?? []).find((x) => x.key === key);
+      if (!b) return "—";
+      const v = b.rawValue;
+      if (
+        v === 1 &&
+        (key === "team_first_blood" ||
+          key === "team_win" ||
+          key === "team_win_under_30" ||
+          key === "team_lose_over_30")
+      )
+        return "✓";
+      if (
+        v === 0 &&
+        (key === "team_first_blood" ||
+          key === "team_win" ||
+          key === "team_win_under_30" ||
+          key === "team_lose_over_30")
+      )
+        return "✗";
+      return Number.isInteger(v) ? v : Number(v).toFixed(1);
+    },
+    bTeamPts(stats, key) {
+      return (
+        (stats?.breakdown ?? []).find((x) => x.key === key)?.points ?? null
+      );
     },
     avgPts(totalPoints) {
       const count = this.playedGames.length || 1;
@@ -555,41 +561,6 @@ export default {
           (g) => g.team1Players?.length > 0 || g.winner != null,
         ) ?? []
       );
-    },
-    playerMetrics() {
-      return [
-        { key: "drakeSteals", label: "Drake steals", short: "DS" },
-        { key: "nashorSteals", label: "Nashor steals", short: "NS" },
-        { key: "pentaKills", label: "Penta kills", short: "5K" },
-        { key: "quardaKills", label: "Quadra kills", short: "4K" },
-        { key: "trippleKills", label: "Triple kills", short: "3K" },
-        { key: "over10KillsAssists", label: "K/A > 10", short: "KA" },
-        { key: "firstBlood", label: "First Blood", short: "FB" },
-        { key: "creepScore", label: "CS", short: "CS" },
-        { key: "kda", label: "K/D/A", short: "K/D/A", isKda: true },
-      ];
-    },
-    playerMetricsReversed() {
-      return [...this.playerMetrics].reverse();
-    },
-    teamMetrics() {
-      const cdn = "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-match-history/global/default";
-      return [
-        { key: "win",         short: "W",    label: "Win" },
-        { key: "under30Win",  short: "<30W", label: "Win under 30 min" },
-        { key: "over30Lose",  short: ">30L", label: "Lose over 30 min" },
-        { key: "firstBlood",  short: "FB",   label: "First Blood" },
-        { key: "kills",       short: "K",    label: "Kills" },
-        { key: "deaths",      short: "D",    label: "Deaths" },
-        { key: "assists",     short: "A",    label: "Assists" },
-        { key: "drakes",      short: "DR",   label: "Dragons",   icon: `${cdn}/dragon-100.png` },
-        { key: "nashors",     short: "NS",   label: "Nashors",   icon: `${cdn}/baron-100.png` },
-        { key: "towers",      short: "TWR",  label: "Towers",    icon: `${cdn}/tower-100.png` },
-        { key: "voidgrubs",   short: "VG",   label: "Voidgrubs", icon: `${cdn}/herald-100.png` },
-      ];
-    },
-    teamMetricsReversed() {
-      return [...this.teamMetrics].reverse();
     },
   },
 };
@@ -748,12 +719,9 @@ export default {
   font-size: 12px;
   font-weight: 700;
   color: var(--GREY-LIGHT);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   text-align: center;
   background: var(--SECONDARY);
   border-bottom: 1px solid var(--GREY-DARKER);
-  white-space: nowrap;
 }
 
 .pt-player {
@@ -775,8 +743,25 @@ export default {
 }
 
 .pt-metric-col {
-  width: 30px;
-  min-width: 26px;
+  width: 28px;
+  min-width: 24px;
+  max-width: 28px;
+  padding: 0 2px 4px;
+  height: 100px;
+  vertical-align: bottom;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.pt-header-text {
+  display: block;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--GREY-LIGHT);
+  margin: 0 auto;
 }
 
 .pt-total {

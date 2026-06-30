@@ -58,7 +58,7 @@
     </div>
 
     <div v-if="pendingSwaps.length > 0">
-      <template v-for="fixture in fixturesSwaps" :key="fixtureId">
+      <template v-for="fixture in fixturesSwaps" :key="fixture.fixtureId">
         <div class="fixture-group">
           <div class="fixture-header">
             <div class="fixture-id">{{ fixture.name }}</div>
@@ -163,11 +163,9 @@ export default {
           `${this.apiURL}Draft/${this.$store.getters.getCurrentTournamentId}/trades/${this.$store.getters.getProfileId}`,
           swapRequest,
         );
-        console.log("Swap accepted", response.data);
         this.$emit("refresh-swaps");
         this.$emit("refresh-teams");
       } catch (error) {
-        console.error("Error swapping", error);
       }
     },
     async cancelSwap(swap) {
@@ -180,10 +178,8 @@ export default {
           `${this.apiURL}Draft/${this.$store.getters.getCurrentTournamentId}/trades/${this.$store.getters.getProfileId}`,
           swapRequest,
         );
-        console.log("Swap canceled", response.data);
         this.$emit("refresh-swaps");
       } catch (error) {
-        console.error("Error canceling swap", error);
       }
     },
     async withdrawSwap(swap) {
@@ -196,10 +192,8 @@ export default {
           `${this.apiURL}Draft/${this.$store.getters.getCurrentTournamentId}/trades/${this.$store.getters.getProfileId}`,
           swapRequest,
         );
-        console.log("Swap withdrawn", response.data);
         this.$emit("refresh-swaps");
       } catch (error) {
-        console.error("Error withdrawing swap", error);
       }
     },
     openDetailsModal(swap) {
@@ -231,6 +225,9 @@ export default {
     this.timer = setInterval(() => {
       this.deadlineCountdown();
     }, 1000);
+  },
+  beforeUnmount() {
+    clearInterval(this.timer);
   },
 };
 </script>

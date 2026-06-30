@@ -222,16 +222,13 @@ export default {
   },
   methods: {
     handlePositionClick(position) {
-      console.log("handlePositionClick: position, player:", position);
 
       if (!position.player) {
-        console.log("handlePositionClick: role", position.role);
 
         this.$emit("handle-position-click", position);
       }
     },
     handlePositionClickSwap(position) {
-      console.log("Swap click on position:", position.role);
       this.$emit("handle-position-swap-click", position.role);
       if (position.player)
         this.$emit("handle-position-swap-player", position.player);

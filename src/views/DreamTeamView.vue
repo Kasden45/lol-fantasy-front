@@ -134,7 +134,6 @@ export default {
       };
     },
     fillMapPlayers() {
-      console.log("filling");
       this.playersForSummonersRiftView = [];
       this.playersForSummonersRiftView.push(
         this.teamPlayerToMapPlayer(this.dreamTeam.dreamTeamPlayers.top, false)
@@ -164,7 +163,6 @@ export default {
     selectTab(index, f) {
       var fixture = f != 0 ? f : null;
       this.selectedTabIndex = index;
-      console.log(this.selectedTabIndex);
       this.currentFixture = this.newRulesData.find(
         (element) => element.fixture.id == fixture
       );
@@ -177,12 +175,10 @@ export default {
         .get(url)
         .then((response) => {
           this.$store.commit("setFixtureId", response.data);
-          console.log("Current fixture: ", this.$store.getters.getFixtureId);
 
           // this.$router.push({name: 'LeaguesView'})
         })
         .catch((error) => {
-          console.log(error.response);
         });
     },
     async fetchRulesData() {
@@ -201,7 +197,6 @@ export default {
             return newFix;
           })
           .sort((a, b) => a.order - b.order);
-        console.log("tabs", this.tabs);
 
         this.selectTab(
           this.tabs.find(
@@ -211,7 +206,6 @@ export default {
         );
         this.getDreamTeam(this.$store.getters.getFixtureId);
       } catch (error) {
-        console.error("Error fetching data:", error);
       }
     },
     getFixtures() {
@@ -233,7 +227,6 @@ export default {
           // this.$router.push({name: 'LeaguesView'})
         })
         .catch((error) => {
-          console.log(error.response);
         });
     },
     getDreamTeam(fixtureId) {
@@ -242,12 +235,10 @@ export default {
           `${this.apiURL}Stats/${this.$store.getters.getCurrentTournamentId}/dream_team/${fixtureId}`
         )
         .then((response) => {
-          console.log("Dream team:", response.data);
           this.dreamTeam = response.data;
           this.fillMapPlayers();
         })
         .catch((error) => {
-          console.error("Error fetching team players:", error);
         });
     },
   },

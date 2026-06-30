@@ -2,11 +2,6 @@
 <template>
   <div class="container">
     <LazyLoader v-if="loader" />
-    <!-- <button class="btn btn-info mb-2">
-      <router-link class="nav-link" :to="{ name: 'TeamSelection' }"
-        >Team Selection v1</router-link
-      >
-    </button> -->
     <div>
       <label class="filter-label">Your teams</label>
       <select
@@ -44,6 +39,7 @@
             <select
               class="w-auto"
               id="captain"
+              data-testid="team-captain-select"
               v-model="selectedUserTeam.captain"
             >
               <option value="1">Top</option>
@@ -57,6 +53,7 @@
             <button
               v-if="this.nextFixture != null"
               class="btn sticky-end"
+              data-testid="team-submit-btn"
               :class="{
                 'btn-warning': !teamIsCorrect,
                 'btn-success': teamIsCorrect,
@@ -601,7 +598,6 @@ export default {
       }
 
       // You can store or display the totalValue as needed
-      console.log("Selected: " + pickedPlayers);
 
       return pickedPlayers;
     },
@@ -612,7 +608,6 @@ export default {
       for (const role in this.selectedUserTeam) {
         // eslint-disable-next-line
         if (role.endsWith("Player")) {
-          console.log("SPRAWDZAM ROLE:", this.selectedUserTeam[role]);
           const player = this.selectedUserTeam[role].player;
           // eslint-disable-next-line
           if (player != null && player.hasOwnProperty("price")) {
@@ -631,7 +626,6 @@ export default {
       }
 
       // You can store or display the totalValue as needed
-      console.log("Total Selected Team Value: " + totalValue);
 
       return totalValue;
     },
@@ -640,25 +634,14 @@ export default {
       // this.loadedPlayers
       var currentLineup = [];
       for (const key in this.selectedUserTeam) {
-        console.log("Key:", key, "Value:", this.selectedUserTeam[key]);
         if (this.selectedUserTeam[key].player != null) {
-          console.log(
-            "taki jest",
-            this.selectedUserTeam[key].player.esportsPlayerId,
-          );
           currentLineup.push(this.selectedUserTeam[key].player.esportsPlayerId);
         }
         if (this.selectedUserTeam[key].team != null) {
-          console.log(
-            "taki jest team",
-            this.selectedUserTeam[key].team.esportsTeamId,
-          );
           currentLineup.push(this.selectedUserTeam[key].team.esportsTeamId);
         }
       }
 
-      console.log("current", currentLineup);
-      console.log("loaded", this.loadedPlayers);
       return this.loadedPlayers.filter((n) => !currentLineup.includes(n))
         .length;
     },
@@ -709,11 +692,9 @@ export default {
       this.selectedUserTeam.chipActivated = id;
     },
     pickCaptain(role) {
-      console.log(role, "lecimy");
       this.selectedUserTeam.captain = this.roleIndex[role];
     },
     rangeChanged(numberOfGames) {
-      console.log(numberOfGames);
       this.numberOfGames = numberOfGames;
       this.fetchPlayers();
       this.fetchTeams();
@@ -747,9 +728,7 @@ export default {
           `${this.apiURL}User/${this.$store.getters.getCurrentTournamentId}/leagues/${this.$store.getters.getProfileId}`,
         ); // Replace with the correct endpoint
         this.userLeagues = response.data;
-      } catch (error) {
-        console.error("Error fetching user leagues:", error);
-      }
+      } catch (error) {}
     },
     async getCurrentFixture() {
       const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixture`;
@@ -758,13 +737,10 @@ export default {
         .get(url)
         .then((response) => {
           this.$store.commit("setFixtureId", response.data);
-          console.log("Current fixture: ", this.$store.getters.getFixtureId);
           this.getFixtures();
           // this.$router.push({name: 'LeaguesView'})
         })
-        .catch((error) => {
-          console.log(error.response);
-        });
+        .catch((error) => {});
     },
     async getFixtures() {
       const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixtures`;
@@ -805,9 +781,7 @@ export default {
               );
             })[0];
         })
-        .catch((error) => {
-          console.log(error.response);
-        });
+        .catch((error) => {});
     },
     async fetchUserTeam(id) {
       try {
@@ -863,12 +837,9 @@ export default {
           userTeam.team.esportsTeamId,
         ];
 
-        console.log("loaded first", this.loadedPlayers);
         this.loader = false;
         // this.sortedPlayers = this.players;
-      } catch (error) {
-        console.error("Error fetching players:", error);
-      }
+      } catch (error) {}
     },
     async fetchPlayers() {
       try {
@@ -881,9 +852,7 @@ export default {
         );
         this.allPlayers = response.data;
         // this.sortedPlayers = this.players;
-      } catch (error) {
-        console.error("Error fetching players:", error);
-      }
+      } catch (error) {}
     },
     async fetchTeams() {
       try {
@@ -897,13 +866,10 @@ export default {
         this.allTeams = response.data;
         this.fetchUserTeam(-1);
         // this.sortedPlayers = this.players;
-      } catch (error) {
-        console.error("Error fetching teams:", error);
-      }
+      } catch (error) {}
     },
     selectTab(index) {
       this.selectedTabIndex = index;
-      console.log(this.selectedTabIndex);
     },
     submitTeam() {
       if (this.loadedPlayers.length == 0) this.submitTeamPost();
@@ -936,7 +902,6 @@ export default {
       this.axios
         .post(url, data)
         .then((response) => {
-          console.log(response.data);
           this.successSubmittingTeam = true;
           this.submittingTeam = false;
           // this.clearInputs()
@@ -949,7 +914,6 @@ export default {
           // }
         });
 
-      console.log("Selected Players:", this.selectedPlayers);
       // You can send the selected team to your backend here
     },
     submitTeamPut() {
@@ -981,7 +945,6 @@ export default {
       this.axios
         .put(url, data)
         .then((response) => {
-          console.log(response.data);
           this.successSubmittingTeam = true;
           this.submittingTeam = false;
 
@@ -996,7 +959,6 @@ export default {
         });
 
       // this.submittingTeam = false
-      console.log("Selected Players:", this.selectedPlayers);
       // You can send the selected team to your backend here
     },
     clearStatus() {
@@ -1015,20 +977,14 @@ export default {
       // && this.selectedUserTeam.team.team != null
     },
     playerSelected(player) {
-      console.log("trying to add ", player.summonerName, " to ", player.role);
       if (player.role == this.roleToAddPlayer || this.roleToAddPlayer == "sub")
         this.addToRole(player, this.roleToAddPlayer);
-      else console.log("WRONG ROLE");
     },
     teamSelected(team) {
-      console.log(this.roleToAddPlayer);
-      console.log("trying to add ", team.name, " to ", "team");
       if ("team" == this.roleToAddPlayer)
         this.addTeamToRole(team, this.roleToAddPlayer);
-      else console.log("WRONG ROLE");
     },
     playerRemoved(role) {
-      console.log("trying to remove a player from ", role);
       if (role == "team") {
         this.selectedUserTeam.team.team = null;
         return;
@@ -1036,7 +992,6 @@ export default {
 
       for (const key in this.selectedUserTeam) {
         if (this.selectedUserTeam[key].role === role) {
-          console.log("removing player from ", role);
           this.selectedUserTeam[key].player = null;
         }
       }
@@ -1049,13 +1004,11 @@ export default {
               this.selectedUserTeam[key]?.player?.esportsPlayerId ===
               this.subToSubPlayer.esportsPlayerId
             ) {
-              console.log("swaping ", this.playerToSubPlayer.summonerName);
               this.selectedUserTeam[key].player = this.playerToSubPlayer;
             } else if (
               this.selectedUserTeam[key]?.player?.esportsPlayerId ===
               this.playerToSubPlayer.esportsPlayerId
             ) {
-              console.log("swapping ", this.subToSubPlayer.summonerName);
               this.selectedUserTeam[key].player = this.subToSubPlayer;
             }
           }
@@ -1065,7 +1018,6 @@ export default {
       }
     },
     playerSub(player) {
-      console.log("trying to sub a player from ", player.role);
       if (player.role == "team") {
         return;
       }
@@ -1078,7 +1030,6 @@ export default {
       }
     },
     playerSubSub(player) {
-      console.log("trying to sub a player sub from ", player.role);
       if (player.role == "team") {
         return;
       }
@@ -1092,42 +1043,34 @@ export default {
     addToRole(player, role) {
       var teamPlayer = this.selectPlayerByRole(role);
       if (teamPlayer != null) {
-        console.log("mamy to, dodaje", player, "do", teamPlayer);
         this.selectedUserTeam[teamPlayer].player = player;
         this.roleToAddPlayer = "";
       }
     },
     addTeamToRole(team, role) {
-      console.log("mamy to, dodaje", team, "do", role);
       this.selectedUserTeam.team.team = team;
       this.roleToAddPlayer = "";
     },
     selectPlayerByRole(role) {
-      console.log("rola", role);
       for (const key in this.selectedUserTeam) {
         if (
           this.selectedUserTeam[key].role === role &&
           this.selectedUserTeam[key].player === null
         ) {
-          console.log("taki player", this.selectedUserTeam[key].player);
           return key;
         }
       }
-      console.log("nope");
       return null; // Return null if no player with the specified role is found
     },
     selectTeamByRole(role) {
-      console.log("rola", role);
       for (const key in this.selectedUserTeam) {
         if (
           this.selectedUserTeam[key].role === role &&
           this.selectedUserTeam[key].player === null
         ) {
-          console.log("taki player", this.selectedUserTeam[key].player);
           return key;
         }
       }
-      console.log("nope");
       return null; // Return null if no player with the specified role is found
     },
   },
@@ -1136,7 +1079,6 @@ export default {
       handler(newroleToAddPlayer, oldroleToAddPlayer) {
         // React to prop changes here
         // playerDetails =
-        console.log(newroleToAddPlayer, oldroleToAddPlayer);
         if (newroleToAddPlayer != "team") {
           this.selectedTabIndex = 0;
         } else {

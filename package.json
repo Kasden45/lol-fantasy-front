@@ -8,7 +8,9 @@
     "build": "vue-cli-service build --skip-plugins @vue/cli-plugin-eslint",
     "lint": "vue-cli-service lint --skip-plugins @vue/cli-plugin-eslint",
     "postinstall": "npm run build",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.7.2",
@@ -30,6 +32,7 @@
     "vuex-persistedstate": "^4.1.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.0",
     "@babel/core": "^7.12.16",
     "@babel/eslint-parser": "^7.12.16",
     "@vue/cli-plugin-babel": "~5.0.0",

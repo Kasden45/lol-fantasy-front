@@ -71,13 +71,14 @@ export default {
   },
   computed: {
     matchStatuses() {
-      return this.teamPoints.gamesPointsDetails.reduce((acc, game) => {
+      return (this.teamPoints?.gamesPointsDetails ?? []).reduce((acc, game) => {
+        if (!game) return acc;
         acc[game.matchId] = game?.match?.state ?? "PLANNED";
         return acc;
       }, {});
     },
     uniqueMatchesThisFixture() {
-      return [...new Set(this.matchesThisFixture.map((item) => item.matchId))];
+      return [...new Set((this.matchesThisFixture ?? []).map((item) => item.matchId))];
     },
   },
   methods: {
@@ -90,12 +91,10 @@ export default {
     },
     removePlayerFromRole(role) {
       // Emit an event to notify the parent component (App) about the selected player
-      console.log("usuwam z ", role);
       this.$emit("playerRemove", role);
     },
     addPlayerToRole(role) {
       // Emit an event to notify the parent component (App) about the selected player
-      console.log("chce dodac do ", role);
       this.$emit("rolePick", role);
     },
   },

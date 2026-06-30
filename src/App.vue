@@ -413,4 +413,5 @@ select option[disabled]:first-child {
 .error-cart {
   color: red !important;
 }
+
 </style>

@@ -132,58 +132,12 @@ export default {
     },
     correctEmptyPlayers() {
       if (this.participantData.userTeam == null) return;
-
-      if (
-        this.participantData.userTeam.topPlayerPoints.gamesPointsDetails
-          .length == 0
-      ) {
-        this.participantData.userTeam.topPlayerPoints.gamesPointsDetails = [
-          this.participantData.userTeam.topPlayerPoints.player,
-        ];
+      for (const slot of this.participantData.userTeam.playersPoints ?? []) {
+        if (!slot.gamesPointsDetails?.length) {
+          slot.gamesPointsDetails = [slot.player];
+        }
       }
-      if (
-        this.participantData.userTeam.junglePlayerPoints.gamesPointsDetails
-          .length == 0
-      ) {
-        this.participantData.userTeam.junglePlayerPoints.gamesPointsDetails = [
-          this.participantData.userTeam.junglePlayerPoints.player,
-        ];
-      }
-      if (
-        this.participantData.userTeam.midPlayerPoints.gamesPointsDetails
-          .length == 0
-      ) {
-        this.participantData.userTeam.midPlayerPoints.gamesPointsDetails = [
-          this.participantData.userTeam.midPlayerPoints.player,
-        ];
-      }
-      if (
-        this.participantData.userTeam.bottomPlayerPoints.gamesPointsDetails
-          .length == 0
-      ) {
-        this.participantData.userTeam.bottomPlayerPoints.gamesPointsDetails = [
-          this.participantData.userTeam.bottomPlayerPoints.player,
-        ];
-      }
-      if (
-        this.participantData.userTeam.supportPlayerPoints.gamesPointsDetails
-          .length == 0
-      ) {
-        this.participantData.userTeam.supportPlayerPoints.gamesPointsDetails = [
-          this.participantData.userTeam.supportPlayerPoints.player,
-        ];
-      }
-      if (
-        this.participantData.userTeam.subPlayerPoints.gamesPointsDetails
-          .length == 0
-      ) {
-        this.participantData.userTeam.subPlayerPoints.gamesPointsDetails = [
-          this.participantData.userTeam.subPlayerPoints.player,
-        ];
-      }
-      if (
-        this.participantData.userTeam.teamPoints.gamesPointsDetails.length == 0
-      ) {
+      if (!this.participantData.userTeam.teamPoints?.gamesPointsDetails?.length) {
         this.participantData.userTeam.teamPoints.gamesPointsDetails = [
           this.participantData.userTeam.teamPoints.team,
         ];
