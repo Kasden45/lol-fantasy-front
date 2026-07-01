@@ -7,28 +7,20 @@
     <table class="points-table">
       <tbody>
         <tr
-          v-for="(points, event) in playerDetails.pointsDetails"
-          :key="event"
-          v-show="points.value > 0 || points.value === true"
+          v-for="item in playerDetails.breakdown"
+          :key="item.key"
+          v-show="item.rawValue !== 0"
         >
-          <td class="event-name">{{ eventDisplay[event] }}</td>
-          <td class="event-value">
-            {{
-              points.value === true
-                ? "✓"
-                : points.value !== null
-                ? points.value
-                : "-"
-            }}
-          </td>
+          <td class="event-name">{{ item.name }}</td>
+          <td class="event-value">{{ formatRaw(item) }}</td>
           <td
             class="event-points"
             :class="{
-              negative: points.points < 0,
-              positive: points.points > 0,
+              negative: item.points < 0,
+              positive: item.points > 0,
             }"
           >
-            {{ points.points > 0 ? "+" : "" }}{{ points.points }}
+            {{ item.points > 0 ? "+" : "" }}{{ item.points }}
           </td>
         </tr>
       </tbody>
@@ -60,29 +52,13 @@ export default {
     title: String,
   },
 
-  data() {
-    return {
-      eventDisplay: {
-        kills: "Kills",
-        assists: "Assists",
-        deaths: "Deaths",
-        trippleKills: "Triple kills",
-        quardaKills: "Quadra kills",
-        pentaKills: "Penta kills",
-        nashorSteals: "Nashor steals",
-        drakeSteals: "Drake steals",
-        creepScore: "CS",
-        firstBlood: "FB",
-        over10KillsAssists: "K/A > 10",
-      },
-    };
-  },
   methods: {
-    calculateTotalPoints(pointsDetails) {
-      return Object.values(pointsDetails).reduce(
-        (total, points) => total + points.points,
-        0,
-      );
+    formatRaw(item) {
+      const v = item.rawValue;
+      const boolKeys = ["first_blood", "ten_ka", "team_first_blood", "team_win", "team_win_under_30", "team_lose_over_30", "team_four_drakes"];
+      if (boolKeys.includes(item.key)) return v ? "✓" : "✗";
+      if (v === null || v === undefined) return "-";
+      return Number.isInteger(v) ? v : Number(v).toFixed(2);
     },
   },
   // watch: {

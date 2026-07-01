@@ -74,64 +74,16 @@
             ref="pointsContainer"
           >
             <PlayerPointsGamesCard
+              v-for="(slot, index) in teamPlayers.playersPoints"
+              :key="slot.slot"
               class="team-points-details"
               :gamesList="fixtureGames"
-              :isCaptain="teamPlayers.captain == 1"
-              :key="teamPlayers"
-              :gamesPointsDetails="
-                teamPlayers.topPlayerPoints.gamesPointsDetails
+              :isCaptain="
+                slot.slot !== 'sub' && teamPlayers.captain == index + 1
               "
-              :totalPointsA="teamPlayers.topPlayerPoints.totalPoints"
-            />
-            <PlayerPointsGamesCard
-              class="team-points-details"
-              :gamesList="fixtureGames"
-              :isCaptain="teamPlayers.captain == 2"
-              :key="teamPlayers"
-              :gamesPointsDetails="
-                teamPlayers.junglePlayerPoints.gamesPointsDetails
-              "
-              :totalPointsA="teamPlayers.junglePlayerPoints.totalPoints"
-            />
-            <PlayerPointsGamesCard
-              class="team-points-details"
-              :gamesList="fixtureGames"
-              :isCaptain="teamPlayers.captain == 3"
-              :key="teamPlayers"
-              :gamesPointsDetails="
-                teamPlayers.midPlayerPoints.gamesPointsDetails
-              "
-              :totalPointsA="teamPlayers.midPlayerPoints.totalPoints"
-            />
-            <PlayerPointsGamesCard
-              class="team-points-details"
-              :gamesList="fixtureGames"
-              :isCaptain="teamPlayers.captain == 4"
-              :key="teamPlayers"
-              :gamesPointsDetails="
-                teamPlayers.bottomPlayerPoints.gamesPointsDetails
-              "
-              :totalPointsA="teamPlayers.bottomPlayerPoints.totalPoints"
-            />
-            <PlayerPointsGamesCard
-              class="team-points-details"
-              :gamesList="fixtureGames"
-              :isCaptain="teamPlayers.captain == 5"
-              :key="teamPlayers"
-              :gamesPointsDetails="
-                teamPlayers.supportPlayerPoints.gamesPointsDetails
-              "
-              :totalPointsA="teamPlayers.supportPlayerPoints.totalPoints"
-            />
-            <PlayerPointsGamesCard
-              class="team-points-details"
-              :gamesList="fixtureGames"
-              :isSub="true"
-              :key="teamPlayers"
-              :gamesPointsDetails="
-                teamPlayers.subPlayerPoints.gamesPointsDetails
-              "
-              :totalPointsA="teamPlayers.subPlayerPoints.totalPoints"
+              :isSub="slot.slot === 'sub'"
+              :gamesPointsDetails="slot.gamesPointsDetails"
+              :totalPointsA="slot.totalPoints"
             />
             <TeamPointsGamesCard
               class="team-points-details"
@@ -141,7 +93,7 @@
               :totalPointsA="teamPlayers.teamPoints.totalPoints"
             />
           </div>
-          <div v-else class="col-8">
+          <div v-else class="col-8 label-color">
             {{ this.errorUserTeamFixture }}
           </div>
         </div>
@@ -275,7 +227,6 @@ export default {
     },
     selectTab(index, fixture) {
       this.selectedTabIndex = index;
-      console.log(this.selectedTabIndex);
       this.teamPlayers = null;
       this.fetchUserTeamFixture(fixture);
       // this.currentLeague = this.fixturesData.fixtures.find((element) => element.fixture == fixture);
@@ -286,7 +237,7 @@ export default {
       this.errorUserTeamFixture = "Loading . . .";
       this.axios
         .get(
-          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/user_team/${this.$store.getters.getProfileId}/fixture/${fixtureId}`
+          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/user_team/${this.$store.getters.getProfileId}/fixture/${fixtureId}`,
         )
         .then((response) => {
           this.teamPlayers = response.data;
@@ -294,7 +245,6 @@ export default {
           this.fillMapPlayers();
         })
         .catch((error) => {
-          console.error("Error fetching team players:", error);
           this.errorUserTeamFixture = "No team found for this fixture";
         });
     },
@@ -305,12 +255,10 @@ export default {
         .get(url)
         .then((response) => {
           this.$store.commit("setFixtureId", response.data);
-          console.log("Current fixture: ", this.$store.getters.getFixtureId);
 
           // this.$router.push({name: 'LeaguesView'})
         })
         .catch((error) => {
-          console.log(error.response);
           this.errorUserTeamFixture = "No team found for this fixture";
         });
     },
@@ -320,7 +268,7 @@ export default {
       this.errorUserTeamFixture = "Loading . . .";
       this.axios
         .get(
-          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/user_team/${this.$store.getters.getProfileId}/fixture/${this.$store.getters.getFixtureId}`
+          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/user_team/${this.$store.getters.getProfileId}/fixture/${this.$store.getters.getFixtureId}`,
         )
         .then((response) => {
           this.teamPlayers = response.data;
@@ -328,7 +276,6 @@ export default {
           this.fillMapPlayers();
         })
         .catch((error) => {
-          console.error("Error fetching team players:", error);
           this.errorUserTeamFixture = "No team found for this fixture";
         });
     },
@@ -343,71 +290,25 @@ export default {
       };
     },
     fillMapPlayers() {
-      console.log("filling");
       this.playersForSummonersRiftView = [];
-      this.playersForSummonersRiftView.push(
-        this.teamPlayerToMapPlayer(
-          this.teamPlayers.topPlayerPoints,
-          this.teamPlayers.captain == 1
-        )
-      );
-      this.playersForSummonersRiftView.push(
-        this.teamPlayerToMapPlayer(
-          this.teamPlayers.junglePlayerPoints,
-          this.teamPlayers.captain == 2
-        )
-      );
-      this.playersForSummonersRiftView.push(
-        this.teamPlayerToMapPlayer(
-          this.teamPlayers.midPlayerPoints,
-          this.teamPlayers.captain == 3
-        )
-      );
-      this.playersForSummonersRiftView.push(
-        this.teamPlayerToMapPlayer(
-          this.teamPlayers.bottomPlayerPoints,
-          this.teamPlayers.captain == 4
-        )
-      );
-      this.playersForSummonersRiftView.push(
-        this.teamPlayerToMapPlayer(
-          this.teamPlayers.supportPlayerPoints,
-          this.teamPlayers.captain == 5
-        )
-      );
+      (this.teamPlayers.playersPoints ?? [])
+        .filter((s) => s.slot !== "sub")
+        .forEach((slot, index) => {
+          this.playersForSummonersRiftView.push(
+            this.teamPlayerToMapPlayer(
+              slot,
+              this.teamPlayers.captain == index + 1,
+            ),
+          );
+        });
     },
     correctEmptyPlayers() {
-      if (this.teamPlayers.topPlayerPoints.gamesPointsDetails.length == 0) {
-        this.teamPlayers.topPlayerPoints.gamesPointsDetails = [
-          this.teamPlayers.topPlayerPoints.player,
-        ];
+      for (const slot of this.teamPlayers.playersPoints ?? []) {
+        if (!slot.gamesPointsDetails?.length) {
+          slot.gamesPointsDetails = [slot.player];
+        }
       }
-      if (this.teamPlayers.junglePlayerPoints.gamesPointsDetails.length == 0) {
-        this.teamPlayers.junglePlayerPoints.gamesPointsDetails = [
-          this.teamPlayers.junglePlayerPoints.player,
-        ];
-      }
-      if (this.teamPlayers.midPlayerPoints.gamesPointsDetails.length == 0) {
-        this.teamPlayers.midPlayerPoints.gamesPointsDetails = [
-          this.teamPlayers.midPlayerPoints.player,
-        ];
-      }
-      if (this.teamPlayers.bottomPlayerPoints.gamesPointsDetails.length == 0) {
-        this.teamPlayers.bottomPlayerPoints.gamesPointsDetails = [
-          this.teamPlayers.bottomPlayerPoints.player,
-        ];
-      }
-      if (this.teamPlayers.supportPlayerPoints.gamesPointsDetails.length == 0) {
-        this.teamPlayers.supportPlayerPoints.gamesPointsDetails = [
-          this.teamPlayers.supportPlayerPoints.player,
-        ];
-      }
-      if (this.teamPlayers.subPlayerPoints.gamesPointsDetails.length == 0) {
-        this.teamPlayers.subPlayerPoints.gamesPointsDetails = [
-          this.teamPlayers.subPlayerPoints.player,
-        ];
-      }
-      if (this.teamPlayers.teamPoints.gamesPointsDetails.length == 0) {
+      if (!this.teamPlayers.teamPoints?.gamesPointsDetails?.length) {
         this.teamPlayers.teamPoints.gamesPointsDetails = [
           this.teamPlayers.teamPoints.team,
         ];
@@ -416,14 +317,12 @@ export default {
     FetchFixtureGames() {
       this.axios
         .get(
-          `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/matches`
+          `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/matches`,
         )
         .then((response) => {
           this.fixtureGames = response.data;
         })
-        .catch((error) => {
-          console.error("Error fetching fixture games:", error);
-        });
+        .catch((error) => {});
     },
   },
   mounted() {
@@ -431,7 +330,7 @@ export default {
 
     this.axios
       .get(
-        `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/rules`
+        `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/rules`,
       )
       .then((response) => {
         this.tabs = response.data
@@ -446,16 +345,14 @@ export default {
           .sort((a, b) => a.order - b.order);
         this.fetchUserTeam();
         this.selectedTabIndex = this.tabs.find(
-          (element) => element.id == this.$store.getters.getFixtureId
+          (element) => element.id == this.$store.getters.getFixtureId,
         ).order;
         // this.$router.push({name: 'LeaguesView'})
         // this.getCurrentFixture().then((response) => {
         //     this.selectedTabIndex = this.$store.getters.getFixtureId;
         //   });
       })
-      .catch((error) => {
-        console.log(error.response);
-      });
+      .catch((error) => {});
 
     this.FetchFixtureGames();
     // this.tabs = Array.from({length: this.$store.getters.getFixtureId}, (_, i) => i + 1)
@@ -476,7 +373,9 @@ export default {
 }
 .game-tabs {
   display: flex;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  color: var(--GREY-LIGHT);
 }
 
 .summoners-rift {
@@ -588,5 +487,8 @@ export default {
   font-weight: 800;
   color: white;
   border: none;
+}
+.label-color {
+  color: var(--GREY-LIGHT);
 }
 </style>

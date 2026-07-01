@@ -12,6 +12,7 @@
       <!-- <div class="col-8 text-center mb-2"> -->
       <input
         id="login-mail"
+        data-testid="login-email-input"
         v-model="email"
         :class="{
           'has-error': (submittingLogin && invalidEmail) || wrongLoginData,
@@ -35,6 +36,7 @@
       <!-- <div class="col-8 text-center mb-2"> -->
       <input
         id="login-password"
+        data-testid="login-password-input"
         v-model="password"
         :class="{
           'has-error': (submittingLogin && invalidPassword) || wrongLoginData,
@@ -55,12 +57,19 @@
       </p>
     </div>
     <div class="w-auto mt-4 mb-2">
-      <button class="account-btn pink-btn" @click="login">Zaloguj się</button>
+      <button
+        class="account-btn pink-btn"
+        data-testid="login-submit-btn"
+        @click="login"
+      >
+        Zaloguj się
+      </button>
     </div>
 
     <div class="w-auto">
       <button
         class="account-btn grey-btn"
+        data-testid="register-open-btn"
         data-bs-target="#registerModal"
         data-bs-toggle="modal"
         @click="this.submittingLogin = false"
@@ -102,6 +111,7 @@
                     >
                     <input
                       id="register-mail"
+                      data-testid="register-email-input"
                       v-model="newEmail"
                       :class="{
                         'has-error':
@@ -126,6 +136,7 @@
                     >
                     <input
                       id="register-password"
+                      data-testid="register-password-input"
                       v-model="newPassword"
                       :class="{
                         'has-error':
@@ -168,6 +179,7 @@
                     >
                     <input
                       id="newLogin"
+                      data-testid="register-login-input"
                       v-model="newLogin"
                       :class="{
                         'has-error': submittingRegister && invalidNewLogin,
@@ -262,13 +274,12 @@ export default {
       this.axios
         .post(url, data)
         .then((response) => {
-          this.$store.commit("setProfileId", response.data);
+          this.$store.commit("setProfileId", response.data.userId);
           this.getUserInfo();
           this.$router.push({ name: "LeaguesView" });
           this.clearInputs();
         })
         .catch((error) => {
-          console.log(error.response);
           this.wrongLoginData = true;
         });
 
@@ -300,7 +311,6 @@ export default {
       this.axios
         .post(url, data)
         .then((response) => {
-          console.log(response.data);
           this.successRegister = true;
           this.clearInputs();
         })
@@ -330,9 +340,7 @@ export default {
 
           this.$router.push({ name: "LeaguesView" });
         })
-        .catch((error) => {
-          console.log(error.response);
-        });
+        .catch((error) => {});
     },
     clearStatus() {
       this.errorLogin = false;
@@ -343,7 +351,8 @@ export default {
       this.emailTaken = false;
     },
     clearStatusWithTimeout() {
-      setTimeout(() => {
+      clearTimeout(this._clearStatusTimer);
+      this._clearStatusTimer = setTimeout(() => {
         this.clearStatus();
       }, 500);
     },
@@ -377,6 +386,9 @@ export default {
     invalidNewLogin() {
       return this.newLogin === "";
     },
+  },
+  beforeUnmount() {
+    clearTimeout(this._clearStatusTimer);
   },
 };
 </script>

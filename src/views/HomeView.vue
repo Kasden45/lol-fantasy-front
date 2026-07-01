@@ -139,30 +139,80 @@
           </div>
 
           <!-- Points Grid -->
-          <div class="points-grid">
+          <div class="points-grid" :class="{ 'points-grid-matrix': playerViewMode === 'matrix' }">
             <!-- Player Points -->
             <div class="points-card">
               <div class="points-card-header">
                 <h3 class="points-card-title">Player Points</h3>
-              </div>
-              <div class="points-list">
-                <div
-                  v-for="rule in playerPointsRules"
-                  :key="rule.name"
-                  class="points-row"
-                  :class="{ 'points-negative': rule.value < 0 }"
-                >
-                  <span class="points-event">{{ rule.name }}</span>
-                  <span
-                    class="points-value"
-                    :class="
-                      rule.value < 0 ? 'value-negative' : 'value-positive'
-                    "
-                  >
-                    {{ rule.value > 0 ? "+" : "" }}{{ rule.value }}
-                  </span>
+                <div class="view-toggle">
+                  <button
+                    class="view-toggle-btn"
+                    :class="{ active: playerViewMode === 'tabs' }"
+                    @click="playerViewMode = 'tabs'"
+                    title="Tab view"
+                  >&#9776;</button>
+                  <button
+                    class="view-toggle-btn"
+                    :class="{ active: playerViewMode === 'matrix' }"
+                    @click="playerViewMode = 'matrix'"
+                    title="Matrix view"
+                  >&#9638;</button>
                 </div>
               </div>
+
+              <!-- Tab view -->
+              <template v-if="playerViewMode === 'tabs'">
+                <div class="role-tabs">
+                  <button
+                    v-for="role in playerPointsRules.roles"
+                    :key="role"
+                    class="role-tab"
+                    :class="{ active: selectedPlayerRole === role }"
+                    @click="selectedPlayerRole = role"
+                  >{{ role }}</button>
+                </div>
+                <div class="points-list">
+                  <div
+                    v-for="rule in playerPointsRules.rules"
+                    :key="rule.key"
+                    class="points-row"
+                    :class="{ 'points-negative': rule.value < 0 }"
+                  >
+                    <span class="points-event">{{ rule.name }}</span>
+                    <span class="points-value" :class="rule.value < 0 ? 'value-negative' : 'value-positive'">
+                      {{ rule.value > 0 ? "+" : "" }}{{ rule.value }}
+                    </span>
+                  </div>
+                </div>
+              </template>
+
+              <!-- Matrix view -->
+              <template v-else>
+                <div class="matrix-wrap">
+                  <table class="matrix-table">
+                    <thead>
+                      <tr>
+                        <th class="matrix-metric-col"></th>
+                        <th v-for="role in playerPointsMatrix.roles" :key="role" class="matrix-role-col">
+                          {{ role }}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="row in playerPointsMatrix.rows" :key="row.key">
+                        <td class="matrix-metric-name">{{ row.name }}</td>
+                        <td
+                          v-for="role in playerPointsMatrix.roles"
+                          :key="role"
+                          class="matrix-value"
+                          :class="{ 'matrix-na': row.cells[role] === null }"
+                          v-html="row.cells[role] ? renderFormula(row.cells[role]) : '—'"
+                        />
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </template>
             </div>
 
             <!-- Team Points -->
@@ -215,6 +265,8 @@ export default {
       tabs: [], // {id, name, order}
       newRulesData: [],
       selectedTabIndex: 0,
+      selectedPlayerRole: "top",
+      playerViewMode: "matrix",
     };
   },
   async mounted() {
@@ -225,7 +277,6 @@ export default {
     }
     // this.fetchRulesData();
     // this.profile =
-    console.log(this.profile);
   },
   methods: {
     closeDetailsModal(name) {
@@ -239,7 +290,6 @@ export default {
     selectTab(index, f) {
       var fixture = f != 0 ? f : null;
       this.selectedTabIndex = index;
-      console.log(this.selectedTabIndex);
       this.currentFixture = this.newRulesData.find(
         (element) => element.fixture.id == fixture,
       );
@@ -260,7 +310,6 @@ export default {
             return newFix;
           })
           .sort((a, b) => a.order - b.order);
-        console.log("tabs", this.tabs);
 
         this.selectTab(
           this.tabs.find(
@@ -269,8 +318,39 @@ export default {
           this.$store.getters.getFixtureId,
         );
       } catch (error) {
-        console.error("Error fetching data:", error);
       }
+    },
+    renderFormula(cell) {
+      const { formulaType, formulaParams, desc, value } = cell;
+      const tierBadge = (threshold, pts) => {
+        const cls = pts > 0 ? "fp-pos" : pts < 0 ? "fp-neg" : "fp-zero";
+        const ptsLabel = (pts > 0 ? "+" : "") + pts;
+        const thrHtml = threshold !== null
+          ? `<span class="fp-thr">${threshold}</span>`
+          : "";
+        return `<span class="fp-tier ${cls}">${thrHtml}<span class="fp-pts">${ptsLabel}</span></span>`;
+      };
+      try {
+        if (formulaType === 3 && formulaParams) {
+          const tiers = JSON.parse(formulaParams);
+          const badges = tiers.map((t) => tierBadge(t.threshold, t.points)).join("");
+          return `<div class="fp-piecewise" title="${desc}">${badges}</div>`;
+        }
+        if (formulaType === 2 && formulaParams) {
+          const p = JSON.parse(formulaParams);
+          const base = p.basePoints;
+          const bonus = +(p.basePoints + p.bonusRate).toFixed(2);
+          const b1 = tierBadge(`≤${p.threshold}`, base);
+          const b2 = tierBadge(`>${p.threshold}`, bonus);
+          return `<div class="fp-piecewise" title="${desc}">${b1}${b2}</div>`;
+        }
+        if (formulaType === 1) {
+          return `<div class="fp-piecewise" title="${desc}">${tierBadge(null, value)}</div>`;
+        }
+      } catch {
+        // fall through
+      }
+      return `<span>${desc ?? "—"}</span>`;
     },
     getCurrentFixture() {
       const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixture`;
@@ -279,12 +359,10 @@ export default {
         .get(url)
         .then((response) => {
           this.$store.commit("setFixtureId", response.data);
-          console.log("Current fixture: ", this.$store.getters.getFixtureId);
 
           // this.$router.push({name: 'LeaguesView'})
         })
         .catch((error) => {
-          console.log(error.response);
         });
     },
   },
@@ -298,9 +376,59 @@ export default {
       return "";
     },
     playerPointsRules() {
-      return this.currentFixture.rules.filter(
-        (rule) => rule.type === "PlayerPoints",
+      const roleOrder = ["top", "jungle", "mid", "bottom", "support"];
+      const roles = [
+        ...new Set(
+          this.currentFixture.rules
+            .filter((r) => r.type === "PlayerPoints" && roleOrder.includes(r.role))
+            .map((r) => r.role),
+        ),
+      ].sort((a, b) => roleOrder.indexOf(a) - roleOrder.indexOf(b));
+
+      if (!roles.includes(this.selectedPlayerRole)) {
+        this.selectedPlayerRole = roles[0] ?? "top";
+      }
+
+      return {
+        roles,
+        rules: this.currentFixture.rules.filter(
+          (r) => r.type === "PlayerPoints" && r.role === this.selectedPlayerRole,
+        ),
+      };
+    },
+    playerPointsMatrix() {
+      const roleOrder = ["top", "jungle", "mid", "bottom", "support"];
+      const all = this.currentFixture.rules.filter(
+        (r) => r.type === "PlayerPoints" && roleOrder.includes(r.role),
       );
+      const roles = [...new Set(all.map((r) => r.role))].sort(
+        (a, b) => roleOrder.indexOf(a) - roleOrder.indexOf(b),
+      );
+      const keys = [...new Set(all.map((r) => r.key))];
+      const rows = keys.map((key) => {
+        const sample = all.find((r) => r.key === key);
+        return {
+          key,
+          name: sample.name,
+          cells: Object.fromEntries(
+            roles.map((role) => {
+              const match = all.find((r) => r.key === key && r.role === role);
+              return [
+                role,
+                match
+                  ? {
+                      desc: match.formulaDescription,
+                      value: match.value,
+                      formulaType: match.formulaType,
+                      formulaParams: match.formulaParams,
+                    }
+                  : null,
+              ];
+            }),
+          ),
+        };
+      });
+      return { roles, rows };
     },
     teamPointsRules() {
       return this.currentFixture.rules.filter(
@@ -517,7 +645,7 @@ p {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
   margin-bottom: 20px;
 }
@@ -660,6 +788,137 @@ p {
   letter-spacing: 1px;
 }
 
+.points-grid-matrix {
+  grid-template-columns: 1fr;
+}
+
+.points-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.view-toggle {
+  display: flex;
+  gap: 4px;
+}
+
+.view-toggle-btn {
+  padding: 3px 8px;
+  font-size: 13px;
+  background: transparent;
+  border: 1px solid var(--GREY-DARKER);
+  border-radius: 4px;
+  color: var(--GREY);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.view-toggle-btn.active {
+  background: var(--PRIMARY);
+  color: #fff;
+  border-color: var(--PRIMARY);
+}
+
+.matrix-wrap {
+  overflow-x: auto;
+}
+
+.matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.matrix-table thead th {
+  padding: 8px 12px;
+  background: var(--BACKGROUND-DARK);
+  color: var(--GREY);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+  border-bottom: 1px solid var(--GREY-DARKER);
+  white-space: nowrap;
+}
+
+.matrix-metric-col {
+  text-align: left !important;
+  min-width: 140px;
+}
+
+.matrix-role-col {
+  min-width: 130px;
+}
+
+.matrix-table tbody tr {
+  border-bottom: 1px solid var(--GREY-DARKER);
+  transition: background 0.12s;
+}
+
+.matrix-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.matrix-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.matrix-metric-name {
+  padding: 9px 12px;
+  color: var(--GREY);
+  font-weight: 500;
+}
+
+.matrix-value {
+  padding: 9px 12px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 12px;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.matrix-na {
+  color: var(--GREY-DARKER);
+  font-weight: 400;
+}
+
+.role-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 10px 12px;
+  background: var(--BACKGROUND-DARK);
+  border-bottom: 1px solid var(--GREY-DARKER);
+  flex-wrap: wrap;
+}
+
+.role-tab {
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid var(--GREY-DARKER);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--GREY);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.role-tab.active {
+  background: var(--PRIMARY);
+  color: #fff;
+  border-color: var(--PRIMARY);
+}
+
+.role-tab:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--GREY-LIGHT);
+}
+
 .points-list {
   display: flex;
   flex-direction: column;
@@ -709,4 +968,52 @@ p {
 .navbar-toggler-icon.button-rules {
   filter: invert(100%) sepia(100%) grayscale(100%) brightness(200%);
 }
+
+/* Formula renderers — :deep() required because content is injected via v-html */
+:deep(.fp-piecewise) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  justify-content: center;
+}
+
+:deep(.fp-tier) {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 4px;
+  padding: 2px 5px;
+  line-height: 1.2;
+  min-width: 28px;
+}
+
+:deep(.fp-thr) {
+  font-size: 9px;
+  opacity: 0.7;
+  font-weight: 500;
+}
+
+:deep(.fp-pts) {
+  font-weight: 800;
+  font-size: 11px;
+}
+
+:deep(.fp-pos) {
+  background: rgba(76, 175, 80, 0.15);
+  color: #81c784;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+:deep(.fp-neg) {
+  background: rgba(244, 67, 54, 0.15);
+  color: #e57373;
+  border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+:deep(.fp-zero) {
+  background: rgba(158, 158, 158, 0.12);
+  color: #aaa;
+  border: 1px solid rgba(158, 158, 158, 0.25);
+}
+
 </style>

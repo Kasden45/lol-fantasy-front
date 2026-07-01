@@ -72,18 +72,15 @@ export default {
       this.$emit("useChip", this.id);
     },
     fillTeamTile(player) {
-      console.log(player);
       // Fill the corresponding tile in the team display when a player is selected
       // You can add logic to determine which tile to fill based on the player's role
     },
     playerRemoved(role) {
       // Emit an event to notify the parent component (App) about the selected player
-      console.log("usuwam z ", role);
       this.$emit("playerRemove", role);
     },
     rolePicked(role) {
       // Emit an event to notify the parent component (App) about the selected player
-      console.log("chce dodac do ", role);
       this.$emit("rolePick", role);
     },
   },

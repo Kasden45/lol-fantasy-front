@@ -20,7 +20,7 @@
           :class="{
             'captain-player': isCaptain,
           }"
-          >{{ teamPlayer?.team.code + " " + teamPlayer?.summonerName }}</span
+          >{{ (teamPlayer?.team?.code ? teamPlayer.team.code + " " : "") + (teamPlayer?.summonerName ?? "") }}</span
         >
       </div>
       <div class="col-2 inline-text-flag role-sub">
@@ -153,13 +153,14 @@ export default {
   },
   computed: {
     matchStatuses() {
-      return this.playerPoints.gamesPointsDetails.reduce((acc, game) => {
+      return (this.playerPoints?.gamesPointsDetails ?? []).reduce((acc, game) => {
+        if (!game) return acc;
         acc[game.matchId] = game?.match?.state ?? "PLANNED";
         return acc;
       }, {});
     },
     uniqueMatchesThisFixture() {
-      return [...new Set(this.matchesThisFixture.map((item) => item.matchId))];
+      return [...new Set((this.matchesThisFixture ?? []).map((item) => item.matchId))];
     },
     displayedPoints() {
       if (this.isTriple && this.isCaptain) {

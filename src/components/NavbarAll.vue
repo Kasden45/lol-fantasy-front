@@ -249,6 +249,7 @@
                   class="btn first-letter"
                   type="button"
                   id="dropdownMenuAccount"
+                  data-testid="navbar-account-btn"
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
@@ -276,7 +277,7 @@
                       this.$store.getters.getProfileId == ''
                     "
                   >
-                    <a @click="openDetailsModal" class="dropdown-item" href="#">
+                    <a @click="openDetailsModal" data-testid="navbar-login-btn" class="dropdown-item" href="#">
                       <span>Login</span>
                     </a>
                   </li>
@@ -299,6 +300,21 @@
                       MSI 2024
                     </a>
                   </li> -->
+
+                  <li>
+                    <a
+                      :class="{
+                        'active-tournament':
+                          this.$store.getters.getCurrentTournamentId ===
+                          this.msi_2026,
+                      }"
+                      class="dropdown-item"
+                      href="#"
+                      @click="switchTournament(this.msi_2026)"
+                    >
+                      MSI 2026
+                    </a>
+                  </li>
                   <li>
                     <a
                       :class="{
@@ -473,9 +489,11 @@ export default {
           this.$store.commit("setNextFixture", this.nextFixture);
         })
         .catch((error) => {
-          console.log(error.response);
         });
     },
+  },
+  beforeUnmount() {
+    clearInterval(this.timer);
   },
 };
 </script>

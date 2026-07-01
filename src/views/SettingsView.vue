@@ -60,7 +60,6 @@ export default {
           );
         })
         .catch((error) => {
-          console.error("Error fetching settings:", error);
         });
     },
     updateSetting(userSettingId) {
@@ -69,12 +68,10 @@ export default {
         (setting) => setting.userSettingId === userSettingId,
       );
       data.value = data.value == true ? 1 : 0;
-      console.log("updated data: ", data);
       const url = `${this.apiURL}User/${this.$store.getters.getProfileId}/settings`;
       this.axios
         .put(url, data)
         .then((response) => {
-          console.log(response.data);
           data.value = data.value == 1 ? true : false;
 
           // this.clearInputs()

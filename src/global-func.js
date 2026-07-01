@@ -155,7 +155,6 @@ export const func_global = {
     var formData = new FormData();
     formData.append("file", file);
     return this.uploadFile(formData, type, token, id).then((resp) => {
-      console.log(resp);
     });
   },
 
@@ -214,10 +213,8 @@ export const func_global = {
         },
       })
       .then((response) => {
-        console.log(response.data);
       })
       .catch((error) => {
-        console.log(error.response);
       });
   },
   downloadPdfFile(url, token) {
@@ -235,7 +232,6 @@ export const func_global = {
         window.open(objectUrl);
       })
       .catch((error) => {
-        console.log(error.response.status);
       });
   },
   async downloadPhoto(url, token) {
@@ -269,7 +265,6 @@ export const func_global = {
         return urlCreator.createObjectURL(data);
       })
       .catch((error) => {
-        console.log(error.response.status);
         return data;
       });
   },
@@ -285,7 +280,7 @@ export const func_global = {
     return (
       date.getDate().toString().padStart(2, "0") +
       "." +
-      eval(date.getMonth() + 1)
+      (date.getMonth() + 1)
         .toString()
         .padStart(2, "0")
     );
@@ -305,14 +300,14 @@ export const func_global = {
     let from =
       mondayDate.getDate().toString().padStart(2, "0") +
       "." +
-      eval(mondayDate.getMonth() + 1)
+      (mondayDate.getMonth() + 1)
         .toString()
         .padStart(2, "0");
     mondayDate.setDate(mondayDate.getDate() + 6);
     let to =
       mondayDate.getDate().toString().padStart(2, "0") +
       "." +
-      eval(mondayDate.getMonth() + 1)
+      (mondayDate.getMonth() + 1)
         .toString()
         .padStart(2, "0");
     return from + " - " + to;

@@ -5,7 +5,12 @@
     <div class="page-header">
       <div class="header-accent" />
       <div>
-        <p class="eyebrow">LOL Fantasy</p>
+        <p class="eyebrow">
+          {{
+            this.tournaments_icons[this.$store.getters.getCurrentTournamentId]
+          }}
+          Fantasy
+        </p>
         <h1 class="page-title">Leagues</h1>
       </div>
     </div>
@@ -29,11 +34,16 @@
             <label class="field-label">League Name</label>
             <input
               v-model="newLeagueName"
+              data-testid="league-name-input"
               class="field-input"
               placeholder="Enter league name"
             />
           </div>
-          <button class="btn-primary" @click="createLeague">
+          <button
+            class="btn-primary"
+            data-testid="league-create-btn"
+            @click="createLeague"
+          >
             Create League
           </button>
         </div>
@@ -47,11 +57,18 @@
             <label class="field-label">Invitation Code</label>
             <input
               v-model="invitationCode"
+              data-testid="league-join-code-input"
               class="field-input"
               placeholder="Enter invitation code"
             />
           </div>
-          <button class="btn-secondary" @click="joinLeague">Join League</button>
+          <button
+            class="btn-secondary"
+            data-testid="league-join-btn"
+            @click="joinLeague"
+          >
+            Join League
+          </button>
         </div>
       </div>
 
@@ -70,6 +87,7 @@
         <div
           v-for="(league, index) in userLeagues"
           :key="league.invitationCode"
+          :data-testid="'league-row-' + league.invitationCode"
           class="league-row"
           :style="{ animationDelay: `${index * 60}ms` }"
         >
@@ -133,7 +151,6 @@ export default {
         this.newLeagueName = ""; // Clear the input field
         this.loader = false;
       } catch (error) {
-        console.error("Error creating league:", error);
         this.loader = false;
       }
     },
@@ -152,7 +169,6 @@ export default {
         this.invitationCode = ""; // Clear the input field
         this.loader = false;
       } catch (error) {
-        console.error("Error joining league:", error);
         this.loader = false;
       }
     },
@@ -162,9 +178,7 @@ export default {
           `${this.apiURL}User/league/${invitationCode}`,
         );
         this.currentLeague = response.data;
-      } catch (error) {
-        console.error("Error fetching league details:", error);
-      }
+      } catch (error) {}
     },
     async fetchUserLeagues() {
       try {
@@ -172,9 +186,7 @@ export default {
           `${this.apiURL}User/${this.$store.getters.getCurrentTournamentId}/leagues/${this.$store.getters.getProfileId}`,
         ); // Replace with the correct endpoint
         this.userLeagues = response.data;
-      } catch (error) {
-        console.error("Error fetching user leagues:", error);
-      }
+      } catch (error) {}
     },
   },
   mounted() {

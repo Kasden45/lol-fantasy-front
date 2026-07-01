@@ -205,7 +205,6 @@ export default {
     },
     selectTab(index, fixture) {
       this.selectedTabIndex = index;
-      console.log(this.selectedTabIndex);
       this.currentLeague = this.fixturesData.fixtures.find(
         (element) => element.fixture == fixture,
       );
@@ -219,9 +218,7 @@ export default {
         );
         this.currentLeague = response.data;
         this.realLeagueId = this.currentLeague.participants[0].fantasyLeagueId;
-        console.log("get league details", this.currentLeague);
       } catch (error) {
-        console.error("Error fetching league details:", error);
       }
     },
     async getLeagueDetailsWithFixtures(invitationCode) {
@@ -237,9 +234,7 @@ export default {
         // this.tabs = response.data.fixtures.map(function(fix) {
         //     return fix.fixture != null ? fix.fixture : 0;
         //   }).sort();
-        console.log("get league details", this.currentLeague);
       } catch (error) {
-        console.error("Error fetching league details:", error);
       }
     },
     async fetchUserLeagues() {
@@ -247,7 +242,6 @@ export default {
         const response = await this.axios.get(`${this.apiURL}User/leagues`); // Replace with the correct endpoint
         this.userLeagues = response.data;
       } catch (error) {
-        console.error("Error fetching user leagues:", error);
       }
     },
     FetchFixtureGames() {
@@ -261,7 +255,6 @@ export default {
           );
         })
         .catch((error) => {
-          console.error("Error fetching fixture games:", error);
         });
     },
     FetchRules() {
@@ -297,7 +290,6 @@ export default {
             .sort((a, b) => a.order - b.order);
         })
         .catch((error) => {
-          console.log(error.response);
         });
     },
   },

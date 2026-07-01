@@ -49,6 +49,9 @@ export default {
 </script>
 
 <style scoped>
+.layout {
+  background: var(--BACKGROUND-DARK);
+}
 .scroll-top {
   height: 50px;
   width: 50px;

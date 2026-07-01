@@ -148,7 +148,6 @@ export default {
     },
     select() {
       this.$emit("select", this.player);
-      console.log("Selected player:", this.player);
     },
     handleImageError(e) {
       e.target.src =

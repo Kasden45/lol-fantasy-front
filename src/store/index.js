@@ -4,7 +4,6 @@ import createPersistedState from "vuex-persistedstate";
 export default createStore({
   state() {
     return {
-      // SOCIAL
       profileId: "",
       login: "",
       fixtureId: "",
@@ -14,9 +13,6 @@ export default createStore({
       roles: [],
       selectedRequest: null,
       nextFixture: null,
-      // NUTRITION
-
-      // TELEMEDICINE
     };
   },
   mutations: {

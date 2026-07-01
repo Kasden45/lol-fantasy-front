@@ -4,7 +4,12 @@
     <div class="page-header">
       <div class="header-accent" />
       <div>
-        <p class="eyebrow">LCK Fantasy</p>
+        <p class="eyebrow">
+          {{
+            this.tournaments_icons[this.$store.getters.getCurrentTournamentId]
+          }}
+          Fantasy
+        </p>
         <h1 class="page-title">Statistics</h1>
       </div>
     </div>
@@ -271,7 +276,6 @@ export default {
     selectTab(index, f) {
       var fixture = f != 0 ? f : null;
       this.selectedTabIndex = index;
-      console.log(this.selectedTabIndex);
       this.currentFixture = this.newRulesData.find(
         (element) => element.fixture.id == fixture,
       );
@@ -289,13 +293,10 @@ export default {
         .get(url)
         .then((response) => {
           this.$store.commit("setFixtureId", response.data);
-          console.log("Current fixture: ", this.$store.getters.getFixtureId);
 
           // this.$router.push({name: 'LeaguesView'})
         })
-        .catch((error) => {
-          console.log(error.response);
-        });
+        .catch((error) => {});
     },
     async fetchRulesData() {
       try {
@@ -313,7 +314,6 @@ export default {
             return newFix;
           })
           .sort((a, b) => a.order - b.order);
-        console.log("tabs", this.tabs);
         this.tabs.unshift({
           id: 0,
           title: "Total",
@@ -325,12 +325,9 @@ export default {
           ).order,
           this.$store.getters.getFixtureId,
         );
-        console.log("Fixture ID:", this.$store.getters.getFixtureId);
         this.getFixturePlayerSummaryStats(this.$store.getters.getFixtureId);
         this.getFixtureTeamSummaryStats(this.$store.getters.getFixtureId);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
+      } catch (error) {}
     },
     getFixtures() {
       const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixtures`;
@@ -351,9 +348,7 @@ export default {
           this.getFixtureTeamSummaryStats(this.$store.getters.getFixtureId);
           // this.$router.push({name: 'LeaguesView'})
         })
-        .catch((error) => {
-          console.log(error.response);
-        });
+        .catch((error) => {});
     },
     getTotalSummaryStats() {
       this.axios
@@ -361,16 +356,11 @@ export default {
           `${this.apiURL}Stats/${this.$store.getters.getCurrentTournamentId}/summary`,
         )
         .then((response) => {
-          console.log("Summary:", response.data);
           this.playersSummary = response.data;
         })
-        .catch((error) => {
-          console.error("Error fetching stats:", error);
-        });
+        .catch((error) => {});
     },
     getFixturePlayerSummaryStats(fixtureId) {
-      console.log("Fetch stats ");
-
       this.axios
         .get(
           `${this.apiURL}Stats/${
@@ -378,16 +368,11 @@ export default {
           }/summary/players${fixtureId == null ? "" : "/" + fixtureId}`,
         )
         .then((response) => {
-          console.log("Summary:", response.data);
           this.playersSummary = response.data;
         })
-        .catch((error) => {
-          console.error("Error fetching stats:", error);
-        });
+        .catch((error) => {});
     },
     getFixtureTeamSummaryStats(fixtureId) {
-      console.log("Fetch stats ");
-
       this.axios
         .get(
           `${this.apiURL}Stats/${
@@ -395,12 +380,9 @@ export default {
           }/summary/teams${fixtureId == null ? "" : "/" + fixtureId}`,
         )
         .then((response) => {
-          console.log("Summary:", response.data);
           this.teamsSummary = response.data;
         })
-        .catch((error) => {
-          console.error("Error fetching stats:", error);
-        });
+        .catch((error) => {});
     },
   },
   mounted() {
