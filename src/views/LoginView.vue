@@ -57,7 +57,13 @@
       </p>
     </div>
     <div class="w-auto mt-4 mb-2">
-      <button class="account-btn pink-btn" data-testid="login-submit-btn" @click="login">Zaloguj się</button>
+      <button
+        class="account-btn pink-btn"
+        data-testid="login-submit-btn"
+        @click="login"
+      >
+        Zaloguj się
+      </button>
     </div>
 
     <div class="w-auto">
@@ -268,7 +274,7 @@ export default {
       this.axios
         .post(url, data)
         .then((response) => {
-          this.$store.commit("setProfileId", response.data);
+          this.$store.commit("setProfileId", response.data.userId);
           this.getUserInfo();
           this.$router.push({ name: "LeaguesView" });
           this.clearInputs();
@@ -334,8 +340,7 @@ export default {
 
           this.$router.push({ name: "LeaguesView" });
         })
-        .catch((error) => {
-        });
+        .catch((error) => {});
     },
     clearStatus() {
       this.errorLogin = false;
