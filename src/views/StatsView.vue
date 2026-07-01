@@ -4,7 +4,12 @@
     <div class="page-header">
       <div class="header-accent" />
       <div>
-        <p class="eyebrow">LCK Fantasy</p>
+        <p class="eyebrow">
+          {{
+            this.tournaments_icons[this.$store.getters.getCurrentTournamentId]
+          }}
+          Fantasy
+        </p>
         <h1 class="page-title">Statistics</h1>
       </div>
     </div>
@@ -291,8 +296,7 @@ export default {
 
           // this.$router.push({name: 'LeaguesView'})
         })
-        .catch((error) => {
-        });
+        .catch((error) => {});
     },
     async fetchRulesData() {
       try {
@@ -323,8 +327,7 @@ export default {
         );
         this.getFixturePlayerSummaryStats(this.$store.getters.getFixtureId);
         this.getFixtureTeamSummaryStats(this.$store.getters.getFixtureId);
-      } catch (error) {
-      }
+      } catch (error) {}
     },
     getFixtures() {
       const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixtures`;
@@ -345,8 +348,7 @@ export default {
           this.getFixtureTeamSummaryStats(this.$store.getters.getFixtureId);
           // this.$router.push({name: 'LeaguesView'})
         })
-        .catch((error) => {
-        });
+        .catch((error) => {});
     },
     getTotalSummaryStats() {
       this.axios
@@ -356,11 +358,9 @@ export default {
         .then((response) => {
           this.playersSummary = response.data;
         })
-        .catch((error) => {
-        });
+        .catch((error) => {});
     },
     getFixturePlayerSummaryStats(fixtureId) {
-
       this.axios
         .get(
           `${this.apiURL}Stats/${
@@ -370,11 +370,9 @@ export default {
         .then((response) => {
           this.playersSummary = response.data;
         })
-        .catch((error) => {
-        });
+        .catch((error) => {});
     },
     getFixtureTeamSummaryStats(fixtureId) {
-
       this.axios
         .get(
           `${this.apiURL}Stats/${
@@ -384,8 +382,7 @@ export default {
         .then((response) => {
           this.teamsSummary = response.data;
         })
-        .catch((error) => {
-        });
+        .catch((error) => {});
     },
   },
   mounted() {

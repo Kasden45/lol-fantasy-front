@@ -3,7 +3,12 @@
     <div class="page-header">
       <div class="header-accent" />
       <div>
-        <p class="eyebrow">LCK Fantasy</p>
+        <p class="eyebrow">
+          {{
+            this.tournaments_icons[this.$store.getters.getCurrentTournamentId]
+          }}
+          Fantasy
+        </p>
         <h1 class="page-title">Standings</h1>
       </div>
     </div>

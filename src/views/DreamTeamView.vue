@@ -4,7 +4,12 @@
     <div class="page-header">
       <div class="header-accent" />
       <div>
-        <p class="eyebrow">MSI Fantasy</p>
+        <p class="eyebrow">
+          {{
+            this.tournaments_icons[this.$store.getters.getCurrentTournamentId]
+          }}
+          Fantasy
+        </p>
         <h1 class="page-title">Dream Teams</h1>
       </div>
     </div>

@@ -5,7 +5,12 @@
     <div class="page-header">
       <div class="header-accent" />
       <div>
-        <p class="eyebrow">LOL Fantasy</p>
+        <p class="eyebrow">
+          {{
+            this.tournaments_icons[this.$store.getters.getCurrentTournamentId]
+          }}
+          Fantasy
+        </p>
         <h1 class="page-title">Leagues</h1>
       </div>
     </div>
@@ -34,7 +39,11 @@
               placeholder="Enter league name"
             />
           </div>
-          <button class="btn-primary" data-testid="league-create-btn" @click="createLeague">
+          <button
+            class="btn-primary"
+            data-testid="league-create-btn"
+            @click="createLeague"
+          >
             Create League
           </button>
         </div>
@@ -53,7 +62,13 @@
               placeholder="Enter invitation code"
             />
           </div>
-          <button class="btn-secondary" data-testid="league-join-btn" @click="joinLeague">Join League</button>
+          <button
+            class="btn-secondary"
+            data-testid="league-join-btn"
+            @click="joinLeague"
+          >
+            Join League
+          </button>
         </div>
       </div>
 
@@ -163,8 +178,7 @@ export default {
           `${this.apiURL}User/league/${invitationCode}`,
         );
         this.currentLeague = response.data;
-      } catch (error) {
-      }
+      } catch (error) {}
     },
     async fetchUserLeagues() {
       try {
@@ -172,8 +186,7 @@ export default {
           `${this.apiURL}User/${this.$store.getters.getCurrentTournamentId}/leagues/${this.$store.getters.getProfileId}`,
         ); // Replace with the correct endpoint
         this.userLeagues = response.data;
-      } catch (error) {
-      }
+      } catch (error) {}
     },
   },
   mounted() {
