@@ -1,14 +1,23 @@
 <template>
-  <div>
-    <h1>Dream teams</h1>
-    <div class="game-tabs ms-2 justify-content-md-center">
-      <div
-        v-for="(fixture, index) in tabs"
-        :key="fixture.order"
-        @click="selectTab(fixture.order, fixture.id)"
-        :class="{ active: selectedTabIndex === fixture.order }"
-      >
-        {{ fixture.title }}
+  <div class="stats-page">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="header-accent" />
+      <div>
+        <p class="eyebrow">MSI Fantasy</p>
+        <h1 class="page-title">Dream Teams</h1>
+      </div>
+    </div>
+    <div class="tabs-wrapper">
+      <div class="game-tabs ms-2 justify-content-md-center">
+        <div
+          v-for="(fixture, index) in tabs"
+          :key="fixture.order"
+          @click="selectTab(fixture.order, fixture.id)"
+          :class="{ active: selectedTabIndex === fixture.order }"
+        >
+          {{ fixture.title }}
+        </div>
       </div>
     </div>
     <div v-if="playersForSummonersRiftView != null">
@@ -136,35 +145,35 @@ export default {
     fillMapPlayers() {
       this.playersForSummonersRiftView = [];
       this.playersForSummonersRiftView.push(
-        this.teamPlayerToMapPlayer(this.dreamTeam.dreamTeamPlayers.top, false)
+        this.teamPlayerToMapPlayer(this.dreamTeam.dreamTeamPlayers.top, false),
       );
       this.playersForSummonersRiftView.push(
         this.teamPlayerToMapPlayer(
           this.dreamTeam.dreamTeamPlayers.jungle,
-          false
-        )
+          false,
+        ),
       );
       this.playersForSummonersRiftView.push(
-        this.teamPlayerToMapPlayer(this.dreamTeam.dreamTeamPlayers.mid, false)
+        this.teamPlayerToMapPlayer(this.dreamTeam.dreamTeamPlayers.mid, false),
       );
       this.playersForSummonersRiftView.push(
         this.teamPlayerToMapPlayer(
           this.dreamTeam.dreamTeamPlayers.bottom,
-          false
-        )
+          false,
+        ),
       );
       this.playersForSummonersRiftView.push(
         this.teamPlayerToMapPlayer(
           this.dreamTeam.dreamTeamPlayers.support,
-          false
-        )
+          false,
+        ),
       );
     },
     selectTab(index, f) {
       var fixture = f != 0 ? f : null;
       this.selectedTabIndex = index;
       this.currentFixture = this.newRulesData.find(
-        (element) => element.fixture.id == fixture
+        (element) => element.fixture.id == fixture,
       );
       this.getDreamTeam(this.currentFixture.fixture.id);
     },
@@ -178,13 +187,12 @@ export default {
 
           // this.$router.push({name: 'LeaguesView'})
         })
-        .catch((error) => {
-        });
+        .catch((error) => {});
     },
     async fetchRulesData() {
       try {
         const response = await this.axios.get(
-          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/rules`
+          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/rules`,
         );
         this.newRulesData = response.data;
         this.tabs = response.data
@@ -200,13 +208,12 @@ export default {
 
         this.selectTab(
           this.tabs.find(
-            (element) => element.id == this.$store.getters.getFixtureId
+            (element) => element.id == this.$store.getters.getFixtureId,
           ).order,
-          this.$store.getters.getFixtureId
+          this.$store.getters.getFixtureId,
         );
         this.getDreamTeam(this.$store.getters.getFixtureId);
-      } catch (error) {
-      }
+      } catch (error) {}
     },
     getFixtures() {
       const url = `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/fixtures`;
@@ -215,31 +222,29 @@ export default {
         .get(url)
         .then((response) => {
           this.matchesByFixture = response.data.fixturesWithMatches.sort(
-            (a, b) => a.fixture.order - b.fixture.order
+            (a, b) => a.fixture.order - b.fixture.order,
           );
           this.selectTab(
             this.tabs.find(
-              (element) => element.id == this.$store.getters.getFixtureId
+              (element) => element.id == this.$store.getters.getFixtureId,
             ).order,
-            this.$store.getters.getFixtureId
+            this.$store.getters.getFixtureId,
           );
           this.getDreamTeam(this.$store.getters.getFixtureId);
           // this.$router.push({name: 'LeaguesView'})
         })
-        .catch((error) => {
-        });
+        .catch((error) => {});
     },
     getDreamTeam(fixtureId) {
       this.axios
         .get(
-          `${this.apiURL}Stats/${this.$store.getters.getCurrentTournamentId}/dream_team/${fixtureId}`
+          `${this.apiURL}Stats/${this.$store.getters.getCurrentTournamentId}/dream_team/${fixtureId}`,
         )
         .then((response) => {
           this.dreamTeam = response.data;
           this.fillMapPlayers();
         })
-        .catch((error) => {
-        });
+        .catch((error) => {});
     },
   },
   mounted() {
@@ -252,10 +257,57 @@ export default {
 </script>
 
 <style scoped>
-/* Add custom styles for team and player cards as needed */
+.stats-page {
+  min-height: 100vh;
+  background: var(--BACKGROUND-DARK);
+  padding: 40px 32px;
+  font-family: "DM Sans", sans-serif;
+}
+
+/* Header */
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.header-accent {
+  width: 4px;
+  height: 52px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, var(--PRIMARY), var(--PRIMARY-LIGHTER));
+  flex-shrink: 0;
+}
+
+.eyebrow {
+  margin: 0 0 2px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--PRIMARY);
+}
+
+.page-title {
+  margin: 0;
+  font-family: "Syne", sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--GREY-LIGHT);
+  line-height: 1;
+}
+
+/* Tabs */
+.tabs-wrapper {
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--GREY-DARKER);
+}
+
 .game-tabs {
   display: flex;
   margin-bottom: 20px;
+  color: #fff;
 }
 
 .game-tabs div {

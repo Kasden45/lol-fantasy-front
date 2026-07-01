@@ -78,7 +78,9 @@
               :key="slot.slot"
               class="team-points-details"
               :gamesList="fixtureGames"
-              :isCaptain="slot.slot !== 'sub' && teamPlayers.captain == index + 1"
+              :isCaptain="
+                slot.slot !== 'sub' && teamPlayers.captain == index + 1
+              "
               :isSub="slot.slot === 'sub'"
               :gamesPointsDetails="slot.gamesPointsDetails"
               :totalPointsA="slot.totalPoints"
@@ -91,7 +93,7 @@
               :totalPointsA="teamPlayers.teamPoints.totalPoints"
             />
           </div>
-          <div v-else class="col-8">
+          <div v-else class="col-8 label-color">
             {{ this.errorUserTeamFixture }}
           </div>
         </div>
@@ -235,7 +237,7 @@ export default {
       this.errorUserTeamFixture = "Loading . . .";
       this.axios
         .get(
-          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/user_team/${this.$store.getters.getProfileId}/fixture/${fixtureId}`
+          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/user_team/${this.$store.getters.getProfileId}/fixture/${fixtureId}`,
         )
         .then((response) => {
           this.teamPlayers = response.data;
@@ -266,7 +268,7 @@ export default {
       this.errorUserTeamFixture = "Loading . . .";
       this.axios
         .get(
-          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/user_team/${this.$store.getters.getProfileId}/fixture/${this.$store.getters.getFixtureId}`
+          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/user_team/${this.$store.getters.getProfileId}/fixture/${this.$store.getters.getFixtureId}`,
         )
         .then((response) => {
           this.teamPlayers = response.data;
@@ -293,7 +295,10 @@ export default {
         .filter((s) => s.slot !== "sub")
         .forEach((slot, index) => {
           this.playersForSummonersRiftView.push(
-            this.teamPlayerToMapPlayer(slot, this.teamPlayers.captain == index + 1)
+            this.teamPlayerToMapPlayer(
+              slot,
+              this.teamPlayers.captain == index + 1,
+            ),
           );
         });
     },
@@ -312,13 +317,12 @@ export default {
     FetchFixtureGames() {
       this.axios
         .get(
-          `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/matches`
+          `${this.apiURL}Matches/${this.$store.getters.getCurrentTournamentId}/matches`,
         )
         .then((response) => {
           this.fixtureGames = response.data;
         })
-        .catch((error) => {
-        });
+        .catch((error) => {});
     },
   },
   mounted() {
@@ -326,7 +330,7 @@ export default {
 
     this.axios
       .get(
-        `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/rules`
+        `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/rules`,
       )
       .then((response) => {
         this.tabs = response.data
@@ -341,15 +345,14 @@ export default {
           .sort((a, b) => a.order - b.order);
         this.fetchUserTeam();
         this.selectedTabIndex = this.tabs.find(
-          (element) => element.id == this.$store.getters.getFixtureId
+          (element) => element.id == this.$store.getters.getFixtureId,
         ).order;
         // this.$router.push({name: 'LeaguesView'})
         // this.getCurrentFixture().then((response) => {
         //     this.selectedTabIndex = this.$store.getters.getFixtureId;
         //   });
       })
-      .catch((error) => {
-      });
+      .catch((error) => {});
 
     this.FetchFixtureGames();
     // this.tabs = Array.from({length: this.$store.getters.getFixtureId}, (_, i) => i + 1)
@@ -370,7 +373,9 @@ export default {
 }
 .game-tabs {
   display: flex;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  color: var(--GREY-LIGHT);
 }
 
 .summoners-rift {
@@ -482,5 +487,8 @@ export default {
   font-weight: 800;
   color: white;
   border: none;
+}
+.label-color {
+  color: var(--GREY-LIGHT);
 }
 </style>

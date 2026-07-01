@@ -1,6 +1,14 @@
 <!-- TeamSelection.vue -->
 <template>
-  <div class="container">
+  <div class="container stats-page">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="header-accent" />
+      <div>
+        <p class="eyebrow">MSI Fantasy</p>
+        <h1 class="page-title">Team Selection</h1>
+      </div>
+    </div>
     <LazyLoader v-if="loader" />
     <div>
       <label class="filter-label">Your teams</label>
@@ -33,7 +41,9 @@
         />
         <div class="row justify-content-md-center m-auto py-2">
           <div class="col-3 d-flex justify-content-start ps-0">
-            <label class="w-auto d-flex align-self-center me-1" for="captain"
+            <label
+              class="w-auto d-flex align-self-center me-1 label-color"
+              for="captain"
               >Captain:
             </label>
             <select
@@ -66,9 +76,15 @@
           </div>
         </div>
 
-        <div v-if="this.submittingTeam">Saving your team . . .</div>
-        <div v-if="this.successSubmittingTeam">Team saved!</div>
-        <div v-if="this.errorSubmittingTeam">You can't make such team!</div>
+        <div class="label-color" v-if="this.submittingTeam">
+          Saving your team . . .
+        </div>
+        <div class="label-color" v-if="this.successSubmittingTeam">
+          Team saved!
+        </div>
+        <div class="label-color" v-if="this.errorSubmittingTeam">
+          You can't make such team!
+        </div>
       </div>
 
       <div
@@ -113,10 +129,10 @@
               />
               <g transform="rotate(90, 270, 270)">
                 <text
-                  class="progress-ring__text"
+                  class="progress-ring__text label-color"
                   :x="center"
                   :y="center"
-                  fill="#000"
+                  fill="var(--GREY-LIGHT)"
                   font-size="26"
                   font-weight="bold"
                   text-anchor="middle"
@@ -127,12 +143,6 @@
               </g>
               <g transform="rotate(90, 165, 165)">
                 <text
-                  :style="{
-                    fill:
-                      this.teamValue > this.nextFixture.fixture.teamValueLimit
-                        ? 'red'
-                        : black,
-                  }"
                   :class="{
                     'fill-primary':
                       this.teamValue <= this.nextFixture.fixture.teamValueLimit,
@@ -193,10 +203,11 @@
               />
               <g transform="rotate(90, 270, 270)">
                 <text
-                  class="progress-ring__text"
+                  class="progress-ring__text label-color"
                   :x="center"
                   :y="center"
-                  fill="#000"
+                  color="var(--GREY-LIGHT)"
+                  fill="var(--GREY-LIGHT)"
                   font-size="26"
                   font-weight="bold"
                   text-anchor="middle"
@@ -249,7 +260,7 @@
             :key="index"
             @click="selectTab(index)"
             :class="{ active: selectedTabIndex === index }"
-            class="game-tab justify-content-center"
+            class="game-tab justify-content-center label-color"
           >
             {{ index == 1 ? "" : game }}
             <div class="vl" v-if="index == 1"></div>
@@ -274,7 +285,7 @@
           </div>
         </div>
 
-        <div class="" v-if="selectedTabIndex == 0">
+        <div class="label-color" v-if="selectedTabIndex == 0">
           <PlayersListV2
             :currentFixture="this.lastPlayedFixture"
             :playersRivals="playersRivals"
@@ -1092,6 +1103,46 @@ export default {
 </script>
 
 <style scoped>
+.stats-page {
+  min-height: 100vh;
+  background: var(--BACKGROUND-DARK);
+  padding: 40px 32px;
+  font-family: "DM Sans", sans-serif;
+}
+
+/* Header */
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.header-accent {
+  width: 4px;
+  height: 52px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, var(--PRIMARY), var(--PRIMARY-LIGHTER));
+  flex-shrink: 0;
+}
+
+.eyebrow {
+  margin: 0 0 2px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--PRIMARY);
+}
+
+.page-title {
+  margin: 0;
+  font-family: "Syne", sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--GREY-LIGHT);
+  line-height: 1;
+}
 .filter-label {
   color: var(--PRIMARY);
   font-weight: 900;
@@ -1217,5 +1268,9 @@ export default {
 
 .fill-error {
   fill: red;
+}
+
+.label-color {
+  color: var(--GREY-LIGHT);
 }
 </style>
