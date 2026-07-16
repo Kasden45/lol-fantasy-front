@@ -49,6 +49,10 @@
       </div>
 
       <div v-else-if="!isActive" class="inactive-overlay">INACTIVE</div>
+
+      <div v-else-if="teamLimitReached" class="team-limit-overlay">
+        TEAM LIMIT
+      </div>
     </div>
 
     <!-- Name -->
@@ -103,6 +107,14 @@ export default {
     userTeamsPicked: Object,
     matchups: Object,
     selectedForSwap: Boolean,
+    userTeamCodes: {
+      type: Array,
+      default: () => [],
+    },
+    maxPlayersFromOneTeam: {
+      type: Number,
+      default: null,
+    },
   },
   computed: {
     isActive() {
@@ -116,13 +128,21 @@ export default {
         this.player.esportsPlayerId,
       );
     },
+    teamLimitReached() {
+      if (!this.maxPlayersFromOneTeam) return false;
+      const sameTeamCount = this.userTeamCodes.filter(
+        (code) => code === this.player.team.code,
+      ).length;
+      return sameTeamCount >= this.maxPlayersFromOneTeam;
+    },
     isSelectable() {
       return (
         this.isActive &&
         (this.selectedRole === this.player.role ||
           this.selectedRole === "sub") &&
         !this.isOwnedByOther &&
-        !this.isOwnedByUser
+        !this.isOwnedByUser &&
+        !this.teamLimitReached
       );
     },
     cardClasses() {
@@ -397,6 +417,21 @@ export default {
 .inactive-overlay {
   color: #f85a67;
   border: 1px solid #f85a67;
+}
+
+.team-limit-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.85);
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  color: #f59e0b;
+  border: 1px solid #f59e0b;
 }
 
 /* Player Name */
