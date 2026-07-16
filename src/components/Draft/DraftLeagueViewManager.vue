@@ -1156,7 +1156,7 @@ export default {
         // Build full state
         var allPickedPlayers = {};
         allPickedPlayers[this.userId] = this.selectedTeam;
-        Object.keys(this.otherTeams).forEach(function (key) {
+        Object.keys(this.otherTeams).forEach((key) => {
           allPickedPlayers[key] = this.otherTeams[key];
         });
 
@@ -1343,10 +1343,10 @@ export default {
     },
 
     async fetchRules() {
-      if (!this.nextFixture?.fixture?.id) return;
+      if (!this.nextFixture?.fixture?.fixtureId) return;
       try {
         const response = await this.axios.get(
-          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/rules/${this.nextFixture.fixture.id}`,
+          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/rules/${this.nextFixture.fixture.fixtureId}`,
         );
         const fixtureRules = response.data[0]?.rules || [];
         const rule = fixtureRules.find(
