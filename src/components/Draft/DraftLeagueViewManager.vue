@@ -1352,7 +1352,7 @@ export default {
         const rule = fixtureRules.find(
           (r) => r.name === "Players from the same team",
         );
-        this.maxPlayersFromOneTeam = rule?.value || null;
+        this.maxPlayersFromOneTeam = Number(rule?.value) || null;
       } catch (error) {
         this.maxPlayersFromOneTeam = null;
       }
