@@ -255,7 +255,7 @@ export default {
       _unsubscribeFunctions: [],
     };
   },
-  emits: ["refetch-teams", "refetch-swaps", "choose-role"],
+  emits: ["refetch-teams", "refetch-swaps", "choose-role", "outgoing-player-change"],
   computed: {
     proposedSwapData() {
       if (!this.selectedFromYourTeam) return null;
@@ -474,6 +474,11 @@ export default {
       } catch (error) {
         this.swapLoading = false;
       }
+    },
+  },
+  watch: {
+    selectedFromYourTeam(player) {
+      this.$emit("outgoing-player-change", player);
     },
   },
   created() {
