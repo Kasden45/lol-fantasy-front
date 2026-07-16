@@ -149,6 +149,8 @@
         :userTeamsPicked="userTeamsPicked"
         :matchups="matchups"
         :swapMode="swapMode"
+        :userTeamCodes="userTeamCodes"
+        :maxPlayersFromOneTeam="maxPlayersFromOneTeam"
         :selectedForSwap="
           selectedForSwap?.esportsPlayerId === player.esportsPlayerId
             ? true
@@ -196,6 +198,14 @@ export default {
     players: Array,
     teams: Array,
     tournamentCode: String,
+    userTeamCodes: {
+      type: Array,
+      default: () => [],
+    },
+    maxPlayersFromOneTeam: {
+      type: Number,
+      default: null,
+    },
   },
   name: "PlayersListDraft",
   data() {
