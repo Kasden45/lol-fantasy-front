@@ -130,6 +130,7 @@
         :timeRemaining="60"
         :isYourTurn="this.isCurrentDrafter"
         :isAutoDrafting="false"
+        :maxPlayersFromOneTeam="maxPlayersFromOneTeam"
       />
       <!-- <div class="team-list col-3">
           <h3>Your Team</h3>

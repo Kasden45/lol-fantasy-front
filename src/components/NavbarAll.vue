@@ -277,7 +277,12 @@
                       this.$store.getters.getProfileId == ''
                     "
                   >
-                    <a @click="openDetailsModal" data-testid="navbar-login-btn" class="dropdown-item" href="#">
+                    <a
+                      @click="openDetailsModal"
+                      data-testid="navbar-login-btn"
+                      class="dropdown-item"
+                      href="#"
+                    >
                       <span>Login</span>
                     </a>
                   </li>
@@ -290,17 +295,20 @@
                       <span>Settings</span>
                     </a>
                   </li>
-                  <!-- <li>
-                    <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.worlds_2023 }" class="dropdown-item" href="#" @click="switchTournament(this.worlds_2023)">
-                      WORLDS 2023
+                  <li>
+                    <a
+                      :class="{
+                        'active-tournament':
+                          this.$store.getters.getCurrentTournamentId ===
+                          this.lck_split_3_2026,
+                      }"
+                      class="dropdown-item"
+                      href="#"
+                      @click="switchTournament(this.lck_split_3_2026)"
+                    >
+                      LCK Split 3 2026
                     </a>
                   </li>
-                  <li>
-                    <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.msi_2024 }" class="dropdown-item" href="#" @click="switchTournament(this.msi_2024)">
-                      MSI 2024
-                    </a>
-                  </li> -->
-
                   <li>
                     <a
                       :class="{
@@ -334,20 +342,6 @@
                       :class="{
                         'active-tournament':
                           this.$store.getters.getCurrentTournamentId ===
-                          this.lec_split_1_2026,
-                      }"
-                      class="dropdown-item"
-                      href="#"
-                      @click="switchTournament(this.lec_split_1_2026)"
-                    >
-                      LEC Split 1 2026
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      :class="{
-                        'active-tournament':
-                          this.$store.getters.getCurrentTournamentId ===
                           this.worlds_2025,
                       }"
                       class="dropdown-item"
@@ -357,25 +351,6 @@
                       WORLDS 2025
                     </a>
                   </li>
-                  <li>
-                    <a
-                      :class="{
-                        'active-tournament':
-                          this.$store.getters.getCurrentTournamentId ===
-                          this.msi_2025,
-                      }"
-                      class="dropdown-item"
-                      href="#"
-                      @click="switchTournament(this.msi_2025)"
-                    >
-                      MSI 2025
-                    </a>
-                  </li>
-                  <!-- <li>
-                    <a :class="{ 'active-tournament': this.$store.getters.getCurrentTournamentId === this.worlds_2024 }" class="dropdown-item" href="#" @click="switchTournament(this.worlds_2024)">
-                      WORLDS 2024
-                    </a>
-                  </li> -->
                   <li
                     v-if="
                       this.$store.getters.getProfileId != null &&
@@ -488,8 +463,7 @@ export default {
             })[0];
           this.$store.commit("setNextFixture", this.nextFixture);
         })
-        .catch((error) => {
-        });
+        .catch((error) => {});
     },
   },
   beforeUnmount() {
