@@ -174,6 +174,12 @@ export default {
   gap: 24px;
 }
 
+.comparison-pair {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
 /* Players */
 .players {
   display: flex;
