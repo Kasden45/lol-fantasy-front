@@ -1,73 +1,77 @@
 <template>
   <div class="comparison-container">
-    <!-- Player/Team Header -->
-    <div class="players" v-if="swap.playerInitiator || swap.teamInitiator">
-      <!-- Left -->
-      <div class="player-card">
-        <p class="owner-name">{{ swap.tradeInitiatorUserTeam.userLogin }}</p>
-        <img
-          :src="
-            swap.playerInitiator
-              ? swap.playerInitiator.imageUrl
-              : swap.teamInitiator.imageUrl
-          "
-          class="player-img"
-        />
-        <p class="summoner-name">
-          {{
-            swap.playerInitiator
-              ? swap.playerInitiator.summonerName
-              : swap.teamInitiator.name
-          }}
-        </p>
-        <span class="team-badge">{{
-          swap.playerInitiator
-            ? swap.playerInitiator.team.code
-            : swap.teamInitiator.code
-        }}</span>
+    <div
+      v-for="(pair, idx) in comparisonPairs"
+      :key="idx"
+      class="comparison-pair"
+    >
+      <!-- Player/Team Header -->
+      <div class="players" v-if="pair.left.player || pair.left.team">
+        <!-- Left -->
+        <div class="player-card">
+          <p class="owner-name">{{ swap.tradeInitiatorUserTeam.userLogin }}</p>
+          <img
+            :src="
+              pair.left.player
+                ? pair.left.player.imageUrl
+                : pair.left.team.imageUrl
+            "
+            class="player-img"
+          />
+          <p class="summoner-name">
+            {{
+              pair.left.player
+                ? pair.left.player.summonerName
+                : pair.left.team.name
+            }}
+          </p>
+          <span class="team-badge">{{
+            pair.left.player ? pair.left.player.team.code : pair.left.team.code
+          }}</span>
+        </div>
+
+        <!-- VS -->
+        <div class="vs-col">
+          <span class="vs-text">VS</span>
+        </div>
+
+        <!-- Right -->
+        <div class="player-card">
+          <p class="owner-name">{{ swap.tradeReceiverUserTeam.userLogin }}</p>
+          <img
+            :src="
+              pair.right.player
+                ? pair.right.player.imageUrl
+                : pair.right.team.imageUrl
+            "
+            class="player-img"
+          />
+          <p class="summoner-name">
+            {{
+              pair.right.player
+                ? pair.right.player.summonerName
+                : pair.right.team.name
+            }}
+          </p>
+          <span class="team-badge">{{
+            pair.right.player
+              ? pair.right.player.team.code
+              : pair.right.team.code
+          }}</span>
+        </div>
       </div>
 
-      <!-- VS -->
-      <div class="vs-col">
-        <span class="vs-text">VS</span>
-      </div>
-
-      <!-- Right -->
-      <div class="player-card">
-        <p class="owner-name">{{ swap.tradeReceiverUserTeam.userLogin }}</p>
-        <img
-          :src="
-            swap.playerReceiver
-              ? swap.playerReceiver.imageUrl
-              : swap.teamReceiver.imageUrl
-          "
-          class="player-img"
-        />
-        <p class="summoner-name">
-          {{
-            swap.playerReceiver
-              ? swap.playerReceiver.summonerName
-              : swap.teamReceiver.name
-          }}
-        </p>
-        <span class="team-badge">{{
-          swap.playerReceiver
-            ? swap.playerReceiver.team.code
-            : swap.teamReceiver.code
-        }}</span>
-      </div>
-    </div>
-
-    <!-- Stats -->
-    <div class="stats-block">
-      <div v-for="stat in stats" :key="stat.label" class="stat-row">
-        <span class="stat-value" :class="getClass(stat.left, stat.right)">
-          {{ stat.left }}
-        </span>
-        <span class="stat-label">{{ stat.label }}</span>
-        <span class="stat-value" :class="getClass(stat.right, stat.left)">
-          {{ stat.right }}
-        </span>
+      <!-- Stats -->
+      <div class="stats-block">
+        <div v-for="stat in getStats(pair)" :key="stat.label" class="stat-row">
+          <span class="stat-value" :class="getClass(stat.left, stat.right)">
+            {{ stat.left }}
+          </span>
+          <span class="stat-label">{{ stat.label }}</span>
+          <span class="stat-value" :class="getClass(stat.right, stat.left)">
+            {{ stat.right }}
+          </span>
+        </div>
       </div>
     </div>
   </div>
@@ -86,17 +90,31 @@ export default {
     return {};
   },
   computed: {
-    stats() {
-      const p1 = this.swap.playerInitiator ?? this.swap.teamInitiator;
-      const p2 = this.swap.playerReceiver ?? this.swap.teamReceiver;
-      // p1.points = 12.5;
-      // p2.points = 15.0;
-
-      // p1.matchesPlayed = 10;
-      // p2.matchesPlayed = 12;
-
-      // p1.price = 5.0;
-      // p2.price = 6.0;
+    comparisonPairs() {
+      if (this.swap.initiatorItems && this.swap.receiverItems) {
+        return this.swap.initiatorItems.map((item, i) => ({
+          left: item,
+          right: this.swap.receiverItems[i],
+        }));
+      }
+      return [
+        {
+          left: {
+            player: this.swap.playerInitiator,
+            team: this.swap.teamInitiator,
+          },
+          right: {
+            player: this.swap.playerReceiver,
+            team: this.swap.teamReceiver,
+          },
+        },
+      ];
+    },
+  },
+  methods: {
+    getStats(pair) {
+      const p1 = pair.left.player ?? pair.left.team;
+      const p2 = pair.right.player ?? pair.right.team;
       return [
         {
           label: "Points",
@@ -140,8 +158,6 @@ export default {
         },
       ];
     },
-  },
-  methods: {
     getClass(val, opponent) {
       if (val > opponent) return "better";
       if (val < opponent) return "worse";
