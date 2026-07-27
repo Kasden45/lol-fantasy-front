@@ -393,12 +393,19 @@ export default {
       // In actual implementation, emit event to parent to select player from pool
     },
     selectPlayerFromYourTeam(player, ownTeam, profileId) {
-      const key = player.esportsPlayerId || player.slug;
-      const targetList =
-        ownTeam && profileId === this.profileId
-          ? "selectedFromYourTeam"
-          : "selectedFromTargetTeam";
+      const isOwnTeam = ownTeam && profileId === this.profileId;
+      const targetList = isOwnTeam
+        ? "selectedFromYourTeam"
+        : "selectedFromTargetTeam";
 
+      // Player-pool tab must stay single-item: always overwrite the own-team
+      // selection instead of toggling/appending into the multi-select list.
+      if (isOwnTeam && this.activeTab === "unused") {
+        this.selectedFromYourTeam = [player];
+        return;
+      }
+
+      const key = player.esportsPlayerId || player.slug;
       const list = this[targetList];
       const existingIndex = list.findIndex(
         (p) => (p.esportsPlayerId || p.slug) === key,
@@ -423,9 +430,16 @@ export default {
       });
 
       if (remainingFrom.length !== remainingTo.length) return false;
-      return remainingFrom.every(
-        (role, i) => role === "sub" || remainingTo[i] === "sub",
-      );
+
+      // Balance via the sub wildcard using counts rather than positional
+      // pairing: every non-sub leftover on one side must be absorbable by a
+      // sub leftover on the other side.
+      const nonSubFrom = remainingFrom.filter((role) => role !== "sub").length;
+      const nonSubTo = remainingTo.filter((role) => role !== "sub").length;
+      const subFrom = remainingFrom.length - nonSubFrom;
+      const subTo = remainingTo.length - nonSubTo;
+
+      return nonSubFrom <= subTo && nonSubTo <= subFrom;
     },
     selectFromTargetTeam(role) {
       this.selectedTargetRole = role;
