@@ -494,7 +494,13 @@ export default {
         const response = await this.axios.get(
           `${this.apiURL}Draft/${this.$store.getters.getCurrentTournamentId}/trades/${this.realLeagueId}`,
         );
-        this.swaps = response.data.draftTrades;
+        const singleTrades = response.data.draftTrades.map((t) => ({ ...t, isGroup: false }));
+        const groupTrades = (response.data.tradeGroups || []).map((g) => ({
+          ...g,
+          lolDraftTradeId: `group-${g.tradeGroupId}`,
+          isGroup: true,
+        }));
+        this.swaps = [...singleTrades, ...groupTrades];
         this.unansweredSwaps = this.swaps.filter(
           (s) =>
             s.tradeReceiverUserTeam?.userId ===

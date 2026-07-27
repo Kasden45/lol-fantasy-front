@@ -45,38 +45,22 @@
     </div>
 
     <div class="swap-request-body">
-      <div class="swap-player">
-        <img
-          v-if="swap.playerInitiator"
-          :src="swap.playerInitiator.imageUrl"
-          :alt="swap.playerInitiator.summonerName"
-        />
-        <span v-if="swap.playerInitiator">{{
-          swap.playerInitiator.summonerName
-        }}</span>
-        <img
-          v-if="swap.teamInitiator"
-          :src="swap.teamInitiator.imageUrl"
-          :alt="swap.teamInitiator.name"
-        />
-        <span v-if="swap.teamInitiator">{{ swap.teamInitiator.name }}</span>
+      <div class="swap-side">
+        <div v-for="(item, idx) in initiatorDisplayItems" :key="'i' + idx" class="swap-player">
+          <img v-if="item.player" :src="item.player.imageUrl" :alt="item.player.summonerName" />
+          <span v-if="item.player">{{ item.player.summonerName }}</span>
+          <img v-if="item.team" :src="item.team.imageUrl" :alt="item.team.name" />
+          <span v-if="item.team">{{ item.team.name }}</span>
+        </div>
       </div>
       <span class="for-text">for</span>
-      <div class="swap-player">
-        <img
-          v-if="swap.playerReceiver"
-          :src="swap.playerReceiver.imageUrl"
-          :alt="swap.playerReceiver.summonerName"
-        />
-        <span v-if="swap.playerReceiver">{{
-          swap.playerReceiver.summonerName
-        }}</span>
-        <img
-          v-if="swap.teamReceiver"
-          :src="swap.teamReceiver.imageUrl"
-          :alt="swap.teamReceiver.name"
-        />
-        <span v-if="swap.teamReceiver">{{ swap.teamReceiver.name }}</span>
+      <div class="swap-side">
+        <div v-for="(item, idx) in receiverDisplayItems" :key="'r' + idx" class="swap-player">
+          <img v-if="item.player" :src="item.player.imageUrl" :alt="item.player.summonerName" />
+          <span v-if="item.player">{{ item.player.summonerName }}</span>
+          <img v-if="item.team" :src="item.team.imageUrl" :alt="item.team.name" />
+          <span v-if="item.team">{{ item.team.name }}</span>
+        </div>
       </div>
     </div>
 
@@ -144,7 +128,16 @@ export default {
       currentSwap: null,
     };
   },
-  computed: {},
+  computed: {
+    initiatorDisplayItems() {
+      if (this.swap.initiatorItems) return this.swap.initiatorItems;
+      return [{ player: this.swap.playerInitiator, team: this.swap.teamInitiator }];
+    },
+    receiverDisplayItems() {
+      if (this.swap.receiverItems) return this.swap.receiverItems;
+      return [{ player: this.swap.playerReceiver, team: this.swap.teamReceiver }];
+    },
+  },
   methods: {
     openDetailsModal(swap) {
       this.currentSwap = swap;
@@ -216,6 +209,13 @@ export default {
 .compare-btn:hover {
   color: var(--PRIMARY, #00d9ff) !important;
 }
+.swap-side {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
 .swap-player {
   display: flex;
   flex-direction: column;
