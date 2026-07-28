@@ -21,6 +21,7 @@
         :own-team="ownTeam"
         :your-turn="yourTurn"
         :selected-role="selectedRole"
+        :selected-slots="selectedSlots"
         @handle-position-click="handlePositionClick"
         @handle-position-swap-click="handlePositionClickSwap"
         @handle-position-swap-player="handlePositionSwapPlayer"
@@ -70,6 +71,10 @@ export default {
     selectedRole: {
       type: String,
       default: null,
+    },
+    selectedSlots: {
+      type: Array,
+      default: () => [],
     },
     nextFixture: {
       type: Object,
