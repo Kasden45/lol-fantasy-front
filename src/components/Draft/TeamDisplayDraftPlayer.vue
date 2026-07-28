@@ -15,7 +15,7 @@
           position.role == selectedRole &&
           !position.player &&
           !position.team) ||
-        (swapMode && position.role == selectedRole),
+        (swapMode && selectedSlots.includes(position.role)),
     }"
     @click="
       ownTeam && yourTurn
@@ -214,6 +214,10 @@ export default {
     selectedRole: {
       type: String,
       default: null,
+    },
+    selectedSlots: {
+      type: Array,
+      default: () => [],
     },
     // nextFixture: {
     //   type: Object,

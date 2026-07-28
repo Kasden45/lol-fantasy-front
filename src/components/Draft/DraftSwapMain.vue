@@ -34,6 +34,7 @@
           :next-fixture="nextFixture"
           :your-turn="false"
           :selected-role="selectedYourRole"
+          :selected-slots="ownSelectedSlots"
           :swap-mode="true"
           @choose-role="selectFromYourTeam"
           @choose-player="selectPlayerFromYourTeam"
@@ -49,8 +50,8 @@
         <div
           class="swap-target-info"
           v-if="
-            selectedFromYourTeam &&
-            (selectedFromTargetTeam ||
+            selectedFromYourTeam.length &&
+            (selectedFromTargetTeam.length ||
               (selectedFromUnusedPlayers && activeTab === 'unused'))
           "
         >
@@ -69,8 +70,8 @@
             data-testid="swap-propose-btn"
             @click="proposeSwap"
             :disabled="
-              !selectedFromYourTeam ||
-              (!selectedFromTargetTeam &&
+              selectedFromYourTeam.length === 0 ||
+              (selectedFromTargetTeam.length === 0 &&
                 !(selectedFromUnusedPlayers && activeTab === 'unused')) ||
               canSwap === false ||
               swapLoading
@@ -78,6 +79,9 @@
           >
             Propose Swap
           </button>
+          <p v-if="errorMessage" class="error-text" data-testid="swap-error-message">
+            {{ errorMessage }}
+          </p>
         </div>
 
         <div v-else class="swap-placeholder">
@@ -151,6 +155,7 @@
                 'Unknown'
               "
               :selected-role="selectedTargetRole"
+              :selected-slots="targetSelectedSlots"
               @choose-role="selectFromTargetTeam"
               @choose-player="selectPlayerFromYourTeam"
             />
@@ -243,8 +248,8 @@ export default {
       swapLoading: false,
       openModal: false,
       activeTab: "unused",
-      selectedFromYourTeam: null,
-      selectedFromTargetTeam: null,
+      selectedFromYourTeam: [],
+      selectedFromTargetTeam: [],
       selectedTeamId: null,
       selectedYourRole: null,
       selectedTargetRole: null,
@@ -258,7 +263,7 @@ export default {
   emits: ["refetch-teams", "refetch-swaps", "choose-role", "outgoing-player-change"],
   computed: {
     proposedSwapData() {
-      if (!this.selectedFromYourTeam) return null;
+      if (!this.selectedFromYourTeam.length) return null;
 
       return {
         tradeInitiatorUserTeam: {
@@ -269,20 +274,28 @@ export default {
           userId: this.rivalUserTeamId,
           userLogin: this.getTeamName(),
         },
-        playerInitiator: this.selectedFromYourTeam,
-        playerReceiver:
-          this.activeTab === "unused"
-            ? this.selectedFromUnusedPlayers
-            : this.selectedFromTargetTeam,
+        initiatorItems: this.selectedFromYourTeam.map((w) => ({
+          player: w.item.summonerName ? w.item : null,
+          team: w.item.summonerName ? null : w.item,
+        })),
+        receiverItems: (this.activeTab === "unused"
+          ? [this.selectedFromUnusedPlayers]
+          : this.selectedFromTargetTeam.map((w) => w.item)
+        ).map((p) => ({
+          player: p.summonerName ? p : null,
+          team: p.summonerName ? null : p,
+        })),
         status: -1,
       };
     },
     canSwap() {
       if (this.activeTab === "unused") {
-        if (!(!!this.selectedFromYourTeam && !!this.selectedFromUnusedPlayers))
+        if (!(this.selectedFromYourTeam.length === 1 && !!this.selectedFromUnusedPlayers))
           return false;
 
-        const fromPlayer = this.selectedFromYourTeam;
+        const fromEntry = this.selectedFromYourTeam[0];
+        const fromPlayer = fromEntry.item;
+        const fromSlot = fromEntry.slot;
         const toPlayer = this.selectedFromUnusedPlayers;
 
         // Check if both are players or both are teams
@@ -294,49 +307,111 @@ export default {
             "You can only swap players with players and teams with teams.";
           return false; // Can't swap a player for a team or vice versa
         }
-        if (
-          this.selectedFromYourTeam.role !=
-            this.selectedFromUnusedPlayers.role &&
-          !(this.selectedYourRole == "sub")
-        ) {
+        if (fromPlayer.role != toPlayer.role && fromSlot != "sub") {
           this.errorMessage =
             "You can only swap players of the same role, unless swapping with a substitute.";
           return false;
         }
+        this.errorMessage = "";
         return true;
       } else {
-        if (
-          !this.selectedFromYourTeam ||
-          !this.selectedFromTargetTeam ||
-          (!(
-            this.selectedYourRole == "sub" && this.selectedTargetRole == "sub"
-          ) &&
-            this.selectedFromYourTeam.role != this.selectedFromTargetTeam.role)
-        ) {
-          this.errorMessage =
-            "You can only swap players of the same role, unless both are substitutes.";
+        const from = this.selectedFromYourTeam;
+        const to = this.selectedFromTargetTeam;
+
+        if (from.length === 0 || to.length === 0 || from.length !== to.length) {
+          this.errorMessage = "Select the same number of items on each side.";
           return false;
         }
-        const fromPlayer = this.selectedFromYourTeam;
-        const toPlayer = this.selectedFromTargetTeam;
-
-        // Check if both are players or both are teams
-        const fromIsPlayer = !!fromPlayer.summonerName;
-        const toIsPlayer = !!toPlayer.summonerName;
-
-        if (fromIsPlayer !== toIsPlayer) {
+        if (
+          from.some((w) => !!w.item.summonerName) !==
+            to.every((w) => !!w.item.summonerName) &&
+          !(
+            from.every((w) => !!w.item.summonerName) ===
+            to.every((w) => !!w.item.summonerName)
+          )
+        ) {
           this.errorMessage =
             "You can only swap players with players and teams with teams.";
-          return false; // Can't swap a player for a team or vice versa
+          return false;
         }
 
-        return true; // Valid swap
+        // A single 1-for-1 selection is still POSTed to the legacy
+        // single-trade endpoint, whose backend validation requires the
+        // roles to match OR BOTH sides to be the Sub slot (no generic
+        // sub-wildcard balancing there). Restore that stricter rule here
+        // instead of falling through to the multi-item rolesBalance check.
+        if (from.length === 1) {
+          const fromSlot = from[0].slot;
+          const toSlot = to[0].slot;
+          const fromPlayer = from[0].item;
+          const toPlayer = to[0].item;
+          const sameRole = fromPlayer.role === toPlayer.role;
+          const bothSub = fromSlot === "sub" && toSlot === "sub";
+          if (!sameRole && !bothSub) {
+            this.errorMessage =
+              "You can only swap players of the same role, unless both sides are substitutes.";
+            return false;
+          }
+          this.errorMessage = "";
+          return true;
+        }
+
+        // The Sub wildcard never bridges a team item with a player item —
+        // team slots can only be matched against other team slots.
+        const fromTeamCount = from.filter((w) => w.slot === "team").length;
+        const toTeamCount = to.filter((w) => w.slot === "team").length;
+        if (fromTeamCount !== toTeamCount) {
+          this.errorMessage =
+            "You can only swap a team slot for another team slot.";
+          return false;
+        }
+
+        const fromRoles = from
+          .filter((w) => w.slot !== "team")
+          .map((w) => w.slot);
+        const toRoles = to.filter((w) => w.slot !== "team").map((w) => w.slot);
+        if (!this.rolesBalance(fromRoles, toRoles)) {
+          this.errorMessage =
+            "You can only swap players of the same role, unless one side is a substitute.";
+          return false;
+        }
+
+        const initiatorPlayerItems = from.filter((w) => w.slot !== "team");
+        const receiverPlayerItems = to.filter((w) => w.slot !== "team");
+        if (initiatorPlayerItems.length > 0) {
+          try {
+            const initiatorCurrentSlots = this.buildCurrentSlots(this.selectedTeam);
+            const receiverCurrentSlots = this.buildCurrentSlots(this.selectedTeamData);
+            this.assignPostTradeRoster(
+              initiatorCurrentSlots,
+              initiatorPlayerItems.map((w) => w.slot),
+              receiverPlayerItems.map((w) => ({ playerId: w.item.esportsPlayerId, role: w.item.role })),
+            );
+            this.assignPostTradeRoster(
+              receiverCurrentSlots,
+              receiverPlayerItems.map((w) => w.slot),
+              initiatorPlayerItems.map((w) => ({ playerId: w.item.esportsPlayerId, role: w.item.role })),
+            );
+          } catch (e) {
+            this.errorMessage = e.message;
+            return false;
+          }
+        }
+
+        this.errorMessage = "";
+        return true;
       }
     },
     selectedTeamData() {
       return this.selectedTeamId
         ? this.transformTeamData(this.otherTeams[this.selectedTeamId]).result
         : null;
+    },
+    ownSelectedSlots() {
+      return this.selectedFromYourTeam.map((w) => w.slot);
+    },
+    targetSelectedSlots() {
+      return this.selectedFromTargetTeam.map((w) => w.slot);
     },
   },
   methods: {
@@ -393,11 +468,116 @@ export default {
       // In actual implementation, emit event to parent to select player from pool
     },
     selectPlayerFromYourTeam(player, ownTeam, profileId) {
-      if (ownTeam && profileId === this.profileId) {
-        this.selectedFromYourTeam = player;
-      } else {
-        this.selectedFromTargetTeam = player;
+      const isOwnTeam = ownTeam && profileId === this.profileId;
+      const targetList = isOwnTeam
+        ? "selectedFromYourTeam"
+        : "selectedFromTargetTeam";
+      // The roster SLOT the player was just clicked from (top/jungle/mid/
+      // bottom/support/sub/team) — set by the choose-role event that fires
+      // immediately before choose-player for the same click. This is the
+      // value role matching must use, NOT the player's attribute role.
+      const slot = isOwnTeam ? this.selectedYourRole : this.selectedTargetRole;
+
+      // Player-pool tab must stay single-item: always overwrite the own-team
+      // selection instead of toggling/appending into the multi-select list.
+      if (isOwnTeam && this.activeTab === "unused") {
+        this.selectedFromYourTeam = [{ item: player, slot }];
+        return;
       }
+
+      const key = player.esportsPlayerId || player.slug;
+      const list = this[targetList];
+      const existingIndex = list.findIndex(
+        (w) => (w.item.esportsPlayerId || w.item.slug) === key,
+      );
+      if (existingIndex !== -1) {
+        list.splice(existingIndex, 1); // toggle off
+      } else if (list.length < 3) {
+        list.push({ item: player, slot });
+      }
+    },
+    rolesBalance(fromRoles, toRoles) {
+      const remainingFrom = [...fromRoles];
+      const remainingTo = [...toRoles];
+
+      fromRoles.forEach((role) => {
+        if (role === "sub") return;
+        const idx = remainingTo.indexOf(role);
+        if (idx !== -1) {
+          remainingTo.splice(idx, 1);
+          remainingFrom.splice(remainingFrom.indexOf(role), 1);
+        }
+      });
+
+      if (remainingFrom.length !== remainingTo.length) return false;
+
+      // Balance via the sub wildcard using counts rather than positional
+      // pairing: every non-sub leftover on one side must be absorbable by a
+      // sub leftover on the other side.
+      const nonSubFrom = remainingFrom.filter((role) => role !== "sub").length;
+      const nonSubTo = remainingTo.filter((role) => role !== "sub").length;
+      const subFrom = remainingFrom.length - nonSubFrom;
+      const subTo = remainingTo.length - nonSubTo;
+
+      return nonSubFrom <= subTo && nonSubTo <= subFrom;
+    },
+    // JS mirror of the backend's RosterAssignment.Assign (LOLFantasyGame/Helpers/RosterAssignment.cs).
+    // Best-effort client-side preview only — the backend re-validates authoritatively at both
+    // propose and accept time regardless of what this concludes.
+    assignPostTradeRoster(currentSlots, outgoingSlots, incomingPlayers) {
+      const NAMED_SLOTS = ["top", "jungle", "mid", "bottom", "support"];
+      const result = {};
+      for (const [slot, occ] of Object.entries(currentSlots)) result[slot] = occ.playerId;
+      for (const slot of outgoingSlots) delete result[slot];
+
+      const pool = [...incomingPlayers];
+      if (currentSlots.sub && !outgoingSlots.includes("sub")) {
+        pool.push(currentSlots.sub);
+        delete result.sub;
+      }
+
+      const emptyNamedSlots = NAMED_SLOTS.filter((s) => !(s in result));
+      const hasLeftoverForSub = pool.length === emptyNamedSlots.length + 1;
+      if (!hasLeftoverForSub && pool.length !== emptyNamedSlots.length) {
+        throw new Error("This trade would leave your roster with the wrong number of players.");
+      }
+
+      const used = new Array(pool.length).fill(false);
+      const assignment = {};
+      const tryAssign = (index) => {
+        if (index === emptyNamedSlots.length) return true;
+        const slot = emptyNamedSlots[index];
+        for (let i = 0; i < pool.length; i++) {
+          if (used[i] || pool[i].role !== slot) continue;
+          used[i] = true;
+          assignment[slot] = pool[i].playerId;
+          if (tryAssign(index + 1)) return true;
+          used[i] = false;
+          delete assignment[slot];
+        }
+        return false;
+      };
+
+      if (!tryAssign(0)) {
+        throw new Error("This trade would leave your roster invalid — no player fits the resulting open slot(s).");
+      }
+
+      Object.assign(result, assignment);
+      if (hasLeftoverForSub) {
+        const usedIds = new Set(Object.values(assignment));
+        const leftover = pool.find((p) => !usedIds.has(p.playerId));
+        result.sub = leftover.playerId;
+      }
+
+      return result;
+    },
+    buildCurrentSlots(teamData) {
+      const slots = {};
+      Object.values(teamData || {}).forEach((entry) => {
+        if (!entry || !entry.role || entry.role === "team" || !entry.player) return;
+        slots[entry.role] = { playerId: entry.player.esportsPlayerId, role: entry.player.role };
+      });
+      return slots;
     },
     selectFromTargetTeam(role) {
       this.selectedTargetRole = role;
@@ -406,7 +586,7 @@ export default {
       this.selectedTeamId = this.selectedTeamId === clientId ? null : clientId;
       this.rivalUserTeamId =
         this.otherTeams[this.selectedTeamId]?.team?.userTeamId || null;
-      this.selectedFromTargetTeam = null;
+      this.selectedFromTargetTeam = [];
       this.selectedTargetRole = null;
     },
     getTeamName(team) {
@@ -418,9 +598,9 @@ export default {
       // Similar to proposeSwap but for players from the pool
       const swapRequest = {
         LeagueId: this.realLeagueId,
-        PlayerInitiatorId: this.selectedFromYourTeam.esportsPlayerId,
+        PlayerInitiatorId: this.selectedFromYourTeam[0].item.esportsPlayerId,
         PlayerReceiverId: this.selectedFromUnusedPlayers.esportsPlayerId,
-        TeamInitiatorId: this.selectedFromYourTeam.slug,
+        TeamInitiatorId: this.selectedFromYourTeam[0].item.slug,
         TeamReceiverId: this.selectedFromUnusedPlayers.slug,
         TradeInitiatorUserTeamId: this.selectedTeam.userTeamId,
         TradeReceiverUserTeamId: 0,
@@ -433,10 +613,12 @@ export default {
         );
         await this.fetchSwaps();
         this.$emit("refetch-teams");
-        this.selectedFromYourTeam = null;
+        this.errorMessage = "";
+        this.selectedFromYourTeam = [];
         this.selectedTeamId = null;
         this.swapLoading = false;
       } catch (error) {
+        this.errorMessage = this.extractErrorMessage(error);
         this.swapLoading = false;
       }
     },
@@ -450,35 +632,100 @@ export default {
         return;
       }
 
-      const swapRequest = {
-        LeagueId: this.realLeagueId,
-        PlayerInitiatorId: this.selectedFromYourTeam.esportsPlayerId,
-        PlayerReceiverId: this.selectedFromTargetTeam.esportsPlayerId,
-        TeamInitiatorId: this.selectedFromYourTeam.slug,
-        TeamReceiverId: this.selectedFromTargetTeam.slug,
-        TradeInitiatorUserTeamId: this.selectedTeam.userTeamId,
-        TradeReceiverUserTeamId: this.rivalUserTeamId,
-      };
-
-      try {
-        const response = await this.axios.post(
-          `${this.apiURL}Draft/${this.$store.getters.getCurrentTournamentId}/trades/${this.$store.getters.getProfileId}`,
-          swapRequest,
-        );
-        await this.fetchSwaps();
-        ablyProposeSwap(this.leagueId, this.rivalUserTeamId);
-        this.selectedFromYourTeam = null;
-        this.selectedFromTargetTeam = null;
-        this.selectedTeamId = null;
-        this.swapLoading = false;
-      } catch (error) {
-        this.swapLoading = false;
+      let success = false;
+      if (this.selectedFromYourTeam.length === 1) {
+        const swapRequest = {
+          LeagueId: this.realLeagueId,
+          PlayerInitiatorId: this.selectedFromYourTeam[0].item.esportsPlayerId,
+          PlayerReceiverId: this.selectedFromTargetTeam[0].item.esportsPlayerId,
+          TeamInitiatorId: this.selectedFromYourTeam[0].item.slug,
+          TeamReceiverId: this.selectedFromTargetTeam[0].item.slug,
+          TradeInitiatorUserTeamId: this.selectedTeam.userTeamId,
+          TradeReceiverUserTeamId: this.rivalUserTeamId,
+        };
+        try {
+          await this.axios.post(
+            `${this.apiURL}Draft/${this.$store.getters.getCurrentTournamentId}/trades/${this.$store.getters.getProfileId}`,
+            swapRequest,
+          );
+          await this.fetchSwaps();
+          ablyProposeSwap(this.leagueId, this.rivalUserTeamId);
+          success = true;
+        } catch (error) {
+          this.errorMessage = this.extractErrorMessage(error);
+        }
+      } else {
+        const toItem = (w) => ({
+          PlayerId: w.item.esportsPlayerId || null,
+          TeamSlug: w.item.slug || null,
+        });
+        const groupRequest = {
+          LeagueId: this.realLeagueId,
+          TradeInitiatorUserTeamId: this.selectedTeam.userTeamId,
+          TradeReceiverUserTeamId: this.rivalUserTeamId,
+          InitiatorItems: this.selectedFromYourTeam.map(toItem),
+          ReceiverItems: this.selectedFromTargetTeam.map(toItem),
+        };
+        try {
+          await this.axios.post(
+            `${this.apiURL}Draft/${this.$store.getters.getCurrentTournamentId}/trade-groups/${this.$store.getters.getProfileId}`,
+            groupRequest,
+          );
+          await this.fetchSwaps();
+          ablyProposeSwap(this.leagueId, this.rivalUserTeamId);
+          success = true;
+        } catch (error) {
+          this.errorMessage = this.extractErrorMessage(error);
+        }
       }
+
+      if (success) {
+        this.errorMessage = "";
+        this.selectedFromYourTeam = [];
+        this.selectedFromTargetTeam = [];
+        this.selectedTeamId = null;
+      }
+      this.swapLoading = false;
+    },
+    extractErrorMessage(error) {
+      const data = error?.response?.data;
+      if (typeof data === "string" && data) {
+        // Guard against ASP.NET Core's developer exception page, which
+        // returns a full HTML document as a plain string body in dev
+        // environments (no controller-level error handling on this
+        // endpoint). Never render raw HTML/oversized payloads into the UI.
+        const trimmed = data.trim();
+        const looksLikeHtml = /^<!doctype html/i.test(trimmed) || /^<html/i.test(trimmed) || trimmed.slice(0, 50).includes("<");
+        const tooLong = trimmed.length > 300;
+        if (!looksLikeHtml && !tooLong) return data;
+      }
+      if (data?.title) return data.title;
+      if (data?.errors) {
+        const firstField = Object.values(data.errors)?.[0];
+        if (Array.isArray(firstField) && firstField.length) return firstField[0];
+      }
+      return "Trade could not be proposed.";
     },
   },
   watch: {
-    selectedFromYourTeam(player) {
-      this.$emit("outgoing-player-change", player);
+    selectedFromYourTeam: {
+      handler(list) {
+        this.$emit(
+          "outgoing-player-change",
+          list.length ? list[list.length - 1].item : null,
+        );
+      },
+      deep: true,
+    },
+    activeTab() {
+      // Switching tabs mid-selection must clear in-progress picks, otherwise
+      // proposedSwapData can be fed a null selectedFromUnusedPlayers while
+      // selectedFromYourTeam/selectedFromTargetTeam still hold stale items
+      // from the other tab, crashing the render.
+      this.selectedFromYourTeam = [];
+      this.selectedFromTargetTeam = [];
+      this.selectedYourRole = null;
+      this.selectedTargetRole = null;
     },
   },
   created() {

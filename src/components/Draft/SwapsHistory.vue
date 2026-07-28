@@ -154,47 +154,32 @@ export default {
       this.selectedFilter = filter;
     },
     async acceptSwap(swap) {
-      var swapRequest = {
-        LolDraftTradeId: swap.lolDraftTradeId,
-        UpdateStatus: 1,
-      };
-      try {
-        const response = await this.axios.put(
-          `${this.apiURL}Draft/${this.$store.getters.getCurrentTournamentId}/trades/${this.$store.getters.getProfileId}`,
-          swapRequest,
-        );
-        this.$emit("refresh-swaps");
-        this.$emit("refresh-teams");
-      } catch (error) {
-      }
+      await this.sendStatusUpdate(swap, 1);
+      this.$emit("refresh-swaps");
+      this.$emit("refresh-teams");
     },
     async cancelSwap(swap) {
-      var swapRequest = {
-        LolDraftTradeId: swap.lolDraftTradeId,
-        UpdateStatus: 2,
-      };
-      try {
-        const response = await this.axios.put(
-          `${this.apiURL}Draft/${this.$store.getters.getCurrentTournamentId}/trades/${this.$store.getters.getProfileId}`,
-          swapRequest,
-        );
-        this.$emit("refresh-swaps");
-      } catch (error) {
-      }
+      await this.sendStatusUpdate(swap, 2);
+      this.$emit("refresh-swaps");
     },
     async withdrawSwap(swap) {
-      var swapRequest = {
-        LolDraftTradeId: swap.lolDraftTradeId,
-        UpdateStatus: 4,
-      };
+      await this.sendStatusUpdate(swap, 4);
+      this.$emit("refresh-swaps");
+    },
+    async sendStatusUpdate(swap, updateStatus) {
       try {
-        const response = await this.axios.put(
-          `${this.apiURL}Draft/${this.$store.getters.getCurrentTournamentId}/trades/${this.$store.getters.getProfileId}`,
-          swapRequest,
-        );
-        this.$emit("refresh-swaps");
-      } catch (error) {
-      }
+        if (swap.isGroup) {
+          await this.axios.put(
+            `${this.apiURL}Draft/${this.$store.getters.getCurrentTournamentId}/trade-groups/${this.$store.getters.getProfileId}`,
+            { TradeGroupId: swap.tradeGroupId, UpdateStatus: updateStatus },
+          );
+        } else {
+          await this.axios.put(
+            `${this.apiURL}Draft/${this.$store.getters.getCurrentTournamentId}/trades/${this.$store.getters.getProfileId}`,
+            { LolDraftTradeId: swap.lolDraftTradeId, UpdateStatus: updateStatus },
+          );
+        }
+      } catch (error) {}
     },
     openDetailsModal(swap) {
       this.currentSwap = swap;
