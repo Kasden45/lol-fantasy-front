@@ -269,13 +269,13 @@ export default {
           userId: this.rivalUserTeamId,
           userLogin: this.getTeamName(),
         },
-        initiatorItems: this.selectedFromYourTeam.map((p) => ({
-          player: p.summonerName ? p : null,
-          team: p.summonerName ? null : p,
+        initiatorItems: this.selectedFromYourTeam.map((w) => ({
+          player: w.item.summonerName ? w.item : null,
+          team: w.item.summonerName ? null : w.item,
         })),
         receiverItems: (this.activeTab === "unused"
           ? [this.selectedFromUnusedPlayers]
-          : this.selectedFromTargetTeam
+          : this.selectedFromTargetTeam.map((w) => w.item)
         ).map((p) => ({
           player: p.summonerName ? p : null,
           team: p.summonerName ? null : p,
@@ -288,7 +288,9 @@ export default {
         if (!(this.selectedFromYourTeam.length === 1 && !!this.selectedFromUnusedPlayers))
           return false;
 
-        const fromPlayer = this.selectedFromYourTeam[0];
+        const fromEntry = this.selectedFromYourTeam[0];
+        const fromPlayer = fromEntry.item;
+        const fromSlot = fromEntry.slot;
         const toPlayer = this.selectedFromUnusedPlayers;
 
         // Check if both are players or both are teams
@@ -300,7 +302,7 @@ export default {
             "You can only swap players with players and teams with teams.";
           return false; // Can't swap a player for a team or vice versa
         }
-        if (fromPlayer.role != toPlayer.role && fromPlayer.role != "sub") {
+        if (fromPlayer.role != toPlayer.role && fromSlot != "sub") {
           this.errorMessage =
             "You can only swap players of the same role, unless swapping with a substitute.";
           return false;
@@ -315,16 +317,32 @@ export default {
           return false;
         }
         if (
-          from.some((p) => !!p.summonerName) !== to.every((p) => !!p.summonerName) &&
-          !(from.every((p) => !!p.summonerName) === to.every((p) => !!p.summonerName))
+          from.some((w) => !!w.item.summonerName) !==
+            to.every((w) => !!w.item.summonerName) &&
+          !(
+            from.every((w) => !!w.item.summonerName) ===
+            to.every((w) => !!w.item.summonerName)
+          )
         ) {
           this.errorMessage =
             "You can only swap players with players and teams with teams.";
           return false;
         }
 
-        const fromRoles = from.map((p) => p.role);
-        const toRoles = to.map((p) => p.role);
+        // The Sub wildcard never bridges a team item with a player item —
+        // team slots can only be matched against other team slots.
+        const fromTeamCount = from.filter((w) => w.slot === "team").length;
+        const toTeamCount = to.filter((w) => w.slot === "team").length;
+        if (fromTeamCount !== toTeamCount) {
+          this.errorMessage =
+            "You can only swap a team slot for another team slot.";
+          return false;
+        }
+
+        const fromRoles = from
+          .filter((w) => w.slot !== "team")
+          .map((w) => w.slot);
+        const toRoles = to.filter((w) => w.slot !== "team").map((w) => w.slot);
         if (!this.rolesBalance(fromRoles, toRoles)) {
           this.errorMessage =
             "You can only swap players of the same role, unless one side is a substitute.";
@@ -397,23 +415,28 @@ export default {
       const targetList = isOwnTeam
         ? "selectedFromYourTeam"
         : "selectedFromTargetTeam";
+      // The roster SLOT the player was just clicked from (top/jungle/mid/
+      // bottom/support/sub/team) — set by the choose-role event that fires
+      // immediately before choose-player for the same click. This is the
+      // value role matching must use, NOT the player's attribute role.
+      const slot = isOwnTeam ? this.selectedYourRole : this.selectedTargetRole;
 
       // Player-pool tab must stay single-item: always overwrite the own-team
       // selection instead of toggling/appending into the multi-select list.
       if (isOwnTeam && this.activeTab === "unused") {
-        this.selectedFromYourTeam = [player];
+        this.selectedFromYourTeam = [{ item: player, slot }];
         return;
       }
 
       const key = player.esportsPlayerId || player.slug;
       const list = this[targetList];
       const existingIndex = list.findIndex(
-        (p) => (p.esportsPlayerId || p.slug) === key,
+        (w) => (w.item.esportsPlayerId || w.item.slug) === key,
       );
       if (existingIndex !== -1) {
         list.splice(existingIndex, 1); // toggle off
       } else if (list.length < 3) {
-        list.push(player);
+        list.push({ item: player, slot });
       }
     },
     rolesBalance(fromRoles, toRoles) {
@@ -460,9 +483,9 @@ export default {
       // Similar to proposeSwap but for players from the pool
       const swapRequest = {
         LeagueId: this.realLeagueId,
-        PlayerInitiatorId: this.selectedFromYourTeam[0].esportsPlayerId,
+        PlayerInitiatorId: this.selectedFromYourTeam[0].item.esportsPlayerId,
         PlayerReceiverId: this.selectedFromUnusedPlayers.esportsPlayerId,
-        TeamInitiatorId: this.selectedFromYourTeam[0].slug,
+        TeamInitiatorId: this.selectedFromYourTeam[0].item.slug,
         TeamReceiverId: this.selectedFromUnusedPlayers.slug,
         TradeInitiatorUserTeamId: this.selectedTeam.userTeamId,
         TradeReceiverUserTeamId: 0,
@@ -495,10 +518,10 @@ export default {
       if (this.selectedFromYourTeam.length === 1) {
         const swapRequest = {
           LeagueId: this.realLeagueId,
-          PlayerInitiatorId: this.selectedFromYourTeam[0].esportsPlayerId,
-          PlayerReceiverId: this.selectedFromTargetTeam[0].esportsPlayerId,
-          TeamInitiatorId: this.selectedFromYourTeam[0].slug,
-          TeamReceiverId: this.selectedFromTargetTeam[0].slug,
+          PlayerInitiatorId: this.selectedFromYourTeam[0].item.esportsPlayerId,
+          PlayerReceiverId: this.selectedFromTargetTeam[0].item.esportsPlayerId,
+          TeamInitiatorId: this.selectedFromYourTeam[0].item.slug,
+          TeamReceiverId: this.selectedFromTargetTeam[0].item.slug,
           TradeInitiatorUserTeamId: this.selectedTeam.userTeamId,
           TradeReceiverUserTeamId: this.rivalUserTeamId,
         };
@@ -513,9 +536,9 @@ export default {
           // swallow, matches existing single-trade behavior
         }
       } else {
-        const toItem = (p) => ({
-          PlayerId: p.esportsPlayerId || null,
-          TeamSlug: p.slug || null,
+        const toItem = (w) => ({
+          PlayerId: w.item.esportsPlayerId || null,
+          TeamSlug: w.item.slug || null,
         });
         const groupRequest = {
           LeagueId: this.realLeagueId,
@@ -543,8 +566,24 @@ export default {
     },
   },
   watch: {
-    selectedFromYourTeam(list) {
-      this.$emit("outgoing-player-change", list[list.length - 1] || null);
+    selectedFromYourTeam: {
+      handler(list) {
+        this.$emit(
+          "outgoing-player-change",
+          list.length ? list[list.length - 1].item : null,
+        );
+      },
+      deep: true,
+    },
+    activeTab() {
+      // Switching tabs mid-selection must clear in-progress picks, otherwise
+      // proposedSwapData can be fed a null selectedFromUnusedPlayers while
+      // selectedFromYourTeam/selectedFromTargetTeam still hold stale items
+      // from the other tab, crashing the render.
+      this.selectedFromYourTeam = [];
+      this.selectedFromTargetTeam = [];
+      this.selectedYourRole = null;
+      this.selectedTargetRole = null;
     },
   },
   created() {
