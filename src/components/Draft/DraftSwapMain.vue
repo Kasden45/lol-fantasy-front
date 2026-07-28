@@ -78,6 +78,9 @@
           >
             Propose Swap
           </button>
+          <p v-if="errorMessage" class="error-text" data-testid="swap-error-message">
+            {{ errorMessage }}
+          </p>
         </div>
 
         <div v-else class="swap-placeholder">
@@ -329,6 +332,26 @@ export default {
           return false;
         }
 
+        // A single 1-for-1 selection is still POSTed to the legacy
+        // single-trade endpoint, whose backend validation requires the
+        // roles to match OR BOTH sides to be the Sub slot (no generic
+        // sub-wildcard balancing there). Restore that stricter rule here
+        // instead of falling through to the multi-item rolesBalance check.
+        if (from.length === 1) {
+          const fromSlot = from[0].slot;
+          const toSlot = to[0].slot;
+          const fromPlayer = from[0].item;
+          const toPlayer = to[0].item;
+          const sameRole = fromPlayer.role === toPlayer.role;
+          const bothSub = fromSlot === "sub" && toSlot === "sub";
+          if (!sameRole && !bothSub) {
+            this.errorMessage =
+              "You can only swap players of the same role, unless both sides are substitutes.";
+            return false;
+          }
+          return true;
+        }
+
         // The Sub wildcard never bridges a team item with a player item —
         // team slots can only be matched against other team slots.
         const fromTeamCount = from.filter((w) => w.slot === "team").length;
@@ -498,10 +521,12 @@ export default {
         );
         await this.fetchSwaps();
         this.$emit("refetch-teams");
+        this.errorMessage = "";
         this.selectedFromYourTeam = [];
         this.selectedTeamId = null;
         this.swapLoading = false;
       } catch (error) {
+        this.errorMessage = this.extractErrorMessage(error);
         this.swapLoading = false;
       }
     },
@@ -515,6 +540,7 @@ export default {
         return;
       }
 
+      let success = false;
       if (this.selectedFromYourTeam.length === 1) {
         const swapRequest = {
           LeagueId: this.realLeagueId,
@@ -532,8 +558,9 @@ export default {
           );
           await this.fetchSwaps();
           ablyProposeSwap(this.leagueId, this.rivalUserTeamId);
+          success = true;
         } catch (error) {
-          // swallow, matches existing single-trade behavior
+          this.errorMessage = this.extractErrorMessage(error);
         }
       } else {
         const toItem = (w) => ({
@@ -554,15 +581,29 @@ export default {
           );
           await this.fetchSwaps();
           ablyProposeSwap(this.leagueId, this.rivalUserTeamId);
+          success = true;
         } catch (error) {
-          // swallow, matches existing single-trade behavior
+          this.errorMessage = this.extractErrorMessage(error);
         }
       }
 
-      this.selectedFromYourTeam = [];
-      this.selectedFromTargetTeam = [];
-      this.selectedTeamId = null;
+      if (success) {
+        this.errorMessage = "";
+        this.selectedFromYourTeam = [];
+        this.selectedFromTargetTeam = [];
+        this.selectedTeamId = null;
+      }
       this.swapLoading = false;
+    },
+    extractErrorMessage(error) {
+      const data = error?.response?.data;
+      if (typeof data === "string" && data) return data;
+      if (data?.title) return data.title;
+      if (data?.errors) {
+        const firstField = Object.values(data.errors)?.[0];
+        if (Array.isArray(firstField) && firstField.length) return firstField[0];
+      }
+      return "Trade could not be proposed.";
     },
   },
   watch: {
