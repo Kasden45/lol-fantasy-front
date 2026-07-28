@@ -310,6 +310,7 @@ export default {
             "You can only swap players of the same role, unless swapping with a substitute.";
           return false;
         }
+        this.errorMessage = "";
         return true;
       } else {
         const from = this.selectedFromYourTeam;
@@ -349,6 +350,7 @@ export default {
               "You can only swap players of the same role, unless both sides are substitutes.";
             return false;
           }
+          this.errorMessage = "";
           return true;
         }
 
@@ -371,6 +373,7 @@ export default {
             "You can only swap players of the same role, unless one side is a substitute.";
           return false;
         }
+        this.errorMessage = "";
         return true;
       }
     },
@@ -597,7 +600,16 @@ export default {
     },
     extractErrorMessage(error) {
       const data = error?.response?.data;
-      if (typeof data === "string" && data) return data;
+      if (typeof data === "string" && data) {
+        // Guard against ASP.NET Core's developer exception page, which
+        // returns a full HTML document as a plain string body in dev
+        // environments (no controller-level error handling on this
+        // endpoint). Never render raw HTML/oversized payloads into the UI.
+        const trimmed = data.trim();
+        const looksLikeHtml = /^<!doctype html/i.test(trimmed) || /^<html/i.test(trimmed) || trimmed.slice(0, 50).includes("<");
+        const tooLong = trimmed.length > 300;
+        if (!looksLikeHtml && !tooLong) return data;
+      }
       if (data?.title) return data.title;
       if (data?.errors) {
         const firstField = Object.values(data.errors)?.[0];
