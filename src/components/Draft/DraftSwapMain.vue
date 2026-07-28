@@ -34,6 +34,7 @@
           :next-fixture="nextFixture"
           :your-turn="false"
           :selected-role="selectedYourRole"
+          :selected-slots="ownSelectedSlots"
           :swap-mode="true"
           @choose-role="selectFromYourTeam"
           @choose-player="selectPlayerFromYourTeam"
@@ -154,6 +155,7 @@
                 'Unknown'
               "
               :selected-role="selectedTargetRole"
+              :selected-slots="targetSelectedSlots"
               @choose-role="selectFromTargetTeam"
               @choose-player="selectPlayerFromYourTeam"
             />
@@ -373,6 +375,29 @@ export default {
             "You can only swap players of the same role, unless one side is a substitute.";
           return false;
         }
+
+        const initiatorPlayerItems = from.filter((w) => w.slot !== "team");
+        const receiverPlayerItems = to.filter((w) => w.slot !== "team");
+        if (initiatorPlayerItems.length > 0) {
+          try {
+            const initiatorCurrentSlots = this.buildCurrentSlots(this.selectedTeam);
+            const receiverCurrentSlots = this.buildCurrentSlots(this.selectedTeamData);
+            this.assignPostTradeRoster(
+              initiatorCurrentSlots,
+              initiatorPlayerItems.map((w) => w.slot),
+              receiverPlayerItems.map((w) => ({ playerId: w.item.esportsPlayerId, role: w.item.role })),
+            );
+            this.assignPostTradeRoster(
+              receiverCurrentSlots,
+              receiverPlayerItems.map((w) => w.slot),
+              initiatorPlayerItems.map((w) => ({ playerId: w.item.esportsPlayerId, role: w.item.role })),
+            );
+          } catch (e) {
+            this.errorMessage = e.message;
+            return false;
+          }
+        }
+
         this.errorMessage = "";
         return true;
       }
@@ -381,6 +406,12 @@ export default {
       return this.selectedTeamId
         ? this.transformTeamData(this.otherTeams[this.selectedTeamId]).result
         : null;
+    },
+    ownSelectedSlots() {
+      return this.selectedFromYourTeam.map((w) => w.slot);
+    },
+    targetSelectedSlots() {
+      return this.selectedFromTargetTeam.map((w) => w.slot);
     },
   },
   methods: {
@@ -489,6 +520,64 @@ export default {
       const subTo = remainingTo.length - nonSubTo;
 
       return nonSubFrom <= subTo && nonSubTo <= subFrom;
+    },
+    // JS mirror of the backend's RosterAssignment.Assign (LOLFantasyGame/Helpers/RosterAssignment.cs).
+    // Best-effort client-side preview only — the backend re-validates authoritatively at both
+    // propose and accept time regardless of what this concludes.
+    assignPostTradeRoster(currentSlots, outgoingSlots, incomingPlayers) {
+      const NAMED_SLOTS = ["top", "jungle", "mid", "bottom", "support"];
+      const result = {};
+      for (const [slot, occ] of Object.entries(currentSlots)) result[slot] = occ.playerId;
+      for (const slot of outgoingSlots) delete result[slot];
+
+      const pool = [...incomingPlayers];
+      if (currentSlots.sub && !outgoingSlots.includes("sub")) {
+        pool.push(currentSlots.sub);
+        delete result.sub;
+      }
+
+      const emptyNamedSlots = NAMED_SLOTS.filter((s) => !(s in result));
+      const hasLeftoverForSub = pool.length === emptyNamedSlots.length + 1;
+      if (!hasLeftoverForSub && pool.length !== emptyNamedSlots.length) {
+        throw new Error("This trade would leave your roster with the wrong number of players.");
+      }
+
+      const used = new Array(pool.length).fill(false);
+      const assignment = {};
+      const tryAssign = (index) => {
+        if (index === emptyNamedSlots.length) return true;
+        const slot = emptyNamedSlots[index];
+        for (let i = 0; i < pool.length; i++) {
+          if (used[i] || pool[i].role !== slot) continue;
+          used[i] = true;
+          assignment[slot] = pool[i].playerId;
+          if (tryAssign(index + 1)) return true;
+          used[i] = false;
+          delete assignment[slot];
+        }
+        return false;
+      };
+
+      if (!tryAssign(0)) {
+        throw new Error("This trade would leave your roster invalid — no player fits the resulting open slot(s).");
+      }
+
+      Object.assign(result, assignment);
+      if (hasLeftoverForSub) {
+        const usedIds = new Set(Object.values(assignment));
+        const leftover = pool.find((p) => !usedIds.has(p.playerId));
+        result.sub = leftover.playerId;
+      }
+
+      return result;
+    },
+    buildCurrentSlots(teamData) {
+      const slots = {};
+      Object.values(teamData || {}).forEach((entry) => {
+        if (!entry || !entry.role || entry.role === "team" || !entry.player) return;
+        slots[entry.role] = { playerId: entry.player.esportsPlayerId, role: entry.player.role };
+      });
+      return slots;
     },
     selectFromTargetTeam(role) {
       this.selectedTargetRole = role;
