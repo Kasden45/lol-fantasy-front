@@ -92,10 +92,12 @@ export default {
   computed: {
     comparisonPairs() {
       if (this.swap.initiatorItems && this.swap.receiverItems) {
-        return this.swap.initiatorItems.map((item, i) => ({
-          left: item,
-          right: this.swap.receiverItems[i],
-        }));
+        return this.swap.initiatorItems
+          .map((item, i) => ({
+            left: item,
+            right: this.swap.receiverItems[i],
+          }))
+          .filter((pair) => pair.left && pair.right);
       }
       return [
         {
