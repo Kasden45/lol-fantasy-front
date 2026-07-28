@@ -49,10 +49,13 @@
     @refetch-teams="refetchTeams"
     @refetch-swaps="fetchSwaps"
     @choose-role="choseRole"
+    @outgoing-player-change="handleOutgoingPlayerChange"
   >
     <PlayersListDraft
       :userTeam="pickedPlayersIdsSwaps"
       :userTeamsPicked="pickedPlayersIdsAllSwaps"
+      :userTeamCodes="pickedPlayersTeamCodesSwaps"
+      :maxPlayersFromOneTeam="maxPlayersFromOneTeam"
       :nextFixture="nextFixture"
       :teamsPlayingNextFixture="teamsPlayingInNextFixture"
       @rangeChange="() => {}"
@@ -127,6 +130,7 @@
         :timeRemaining="60"
         :isYourTurn="this.isCurrentDrafter"
         :isAutoDrafting="false"
+        :maxPlayersFromOneTeam="maxPlayersFromOneTeam"
       />
       <!-- <div class="team-list col-3">
           <h3>Your Team</h3>
@@ -153,6 +157,8 @@
         <PlayersListDraft
           :userTeam="pickedPlayersIds"
           :userTeamsPicked="pickedPlayersIdsAll"
+          :userTeamCodes="pickedPlayersTeamCodes"
+          :maxPlayersFromOneTeam="maxPlayersFromOneTeam"
           :nextFixture="nextFixture"
           :teamsPlayingNextFixture="teamsPlayingInNextFixture"
           @rangeChange="() => {}"
@@ -273,6 +279,8 @@ export default {
       // League Data
       realLeagueId: null,
       currentLeague: null,
+      maxPlayersFromOneTeam: null,
+      swapOutgoingPlayer: null,
 
       // Available entities
       availablePlayers: [],
@@ -356,6 +364,20 @@ export default {
       return pickedPlayers;
     },
 
+    /** Team codes of players on user's current team (for same-team-limit greying) */
+    pickedPlayersTeamCodes() {
+      let teamCodes = [];
+      for (const role in this.selectedTeam) {
+        if (this.selectedTeam.hasOwnProperty(role)) {
+          const player = this.selectedTeam[role].player;
+          if (player?.team?.code) {
+            teamCodes.push(player.team.code);
+          }
+        }
+      }
+      return teamCodes;
+    },
+
     /** For swap mode - user's current team IDs */
     pickedPlayersIdsSwaps() {
       let pickedPlayers = [];
@@ -368,6 +390,27 @@ export default {
           });
       }
       return pickedPlayers;
+    },
+
+    /** For swap mode - team codes of players on user's current team, minus
+     *  the player currently staged to be swapped out */
+    pickedPlayersTeamCodesSwaps() {
+      let teamCodes = [];
+      if (this.selectedUserTeam) {
+        Object.values(this.selectedUserTeam)
+          .filter((u) => u != null && u.player != null)
+          .forEach((u) => {
+            if (u.player?.team?.code) teamCodes.push(u.player.team.code);
+          });
+      }
+
+      const outgoingTeamCode = this.swapOutgoingPlayer?.team?.code;
+      if (outgoingTeamCode) {
+        const idx = teamCodes.indexOf(outgoingTeamCode);
+        if (idx !== -1) teamCodes.splice(idx, 1);
+      }
+
+      return teamCodes;
     },
 
     /** For swap mode - all other teams' player IDs */
@@ -421,6 +464,7 @@ export default {
       await this.fetchPlayers();
       await this.fetchTeams();
       await this.getFixtures();
+      await this.fetchRules();
       await this.getLeagueDetails(this.leagueId);
       await this.fetchUserTeam();
       await this.fetchSwaps();
@@ -437,6 +481,11 @@ export default {
       },
       immediate: true,
       deep: true,
+    },
+    activeTab(val) {
+      if (val !== "swaps") {
+        this.swapOutgoingPlayer = null;
+      }
     },
   },
   methods: {
@@ -974,6 +1023,19 @@ export default {
         return;
       }
 
+      // Check same-team-from-one-team limit
+      if (this.maxPlayersFromOneTeam && player.team?.code) {
+        const sameTeamCount = this.pickedPlayersTeamCodes.filter(
+          (code) => code === player.team.code,
+        ).length;
+        if (sameTeamCount >= this.maxPlayersFromOneTeam) {
+          alert(
+            `You already have ${this.maxPlayersFromOneTeam} players from ${player.team.code}. Limit reached.`,
+          );
+          return;
+        }
+      }
+
       // Process selection
       var roleKey = this.roleToAddPlayer + "Player";
       if (this.selectedTeam[roleKey]) {
@@ -1095,7 +1157,7 @@ export default {
         // Build full state
         var allPickedPlayers = {};
         allPickedPlayers[this.userId] = this.selectedTeam;
-        Object.keys(this.otherTeams).forEach(function (key) {
+        Object.keys(this.otherTeams).forEach((key) => {
           allPickedPlayers[key] = this.otherTeams[key];
         });
 
@@ -1153,6 +1215,10 @@ export default {
 
     choseRole(role) {
       this.roleToAddPlayer = role;
+    },
+
+    handleOutgoingPlayerChange(player) {
+      this.swapOutgoingPlayer = player;
     },
 
     playerSelected(player) {
@@ -1275,6 +1341,22 @@ export default {
             .map((m) => m.code);
         }
       } catch (error) {}
+    },
+
+    async fetchRules() {
+      if (!this.nextFixture?.fixture?.fixtureId) return;
+      try {
+        const response = await this.axios.get(
+          `${this.apiURL}FantasyPoints/${this.$store.getters.getCurrentTournamentId}/rules/${this.nextFixture.fixture.fixtureId}`,
+        );
+        const fixtureRules = response.data[0]?.rules || [];
+        const rule = fixtureRules.find(
+          (r) => r.name === "Players from the same team",
+        );
+        this.maxPlayersFromOneTeam = Number(rule?.value) || null;
+      } catch (error) {
+        this.maxPlayersFromOneTeam = null;
+      }
     },
 
     async fetchPlayers() {

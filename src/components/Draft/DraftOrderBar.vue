@@ -16,6 +16,10 @@
             {{ currentPick + 1 }} of {{ totalPicks }}
           </div>
         </div>
+        <div class="info-item" v-if="maxPlayersFromOneTeam">
+          <div class="info-label">Max Per Team</div>
+          <div class="info-value">{{ maxPlayersFromOneTeam }}</div>
+        </div>
         <!-- <div class="info-item">
           <div class="info-label">Time Remaining</div>
           <div class="timer">1:45</div>
@@ -101,6 +105,10 @@ export default {
     isYourTurn: {
       type: Boolean,
       default: false,
+    },
+    maxPlayersFromOneTeam: {
+      type: Number,
+      default: null,
     },
   },
   data() {

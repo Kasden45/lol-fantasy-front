@@ -134,6 +134,7 @@ export function validateTurn(userId, draftQueue, currentPickIndex) {
  * @param {object} params.pickedPlayers - All players picked so far {userId: teamObject}
  * @param {Array} params.draftQueue - Current draft queue
  * @param {number} params.currentPick - Current pick index
+ * @param {number} [params.maxPlayersFromOneTeam] - Optional limit on players from the same team
  * @returns {{updatedPickedPlayers: object, updatedQueue: Array, newCurrentPick: number, isComplete: boolean}}
  */
 export function processPlayerSelection({
@@ -143,6 +144,7 @@ export function processPlayerSelection({
   pickedPlayers,
   draftQueue,
   currentPick,
+  maxPlayersFromOneTeam,
 }) {
   // Initialize user's team if not exists
   if (!pickedPlayers[clientId]) {
@@ -155,6 +157,21 @@ export function processPlayerSelection({
   // Validate role key exists
   if (!pickedPlayers[clientId][roleKey]) {
     return null;
+  }
+
+  // Enforce "players from the same team" limit
+  if (maxPlayersFromOneTeam) {
+    const sameTeamCount = Object.keys(pickedPlayers[clientId])
+      .filter((key) => key.endsWith("Player"))
+      .filter(
+        (key) =>
+          pickedPlayers[clientId][key].player?.team?.code ===
+          player.team?.code,
+      ).length;
+
+    if (sameTeamCount >= maxPlayersFromOneTeam) {
+      return null;
+    }
   }
 
   // Assign player to position
