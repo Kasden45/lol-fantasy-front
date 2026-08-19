@@ -227,20 +227,22 @@ export default {
     matchups() {
       if (!this.nextFixture) return [];
 
-      return this.nextFixture.matches.reduce((acc, match) => {
-        if (!acc[match.team1.code]) acc[match.team1.code] = [];
-        if (!acc[match.team2.code]) acc[match.team2.code] = [];
+      return this.nextFixture.matches
+        .filter((match) => match.team1 && match.team2)
+        .reduce((acc, match) => {
+          if (!acc[match.team1.code]) acc[match.team1.code] = [];
+          if (!acc[match.team2.code]) acc[match.team2.code] = [];
 
-        acc[match.team1.code].push({
-          code: match.team2.code,
-          difficulty: match.team2.difficulty,
-        });
-        acc[match.team2.code].push({
-          code: match.team1.code,
-          difficulty: match.team1.difficulty,
-        });
-        return acc;
-      }, {});
+          acc[match.team1.code].push({
+            code: match.team2.code,
+            difficulty: match.team2.difficulty,
+          });
+          acc[match.team2.code].push({
+            code: match.team1.code,
+            difficulty: match.team1.difficulty,
+          });
+          return acc;
+        }, {});
     },
     // Form stats are historical — overlay persists across prop updates;
     // drafted players remain visible but show as owned via userTeamsPicked.

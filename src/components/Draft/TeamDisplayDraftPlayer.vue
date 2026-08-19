@@ -44,7 +44,7 @@
             </span>
           </template>
           <span
-            v-else
+            v-else-if="matchups"
             class="team-badge"
             :style="{
               backgroundColor: $func_global.difficultyMap(
@@ -112,15 +112,15 @@
             </span>
           </template>
           <span
-            v-else
+            v-else-if="matchups"
             class="team-badge"
             :style="{
               backgroundColor: $func_global.difficultyMap(
-                matchups[position.team?.code].difficulty,
+                matchups[position.team?.code]?.difficulty ?? 0,
               ),
             }"
           >
-            vs {{ matchups[position.team?.code].code }}
+            vs {{ matchups[position.team?.code]?.code }}
           </span>
         </div>
         <span class="role-badge" :class="`role-team`"> TEAM </span>
@@ -226,9 +226,7 @@ export default {
   },
   methods: {
     handlePositionClick(position) {
-
       if (!position.player) {
-
         this.$emit("handle-position-click", position);
       }
     },
