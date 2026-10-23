@@ -40,7 +40,7 @@
         @error="handleImageError"
       />
 
-      <div v-if="isOwnedByUser" class="owned-overlay">OWNED</div>
+      <div v-if="isOwnedByUser" class="owned-overlay">YOURS</div>
 
       <div v-else-if="isOwnedByOther" class="owned-rival-overlay">
         {{ userTeamsPicked[team.esportsTeamId].username }}
