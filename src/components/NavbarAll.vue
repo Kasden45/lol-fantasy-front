@@ -300,6 +300,20 @@
                       :class="{
                         'active-tournament':
                           this.$store.getters.getCurrentTournamentId ===
+                          this.worlds_2026,
+                      }"
+                      class="dropdown-item"
+                      href="#"
+                      @click="switchTournament(this.worlds_2026)"
+                    >
+                      Worlds 2026
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      :class="{
+                        'active-tournament':
+                          this.$store.getters.getCurrentTournamentId ===
                           this.lck_split_3_2026,
                       }"
                       class="dropdown-item"

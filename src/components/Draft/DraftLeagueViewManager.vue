@@ -425,6 +425,12 @@ export default {
                 pickedPlayers[u.player.esportsPlayerId] = userTeam.user;
               if (u.team) pickedPlayers[u.team.esportsTeamId] = userTeam.user;
             });
+          if (userTeam.team.playersPoints) {
+            userTeam.team.playersPoints.forEach((p) => {
+              if (p.player)
+                pickedPlayers[p.player.esportsPlayerId] = userTeam.user;
+            });
+          }
         }
       });
       return pickedPlayers;
@@ -494,7 +500,10 @@ export default {
         const response = await this.axios.get(
           `${this.apiURL}Draft/${this.$store.getters.getCurrentTournamentId}/trades/${this.realLeagueId}`,
         );
-        const singleTrades = response.data.draftTrades.map((t) => ({ ...t, isGroup: false }));
+        const singleTrades = response.data.draftTrades.map((t) => ({
+          ...t,
+          isGroup: false,
+        }));
         const groupTrades = (response.data.tradeGroups || []).map((g) => ({
           ...g,
           lolDraftTradeId: `group-${g.tradeGroupId}`,

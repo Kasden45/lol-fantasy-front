@@ -26,47 +26,33 @@
       </div>
     </div>
     <div v-if="playersForSummonersRiftView != null">
-      <div class="summoners-rift mx-auto">
-        <div
-          class="player-card"
-          v-for="player in playersForSummonersRiftView"
-          :key="player.id"
-          :style="getPlayerPosition(player)"
-        >
-          <img
-            :src="player.imageUrl"
-            :alt="player.summonerName"
-            class="player-image"
-          />
-          <div class="player-info">
-            <div class="player-name">{{ player.summonerName }}</div>
-            <div class="player-role">{{ player.role }}</div>
-            <div class="player-points">{{ player.points.toFixed(2) }}</div>
+      <div class="summoners-rift-scroll">
+        <div class="summoners-rift mx-auto">
+          <div
+            class="tile-anchor"
+            v-for="player in playersForSummonersRiftView"
+            :key="player.id"
+            :style="getPlayerPosition(player)"
+          >
+            <DreamTeamPlayerTile
+              :player="player"
+              :highlighted="player.highlighted"
+            />
           </div>
-        </div>
-        <div
-          class="player-card"
-          :style="getTeamPosition()"
-          v-if="dreamTeam.dreamTeamTeam != null"
-        >
-          <img
-            :src="dreamTeam.dreamTeamTeam.imageUrl"
-            :alt="dreamTeam.dreamTeamTeam.name"
-            class="player-image"
-          />
-          <div class="player-info">
-            <div class="player-name">{{ dreamTeam.dreamTeamTeam.name }}</div>
-            <div class="player-points">
-              {{ dreamTeam.dreamTeamTeam.points.toFixed(2) }}
-            </div>
+          <div
+            class="tile-anchor"
+            :style="getTeamPosition()"
+            v-if="dreamTeam.dreamTeamTeam != null"
+          >
+            <DreamTeamTeamTile :team="dreamTeam.dreamTeamTeam" />
           </div>
-        </div>
-        <div
-          class="player-card"
-          :style="getTotalPosition()"
-          v-if="dreamTeam.totalPoints != null"
-        >
-          Total Points: {{ dreamTeam.totalPoints.toFixed(2) }}
+          <div
+            class="total-points-pill"
+            :style="getTotalPosition()"
+            v-if="dreamTeam.totalPoints != null"
+          >
+            {{ dreamTeam.totalPoints.toFixed(2) }} pts
+          </div>
         </div>
       </div>
     </div>
@@ -74,7 +60,14 @@
 </template>
 
 <script>
+import DreamTeamPlayerTile from "@/components/DreamTeam/DreamTeamPlayerTile.vue";
+import DreamTeamTeamTile from "@/components/DreamTeam/DreamTeamTeamTile.vue";
+
 export default {
+  components: {
+    DreamTeamPlayerTile,
+    DreamTeamTeamTile,
+  },
   data() {
     return {
       selectedTabIndex: 0,
@@ -86,93 +79,53 @@ export default {
   },
   methods: {
     getTotalPosition() {
-      return { top: "25%", left: "75%" };
+      return { top: "8%", left: "88%" };
     },
     getTeamPosition() {
-      return { top: "70%", left: "30%" };
+      return { top: "88%", left: "15%" };
     },
     getPlayerPosition(player) {
-      // Implement logic to calculate the position based on player's role
-      // Adjust the positioning according to your needs
-
-      var backgroundColor = player.captain ? "#fde9a8d0" : "#faf3dd75";
-
       switch (player.role) {
         case "top":
-          return {
-            top: "15%",
-            left: "25%",
-            "background-color": backgroundColor,
-          }; // Adjust the values accordingly
+          return { top: "12%", left: "20%" };
         case "jungle":
-          return {
-            top: "33%",
-            left: "35%",
-            "background-color": backgroundColor,
-          };
+          return { top: "32%", left: "34%" };
         case "mid":
-          return {
-            top: "50%",
-            left: "50%",
-            "background-color": backgroundColor,
-          }; // Adjust the values accordingly
+          return { top: "50%", left: "50%" };
         case "bottom":
-          return {
-            top: "68%",
-            left: "65%",
-            "background-color": backgroundColor,
-          };
+          return { top: "68%", left: "66%" };
         case "support":
-          return {
-            top: "85%",
-            left: "75%",
-            "background-color": backgroundColor,
-          }; // Adjust the values accordingly
-        // Add more cases for other roles
+          return { top: "85%", left: "80%" };
         default:
-          return {
-            top: "50%",
-            left: "50%",
-            "background-color": backgroundColor,
-          }; // Default position
+          return { top: "50%", left: "50%" };
       }
     },
-    teamPlayerToMapPlayer(teamPlayer, isCaptain) {
+    teamPlayerToMapPlayer(teamPlayer) {
       return {
         points: teamPlayer.points,
         id: teamPlayer.esportsPlayerId,
         summonerName: teamPlayer.summonerName,
         role: teamPlayer.role,
         imageUrl: teamPlayer.imageUrl,
-        captain: isCaptain,
+        team: teamPlayer.team,
+        nationality: teamPlayer.nationality,
+        highlighted: false,
       };
     },
     fillMapPlayers() {
-      this.playersForSummonersRiftView = [];
-      this.playersForSummonersRiftView.push(
-        this.teamPlayerToMapPlayer(this.dreamTeam.dreamTeamPlayers.top, false),
+      this.playersForSummonersRiftView = [
+        this.teamPlayerToMapPlayer(this.dreamTeam.dreamTeamPlayers.top),
+        this.teamPlayerToMapPlayer(this.dreamTeam.dreamTeamPlayers.jungle),
+        this.teamPlayerToMapPlayer(this.dreamTeam.dreamTeamPlayers.mid),
+        this.teamPlayerToMapPlayer(this.dreamTeam.dreamTeamPlayers.bottom),
+        this.teamPlayerToMapPlayer(this.dreamTeam.dreamTeamPlayers.support),
+      ];
+      const maxPoints = Math.max(
+        ...this.playersForSummonersRiftView.map((p) => p.points),
       );
-      this.playersForSummonersRiftView.push(
-        this.teamPlayerToMapPlayer(
-          this.dreamTeam.dreamTeamPlayers.jungle,
-          false,
-        ),
-      );
-      this.playersForSummonersRiftView.push(
-        this.teamPlayerToMapPlayer(this.dreamTeam.dreamTeamPlayers.mid, false),
-      );
-      this.playersForSummonersRiftView.push(
-        this.teamPlayerToMapPlayer(
-          this.dreamTeam.dreamTeamPlayers.bottom,
-          false,
-        ),
-      );
-      this.playersForSummonersRiftView.push(
-        this.teamPlayerToMapPlayer(
-          this.dreamTeam.dreamTeamPlayers.support,
-          false,
-        ),
-      );
+      this.playersForSummonersRiftView.forEach((p) => {
+        p.highlighted = p.points === maxPoints;
+      });
     },
     selectTab(index, f) {
       var fixture = f != 0 ? f : null;
@@ -328,28 +281,45 @@ export default {
   color: #fff;
 }
 
+.summoners-rift-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 12px;
+}
+
 .summoners-rift {
   position: relative;
   width: 1200px;
+  min-width: 900px;
   height: 1000px;
-  background-image: url("https://2.bp.blogspot.com/--A1wNZhS868/U7L4xKhbQTI/AAAAAAAAS04/rfzak1JCZFY/s1600/srdb3-1.jpg"); /* Replace with your Summoner's Rift map image */
+  border-radius: 24px;
+  overflow: hidden;
+  background-image: url("https://2.bp.blogspot.com/--A1wNZhS868/U7L4xKhbQTI/AAAAAAAAS04/rfzak1JCZFY/s1600/srdb3-1.jpg");
   background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   image-rendering: -webkit-optimize-contrast;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
-.player-image {
-  width: 100px; /* Adjust the size of the player image */
-  height: 85px;
-  border-radius: 50%;
+.tile-anchor {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 3;
 }
 
-.player-card {
-  display: flex;
-  border: 1px solid #ccc;
-  margin: 10px;
-  padding: 10px;
-  border-radius: 5px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+.total-points-pill {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  background: var(--PRIMARY);
+  color: white;
+  font-weight: 700;
+  font-size: clamp(0.6rem, 1vw, 0.85rem);
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  box-shadow: 0 8px 8px rgba(0, 0, 0, 0.25);
+  white-space: nowrap;
 }
 
 @media (max-width: 1000px) {
@@ -359,63 +329,9 @@ export default {
   }
 
   .summoners-rift {
-    position: relative;
-    width: 90vw;
-    height: 80vw;
-    /* width: 400px;  */
-    /* height: 333px; */
-    background-image: url("https://2.bp.blogspot.com/--A1wNZhS868/U7L4xKhbQTI/AAAAAAAAS04/rfzak1JCZFY/s1600/srdb3-1.jpg"); /* Replace with your Summoner's Rift map image */
-    background-size: cover;
-    image-rendering: -webkit-optimize-contrast;
+    width: 900px;
+    min-width: 900px;
+    height: 750px;
   }
-
-  .player-card {
-    display: flex;
-    border: 1px solid #ccc;
-    margin: 3px;
-    padding: 3px;
-    border-radius: 1px;
-    box-shadow: 0 0 1px rgba(0, 0, 0, 0.2);
-    font-size: x-small;
-    width: min-content;
-  }
-  .player-image {
-    width: 33px; /* Adjust the size of the player image */
-    height: 28px;
-    border-radius: 50%;
-  }
-}
-
-.player-card {
-  /* background-color: #fde9a8d0; */
-  background-color: #faf3dd75;
-  position: absolute;
-  transform: translate(-50%, -50%);
-}
-
-.player-image {
-  width: 100px; /* Adjust the size of the player image */
-  height: 85px;
-  border-radius: 50%;
-}
-
-.player-info {
-  text-align: center;
-}
-
-.player-name {
-  font-weight: bold;
-  color: white;
-}
-
-.player-points {
-  font-weight: bold;
-  color: white;
-}
-
-.player-role {
-  font-style: italic;
-  color: white;
-  text-transform: capitalize;
 }
 </style>
